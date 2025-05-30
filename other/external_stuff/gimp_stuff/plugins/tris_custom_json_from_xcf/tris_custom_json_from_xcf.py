@@ -75,10 +75,9 @@ class AdventureGameNook(Gimp.PlugIn):
         )
 
         procedure.set_attribution("Tris", "---", "2025")
-
         return procedure
-
-
+    
+    
     def procedure_is_complete(self, prcdr):
         #Gimp.PDBStatusType
         #       .EXECUTION_ERROR # == 0
@@ -94,60 +93,7 @@ class AdventureGameNook(Gimp.PlugIn):
         GLib.chdir(GLib.path_get_dirname(__file__))
         GLib.chdir("../..")
         return GLib.get_current_dir()
-    
-    def load_and_parse_gamedata_json(self):
-        terminal_col_start = '\033[45m'
-        terminal_col_end = '\033[0m'
-        terminal_col_end = f"{terminal_col_end}\n"
-
-        print(GLib.path_get_basename(__file__), f"{terminal_col_start}This script name (including '.py' extension){terminal_col_end}")
-        print(__file__, f"{terminal_col_start}full script path (including file extension){terminal_col_end}")
-        print(sys.path[0], f"{terminal_col_start}The folder of this script (without separator in the end){terminal_col_end}")
-        print(GLib.DIR_SEPARATOR_S, f"{terminal_col_start}OS Separator{terminal_col_end}")
-
-        # The JSON:
-        print("Load JSON:")
-        wanted_file = "gamedata.json"
-        complete_path= f"{sys.path[0]}{GLib.DIR_SEPARATOR_S}{wanted_file}"
-        grabbeddata = None
-        with open(complete_path) as json_file:
-            grabbeddata = json.load(json_file)
-        
-        #for key, value in grabbeddata.items():
-        #    print(f"{key}: {value}", end="\n")
-        #print("\ngrabbeddata KEYS:", *grabbeddata.keys(), sep="\n")
-
-        # self.gamedata:
-        # self.gamedata["BOOL"]
-        # self.gamedata["CRUMBLE"]
-        # self.gamedata["NIBBLE"]
-        # self.gamedata["BYTE"]
-        # self.gamedata["onHoverNames"]
-        # self.gamedata["thingKind"]
-        # self.gamedata["thingProps"]
-        #self.gamedata = grabbeddata
-        return grabbeddata
-    
-    def load_splitted_jsons(self):
-        from os import listdir
-        print("Splitted JSON grabbing")
-
-        # wanted dir path, as string
-        folder_path = f"{sys.path[0]}{GLib.DIR_SEPARATOR_S}splitted_gamedata{GLib.DIR_SEPARATOR_S}"
-        
-        # list of filenames, as string
-        dir_content = listdir(folder_path)
-        print(*dir_content, sep="\n")
-
-        
-        # bools = None
-        # wanted_file = "bool_names.json"
-        # with open(f"{folder_path}{wanted_file}") as json_file:
-        #     bools = json.load(json_file)
-
-        # print(f"{bools =}")
-        return self
-    
+       
     def run(self, procedure, run_mode, image, drawables, config, run_data):
         print("** Starting -from scratch!- Json procedure **")
         # just for debug: not required for the plugin purpose
@@ -165,14 +111,11 @@ class AdventureGameNook(Gimp.PlugIn):
         
         print("*** Generate Game Json Plugin ***")
         
-        #from trispackage.logic.Stocker import var_ary, hover_names_ary
-
         from trispackage import TrisDialog
         from trispackage.gamedata import GamedataGatherer
 
         print("Plugin is creating the TrisDialog()")
         dialog_holder = TrisDialog(image)
-        #dialog_holder.dialog.show_all()
         dialog_holder.dialog.run()
 
         
@@ -187,20 +130,6 @@ class AdventureGameNook(Gimp.PlugIn):
             "hoverName": 8
         }
         '''
-        #imports
-        #from trismodule import WidgetTree, TrisLabel, TrisDialog, TrisEnum, Necessary
-        #print("TrisDialog MRO:", TrisDialog.__mro__)
-
-        # get the gamedata.JSON
-        #gamedata = self.load_and_parse_gamedata_json()
-
-        # Initialize the shared stuff, managed by 'Necessary' class
-        #Necessary.setup(image=image, gamedata=gamedata)
-        
-        #test Plugin Dialog
-        #dialog = TrisDialog().run()
-        #dialog.run()
-
         
         # We have reached the end of the procedure: let's return "Success"
         return self.procedure_is_complete(procedure)  #procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
