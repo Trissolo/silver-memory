@@ -1,0 +1,64 @@
+{
+    "thingKind": [{
+            "comment": "BACKGROUND",
+            "val": -5,
+            "key": "bg"
+        },
+        {
+            "comment": "RIDICULOUSLY FARAWAY",
+            "val": 0,
+            "key": "rf"
+        },
+        {
+            "comment": "TRIGGER AREA",
+            "val": 1,
+            "key": "ta"
+        },
+        {
+            "comment": "COVERED",
+            "other": "or CONCEALED",
+            "val": 2,
+            "key": "co"
+        },
+        {
+            "comment": "ALWAYS BACK",
+            "val": 3,
+            "key": "ab"
+        },
+        {
+            "comment": "DEPTH SORTED",
+            "other": "setOrigin(0.5, 1)",
+            "val": 4,
+            "key": "ds"
+        },
+        {
+            "comment": "FOREGROUND",
+            "other": "(800px is the maximum height a room background will have)",
+            "val": 800,
+            "key": "fg"
+        }
+    ],
+
+    "thingProps": ["kind", "hoverName", "suffix", "skipCond", "animation", "noInteraction"],
+
+    "thingProps_dataSize": {
+        "kind": 1,
+        "hoverName": 1,
+        "suffix": 2,
+        "skipCond": 3,
+        "animation": 1,
+        "noInteraction": 1
+        },
+
+    "thingOldProps": ["hoverName", "suffix", "skipCondition", "animation", "noInteraction"],
+
+    "randomExample":{
+        "kind": "ab",
+        "frame": "r2cabinetDoors",
+        "suffix": [0, 7],
+        "skipCond": [0, 351, 1],
+        "hoverName": 8,
+        "x": 90,
+        "y": 68
+    }
+}

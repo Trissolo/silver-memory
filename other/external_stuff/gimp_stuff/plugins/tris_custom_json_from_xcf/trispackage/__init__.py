@@ -1,0 +1,1 @@
+from .dialog.Dialog import TrisDialog

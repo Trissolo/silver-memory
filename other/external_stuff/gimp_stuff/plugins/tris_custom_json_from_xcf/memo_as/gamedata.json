@@ -1,0 +1,92 @@
+{
+
+    "BOOL": [
+      "unused",
+      "r1#doorIsOpen",
+      "r1#wrenchTaken",
+      "r1#crateIsOpen",
+      "r1#cabinetIsOpen",
+      "r1#redCardTaken",
+      "r1#buttonIsPressed"
+    ],
+
+    "CRUMBLE": [
+      "unused",
+      "no crumble"
+    ],
+    "NIBBLE": [
+      "unused",
+      "lighta",
+      "lightb"
+    ],
+    "BYTE": [
+      "unused",
+      "digita",
+      "digitb",
+      "digitc"
+    ],
+
+    "onHoverNames": [
+      "?",
+      "Pulsante",
+      "Affare metallico",
+      "Coperchio",
+      "Cassa",
+      "Crepa",
+      "Mensole",
+      "Porta",
+      "Striscia",
+      "Sportelli",
+      "Tubo",
+      "Vasca",
+      "Chiave inglese",
+      "Pass Card",
+      "Vai Ovest",
+      "Vai corridoio",
+      "Vai altra stanza",
+      "Torna Est",
+      "Armadietto",
+      "Piattaforma",
+      "Top window",
+      "Bottom window"
+    ],
+
+    "thingKind": [{
+            "comment": "BACKGROUND",
+            "val": -5,
+            "key": "bg"
+        },
+        {
+            "comment": "RIDICULOUSLY FARAWAY",
+            "val": 0,
+            "key": "rf"
+        },
+        {
+            "comment": "TRIGGER AREA",
+            "val": 1,
+            "key": "ta"
+        },
+        {
+            "comment": "COVERED or CONCEALED",
+            "val": 2,
+            "key": "co"
+        },
+        {
+            "comment": "ALWAYS BACK",
+            "val": 3,
+            "key": "ab"
+        },
+        {
+            "comment": "DEPTH SORTED",
+            "val": 4,
+            "key": "ds"
+        },
+        {
+            "comment": "FOREGROUND (800px is the maximum height a room background will have)",
+            "val": 800,
+            "key": "fg"
+        }
+    ],
+    "thingProps": ["hoverName", "suffix", "skipCondition", "animation", "noInteraction"]
+  }
+  
