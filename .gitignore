@@ -13,3 +13,7 @@ node_modules/
 # Build
 dist/
 /npm-debug.log
+
+# Python cache
+*.pyc
+**/__pycache__/
