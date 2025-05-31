@@ -77,7 +77,7 @@ class AdventureGameNook(Gimp.PlugIn):
         procedure.set_attribution("Tris", "---", "2025")
         return procedure
     
-    
+
     def procedure_is_complete(self, prcdr):
         #Gimp.PDBStatusType
         #       .EXECUTION_ERROR # == 0
@@ -112,7 +112,7 @@ class AdventureGameNook(Gimp.PlugIn):
         print("*** Generate Game Json Plugin ***")
         
         from trispackage import TrisDialog
-        from trispackage.gamedata import GamedataGatherer
+        #from trispackage.gamedata import GamedataGatherer
 
         print("Plugin is creating the TrisDialog()")
         dialog_holder = TrisDialog(image)

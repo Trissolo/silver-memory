@@ -9,34 +9,20 @@ from gi.repository import GimpUi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from .LayerManager import LayerManager
+from ..toolwidgets.KindsWidget import KindsWidget
+from ..mixins.LayerManager import LayerManager
 
 class TrisDialog(LayerManager):
     def __init__(self, image):
-        super().__init__(image=image)
+        
+        LayerManager.provide_image(image)
         self.gui_widget = []
         self.div = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
         self.dialog = self.build_dialog(self.div)
         #self.main_bar = MainBar()
 
-        self.dialog.get_content_area().pack_start(Gtk.Label.new("Orcus"), True, True, 2)
-        #self.div.pack_start(self.main_bar.div, False, False, 0)
-
-        #self.main_bar.refresh_button_action(self.update_layer)
-        #self.main_bar.refresh_button_action(self.refresh_all)
-
-        # Test layer stuff...
-
-        #print(f"TrisDialog's {self.layer.get_name() =}")
-        #print("KEYS:", *thingProps_dataSize.keys())
-        #newsumm = TrisSummary('kind', ["abc", "def", "ghi"])
-        #self.div.pack_start(newsumm.div, False, False, 0)
-
-
-        # for jproperty in thingProps_dataSize.keys():
-        #     prop_widget = TrisSummary(jproperty, names["hover_names_ary"])
-        #     self.gui_widget.append(prop_widget)
-        #     self.div.pack_start(prop_widget.div, False, False, 0)
+        test_kinds_widget = KindsWidget("Orcus")
+        self.dialog.get_content_area().pack_start(test_kinds_widget.div, True, True, 2)
         
     def refresh_all(self, button):
         self.update_layer()

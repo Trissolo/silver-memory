@@ -3,7 +3,7 @@ class LayerManager():
     layer = None
 
     @classmethod
-    def setup(cls, image):
+    def provide_image(cls, image):
          cls.image = image
          cls.layer = None
          cls.update()
@@ -13,9 +13,6 @@ class LayerManager():
         cls.layer = cls.image.get_selected_layers()[0]
 
     # instance things:
-    def __init__(self, image):
-        if image is not None:
-            self.set_image_globally(image)
 
     @property
     def layer(self):
@@ -23,9 +20,3 @@ class LayerManager():
     
     def update_layer(self):
         LayerManager.update()
-        
-    #def __call__(self):
-    #    return type(self).layer
-    
-    def set_image_globally(self, image):
-        LayerManager.setup(image)
