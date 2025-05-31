@@ -21,7 +21,8 @@ class TrisDialog(LayerManager):
         self.dialog = self.build_dialog(self.div)
         #self.main_bar = MainBar()
 
-        test_kinds_widget = KindsWidget("Orcus")
+        test_kinds_widget = KindsWidget("kind")
+        test_kinds_widget.info()
         self.dialog.get_content_area().pack_start(test_kinds_widget.div, True, True, 2)
         
     def refresh_all(self, button):

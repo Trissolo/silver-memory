@@ -15,15 +15,15 @@ from ..misc.MarkupLabel import MarkupLabel
 class BaseWidget(LayerManager):       
     def make_left_gui(self, prop):
         self.div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
-        div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
-        div.show()
-        self.right_div = div
-        self.div.pack_end(div, True, True, 0)
+        # create the right div and add it to the main div
+        self.right_div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
+        self.div.pack_end(self.right_div, True, True, 0)
 
+        # create the LEFT div, show it and add it to the main div
         div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
         self.left_div = div
-        div.show()
         self.div.pack_start(div, False, False, 0)
+        div.show()
 
         for num in range(97, 99):
             label = MarkupLabel(prop if num == 97 else "----")
