@@ -12,18 +12,9 @@ from gi.repository import Gtk
 from .LayerManager import LayerManager
 from ..misc.MarkupLabel import MarkupLabel
 
-class BaseWidget(LayerManager):
-    def __init__(self):
-        #super().__init__()
-        self.div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
-        self.left_div = None
-        self.label_a = None
-        self.label_b = None
-        self.button_a = None
-        self.button_b = None
-        self.button_c = None
-        
+class BaseWidget(LayerManager):       
     def make_left_gui(self, prop):
+        self.div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
         div.show()
         self.right_div = div
