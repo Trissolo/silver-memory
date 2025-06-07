@@ -22,20 +22,19 @@ class BaseWidget(LayerManager):
         # create the LEFT div, show it and add it to the main div
         div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
         self.left_div = div
+        self.left_div.set_valign(1)
         self.div.pack_start(div, False, False, 0)
         div.show()
 
         for num in range(97, 99):
-            label = MarkupLabel(prop if num == 97 else "----")
-            #label.set_default_text()
+            label = MarkupLabel(f"{prop}:" if num == 97 else "----")
             div.pack_start(label, False, False, 2)
             setattr(self, f"label_{chr(num)}", label)
 
-        for num, name in enumerate([GimpUi.ICON_MENU_RIGHT, GimpUi.ICON_DIALOG_ERROR, GimpUi.ICON_GO_PREVIOUS], start=97):
+        for num, name in enumerate([GimpUi.ICON_GO_NEXT, GimpUi.ICON_DIALOG_ERROR, GimpUi.ICON_ATTACH], start=97):
             button = GimpUi.Button.new_from_icon_name(name, 1)
-            button.show()
+            #button.show()
             div.pack_end(button, False, False, 2)
             setattr(self, f"button_{chr(num)}", button)
-        #self.left_div = div
         self.div.show()
         

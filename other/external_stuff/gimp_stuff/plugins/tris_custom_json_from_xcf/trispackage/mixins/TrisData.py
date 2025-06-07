@@ -1,10 +1,12 @@
-from ..gamedata.GamedataGatherer import GamedataGatherer
+import gi
+
+gi.require_version("Gimp", "3.0")
+from gi.repository import Gimp
 
 class TrisData():
-    dict_datasize = GamedataGatherer.props_datasize
-    def add_data(self, property):
-        self.length = type(self).dict_datasize[property]
-        self.final = [None] * self.length
+    def add_data(self, length):
+        self.length = length
+        self.final = [None] * length
         self.proposed = self.final.copy()
     
     def proposal_accepted(self):
@@ -12,10 +14,6 @@ class TrisData():
         
     def proposal_rejected(self):
         type(self).set_from_array(self.final, self.proposed)
-    
-    def clear_proposed(self):
-        for idx in range(self.length):
-            self.proposed[idx] = None
     
     def reset_final(self):
         return self._reset_ary(self.final)
@@ -31,6 +29,17 @@ class TrisData():
     def info(self):
         print(f"{self.final=}")
         print(f"{self.proposed=}")
+    
+    def get_prop_parasite(self):
+        return self.layer.get_parasite(self.property)
+    
+    def remove_prop_parasite(self):
+        if self.property in self.layer.get_parasite_list(): #old_parasite:
+            self.layer.detach_parasite(self.property)
+    
+    def attach_prop_parasite(self):
+        self.remove_prop_parasite()
+        self.layer.attach_parasite(Gimp.Parasite.new(self.property, 1, TrisData.ary_to_bytes(self.final)))
       
     @staticmethod
     def set_from_array(source, target):
