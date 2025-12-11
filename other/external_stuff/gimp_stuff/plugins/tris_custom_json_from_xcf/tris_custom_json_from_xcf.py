@@ -127,7 +127,9 @@ class AdventureGameNook(Gimp.PlugIn):
             "frame": "r2cabinetDoors",
             "suffix": [0, 7],
             "skipCond": "b_4_1",
-            "hoverName": 8
+            "hoverName": 8,
+            "animation": "blink",
+            "no_interaction": True
         }
         '''
         
