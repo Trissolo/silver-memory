@@ -41,7 +41,7 @@ from gi.repository import GObject
 
 
 # other custom imports
-import json
+#import json
 #import os
 
 
@@ -49,7 +49,7 @@ import json
 class AdventureGameNook(Gimp.PlugIn):
     # procedure(s) name in Procedure Browser. Note that this string value CANNOT have underscores, only hyphens/dashes
     def do_query_procedures(self):
-        return ["tris-custom-json-from-xcf"]
+        return ["tris-game-properties-json-editor"]
 
 
     def do_set_i18n(self, name):
@@ -64,7 +64,7 @@ class AdventureGameNook(Gimp.PlugIn):
 
         procedure.set_image_types("*")
 
-        procedure.set_menu_label("[Tris] ✍️💠 New Room Editor and JSON generator")
+        procedure.set_menu_label("[Tris] 🕹️ Tris Game Properties JSON generator")
 
         procedure.add_menu_path("<Image>/Filters/[[Tris]]/")
 
@@ -74,7 +74,7 @@ class AdventureGameNook(Gimp.PlugIn):
             name,
         )
 
-        procedure.set_attribution("Tris", "---", "2025")
+        procedure.set_attribution("Tris", "---", "2026")
         return procedure
     
 
@@ -111,14 +111,13 @@ class AdventureGameNook(Gimp.PlugIn):
         
         print("*** Generate Game Json Plugin ***")
         
-        from trispackage import TrisDialog
-        #from trispackage.gamedata import GamedataGatherer
+        from banalpackage import MainDialog
+        dialog = MainDialog()
+        dialog.run()
+        dialog.destroy()
 
-        print("Plugin is creating the TrisDialog()")
+        print("DESTROYED")
         print(GLib.path_get_dirname(__file__))
-        dialog_holder = TrisDialog(image)
-        dialog_holder.dialog.run()
-
         
         '''
         {

@@ -12,7 +12,7 @@ from gi.repository import Gtk
 #from ..toolwidgets.KindsWidget import KindsWidget
 from ..mixins.LayerManager import LayerManager
 from ..gamedata.GamedataGatherer import GamedataGatherer
-from ..mixins.LeftTreeView import LeftTreeViev
+from ..mixins.RightTreeView import LeftTreeViev
 
 class TrisDialog(LayerManager, LeftTreeViev):
     def __init__(self, image):
