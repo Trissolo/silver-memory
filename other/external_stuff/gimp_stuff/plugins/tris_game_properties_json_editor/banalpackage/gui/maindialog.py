@@ -20,8 +20,9 @@ class Altr():
         self.param = param
 '''
 from .singlechooser import SingleChooser
+from ..modules.datagrabber import DataGrabber
 
-class MainDialog(GimpUi.Dialog):
+class MainDialog(GimpUi.Dialog, DataGrabber):
     def __new__(cls):
         print("Creating MainDialog")
         gag = super(MainDialog, cls).__new__(cls)
@@ -30,6 +31,7 @@ class MainDialog(GimpUi.Dialog):
         super().__init__(*args)
         self.add_button("_Done (Close)", Gtk.ResponseType.CANCEL)
         self.connect("destroy", self._on_destroy)
+        self.set_data_path()
         self.get_content_area().pack_start(SingleChooser(["Uno", "Due", "Tre", "Quattro", "Cinque", "Sei"]), True, True, 2)
         # Test:
         check = self.get_content_area()

@@ -1,0 +1,9 @@
+[
+  "unused",
+  "r1#doorIsOpen",
+  "r1#wrenchTaken",
+  "r1#crateIsOpen",
+  "r1#cabinetIsOpen",
+  "r1#redCardTaken",
+  "r1#buttonIsPressed"
+]
