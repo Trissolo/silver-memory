@@ -19,8 +19,10 @@ class Altr():
         print(f"Setting param for Altr Class: {param}")
         self.param = param
 '''
-from .singlechooser import SingleChooser
 from ..modules.datagrabber import DataGrabber
+from .singlechooser import SingleChooser
+from .versatilebox import VersatileBox
+from .multichooser import MultiChooser
 
 class MainDialog(GimpUi.Dialog, DataGrabber):
     def __new__(cls):
@@ -31,8 +33,16 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         super().__init__(*args)
         self.add_button("_Done (Close)", Gtk.ResponseType.CANCEL)
         self.connect("destroy", self._on_destroy)
-        self.set_data_path()
-        self.get_content_area().pack_start(SingleChooser(["Uno", "Due", "Tre", "Quattro", "Cinque", "Sei"]), True, True, 2)
+        self.initialize_internal_stuff()
+
+        #TESTING Multi:
+        m = MultiChooser(self.raw_vars, self.ntr_vars_kinds)
+        #self.connect("destroy", self._on_destroy, m)
+        self.get_content_area().pack_start(m, True, True, 2)
+        #Building GUI:
+        self.get_content_area().pack_start(VersatileBox().make_kind_selector(self.ntr_depth), False, False, 2)
+        #self.get_content_area().pack_start(SingleChooser(["Uno", "Due", "Tre", "Quattro", "Cinque", "Sei"]), True, True, 2)
+        self.get_content_area().pack_start(SingleChooser(self.raw_hovernames), True, True, 2)
         # Test:
         check = self.get_content_area()
         #Gtk.Orientation.HORIZONTAL: 0
@@ -42,5 +52,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         print(f"get_vexpand: {check.get_vexpand()}\nget_hexpand: {check.get_hexpand()}")
         #self.conf_a("qghjqwgqhgwqjhwgqhwgqwhjqgwhqjwgqhjgwqhwgqjwgqhj")
     def _on_destroy(self, widget):
+        #print("SELE:", m.get_kind_from_child())
         #a.conf_a("Fare the well!")
         print(f"ON DESTROY CALLED! TEST:{self is widget}\n:)" )
