@@ -3,8 +3,8 @@ import gi
 # gi.require_version("Gimp", "3.0")
 # from gi.repository import Gimp
 
-# gi.require_version("GimpUi", "3.0")
-# from gi.repository import GimpUi
+gi.require_version("GimpUi", "3.0")
+from gi.repository import GimpUi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
@@ -26,4 +26,14 @@ class VersatileBox(Gtk.Box):
             self.pack_start(button, True, True, 2)
         self.show_all()
         #[print(elem.val) for elem in self.get_children()]
+        return self
+    def make_main_bar(self):
+        refresh_button = GimpUi.Button.new_from_icon_name(GimpUi.ICON_VIEW_REFRESH, 1)
+        #refresh_button.show()
+        self.pack_start(refresh_button, False, False, 2)
+        l = Gtk.Label.new(f"Layer name here")
+        self.pack_start(l, True, True, 2)
+        button_generate_json = GimpUi.Button.new_from_icon_name(GimpUi.ICON_DOCUMENT_SAVE, 1)
+        self.pack_end(button_generate_json, False, False, 2)
+        self.show_all()
         return self

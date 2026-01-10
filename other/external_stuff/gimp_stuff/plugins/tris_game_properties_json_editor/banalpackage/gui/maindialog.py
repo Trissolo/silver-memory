@@ -31,13 +31,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         return gag
     def __init__(self, *args):
         super().__init__(*args)
+        self.set_title("Tris JSON generator")
         self.add_button("_Done (Close)", Gtk.ResponseType.CANCEL)
         self.connect("destroy", self._on_destroy)
         self.initialize_internal_stuff()
-
+        #MAINBAR:
+        self.get_content_area().pack_start(VersatileBox().make_main_bar(), True, True, 0)
         #TESTING Multi:
         m = MultiChooser(self.raw_vars, self.ntr_vars_kinds)
-        #self.connect("destroy", self._on_destroy, m)
         self.get_content_area().pack_start(m, True, True, 2)
         #Building GUI:
         self.get_content_area().pack_start(VersatileBox().make_kind_selector(self.ntr_depth), False, False, 2)
@@ -50,8 +51,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #check.set_valign(Gtk.Align.FILL)
         print(f"ORIENTATION: {check.get_orientation()}\n get_spacing: {check.get_spacing()}")
         print(f"get_vexpand: {check.get_vexpand()}\nget_hexpand: {check.get_hexpand()}")
-        #self.conf_a("qghjqwgqhgwqjhwgqhwgqwhjqgwhqjwgqhjgwqhwgqjwgqhj")
     def _on_destroy(self, widget):
-        #print("SELE:", m.get_kind_from_child())
         #a.conf_a("Fare the well!")
         print(f"ON DESTROY CALLED! TEST:{self is widget}\n:)" )
