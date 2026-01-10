@@ -76,9 +76,14 @@ class MultiChooser(Gtk.Box):
                 spinbutton.set_value(0)
                 spinbutton.set_range(0, self.get_actual_visible().maximum)
     def on_confirm_clicked(self, button):
-         retrieved_spinbutton = button.get_parent().get_children()[0]
-         value = retrieved_spinbutton.get_value_as_int()
-         print(f"Confirming: {value}")
-         # test hiding entire widget:
-         if value == 100:
-              button.get_parent().get_parent().hide()
+        retrieved_spinbutton = button.get_parent().get_children()[0]
+        value = retrieved_spinbutton.get_value_as_int()
+        print(f"Confirming: {value}")
+        # test hiding entire widget:
+        if value == 100: 
+            button.get_parent().get_parent().hide()
+            wid = button
+            while not wid.get_name() == "az":
+                wid = wid.get_parent()
+            wid.greet()
+            

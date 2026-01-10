@@ -32,6 +32,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def __init__(self, *args):
         super().__init__(*args)
         self.set_title("Tris JSON generator")
+        self.set_name("az")
         self.add_button("_Done (Close)", Gtk.ResponseType.CANCEL)
         self.connect("destroy", self._on_destroy)
         self.initialize_internal_stuff()
@@ -54,3 +55,5 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def _on_destroy(self, widget):
         #a.conf_a("Fare the well!")
         print(f"ON DESTROY CALLED! TEST:{self is widget}\n:)" )
+    def greet(self):
+        print(f"Hi from {self.get_name()} 😎!")
