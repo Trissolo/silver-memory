@@ -17,6 +17,7 @@ class MultiChooser(Gtk.Box):
     def __init__(self, source_ary, names):
         super().__init__(homogeneous=False, spacing=2)
         self.set_orientation(1)
+        self.source = source_ary
         #self.lettererichieste = ""
         stack = Gtk.Stack.new()
         stack.set_transition_type(Gtk.StackTransitionType.NONE)
@@ -80,10 +81,12 @@ class MultiChooser(Gtk.Box):
         value = retrieved_spinbutton.get_value_as_int()
         print(f"Confirming: {value}")
         # test hiding entire widget:
-        if value == 100: 
+        if value == 99: 
             button.get_parent().get_parent().hide()
+            fr = button.get_name()
             wid = button
             while not wid.get_name() == "az":
                 wid = wid.get_parent()
+            print(f"From: {fr}")
             wid.greet()
             
