@@ -11,7 +11,7 @@ from gi.repository import Gtk
 
 class SingleChooser(Gtk.Box):
     def __new__(cls, b):
-        print(f"Creating instance {super(SingleChooser, cls)}")
+        #print(f"Creating instance {super(SingleChooser, cls)}")
         gag = super(SingleChooser, cls).__new__(cls)
         return gag
     def __init__(self, myp):

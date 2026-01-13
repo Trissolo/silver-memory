@@ -72,7 +72,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         stack = self.get_stack()
         
         for prop, size in var_size.items():
-            print(f"PROP: {prop} --> Val: {size}")
+            #print(f"PROP: {prop} --> Val: {size}")
             core_stuff.append({'prop': prop, 'size': size})
         
         #kind:
@@ -89,40 +89,34 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         core_stuff[2]['wid'] = vars_wid
         core_stuff[3]['wid'] = vars_wid
         stack.add_named(vars_wid, "vars")
-
-
-
-
-        #print("PARENT:", stack.get_parent())
         stack.get_parent().show_all()
         stack.set_visible_child(core_stuff[0]['wid'])
         
 
     def _on_destroy(self, widget):
-        #a.conf_a("Fare the well!")
-        print(f"ON DESTROY CALLED! TEST:{self is widget}\n:)" )
+        print(f"ON DESTROY CALLED!\n:)" )
+        self.remove_image_references()
         for elem in self.core_stuff:
             elem.clear()
         self.core_stuff.clear()
         self.current_sel = None
+        #self.remove_image_references()
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
     def get_stack(self):
-        print("getting_ctack", self.get_content_area().get_children()[1].get_children())
         return self.get_content_area().get_children()[1].get_children()[1]
     def on_active_row(self, treemodel, row_idx, colu):
-        print(f"TreeView: {treemodel}\nRow[{row_idx}]\nColumn: {colu.get_name()}")
         treemodel.get_selection().unselect_all()
         store = treemodel.get_model()
         #store[row_idx][1] = letters[randint(0, 25)]*4
         #store[row_idx][2] = letters[randint(0, 25)]*4
-        #for i, elem in enumerate(treemodel.get_columns()):
-        amount = treemodel.get_n_columns()
+        first_cell_color = treemodel.get_n_columns()
+        other_cells_color = first_cell_color + 1
         for i in range(store.iter_n_children(None)):
-            store[i][amount] = "#777"
-        store[row_idx][amount] = "#ff0"
-        print(row_idx, type(self.core_stuff), row_idx.get_indices()[0] )
-        #cu = self.core_stuff[row_idx.get_indices()[0]]
+            store[i][first_cell_color] = "#777"
+            store[i][other_cells_color] = "666"
+        store[row_idx][first_cell_color] = "#770"
+        store[row_idx][other_cells_color] = "#270"
         self.current_sel = self.core_stuff[row_idx.get_indices()[0]]
         self.get_stack().set_visible_child(self.current_sel['wid'])
 
@@ -138,7 +132,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
 
         tw = Gtk.TreeView.new()
         tw.set_model(store) #(model=store)
-        print(tw)
+        #print(tw)
 
         cell = Gtk.CellRendererText.new()
 
@@ -165,3 +159,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         tw.get_selection().unselect_all()
         tw.set_activate_on_single_click(True)
         tw.connect('row-activated', self.on_active_row)
+    def provide_image(self, image):
+        self.image = image
+        self.layer = None
+        self.update_layer()
+    def update_layer(self):
+        self.layer = self.image.get_selected_layers()[0]
+        print(f"Layer: {self.layer.get_name()}")
+    def remove_image_references(self):
+        self.image = None
+        self.layer = None
+        print("No more reference to .xcf file")

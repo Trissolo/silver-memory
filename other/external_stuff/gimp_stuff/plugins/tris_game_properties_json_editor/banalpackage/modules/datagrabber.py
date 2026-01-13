@@ -12,7 +12,7 @@ class DataGrabber():
             with open(f"{basedir}{directory_separator}{filename}.json".lower()) as json_file:
                 res.append(json.load(json_file))
         # PSEUDO INTERNAL CONSTS
-        print(*res, sep="AZAZAZAZAZ\n")
+        #print(*res, sep="AZAZAZAZAZ\n")
         return res
         #original code before the "return" above:
         #self.raw_hovernames = res.pop()

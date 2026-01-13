@@ -113,6 +113,7 @@ class AdventureGameNook(Gimp.PlugIn):
         
         from banalpackage import MainDialog
         dialog = MainDialog()
+        dialog.provide_image(image)
         dialog.run()
         dialog.destroy()
 

@@ -22,12 +22,12 @@ class MultiChooser(Gtk.Box):
         stack = Gtk.Stack.new()
         stack.set_transition_type(Gtk.StackTransitionType.NONE)
         for idx, ary in enumerate(source_ary):
-            print(f"MULTI: [{idx}]:\n{ary}\n")
+            #print(f"MULTI: [{idx}]:\n{ary}\n")
             c = SingleChooser(ary)
             c.idx = idx
             name = names[idx]
             c.set_name(name)
-            print(c.get_name())
+            #print(c.get_name())
             bits_amount = 1<<idx
             c.maximum = (1<<bits_amount)-1
             stack.add_titled(c, name, f"{name} (0-{(1<<bits_amount)-1})")
@@ -40,7 +40,7 @@ class MultiChooser(Gtk.Box):
 
         self.pack_start(stack_switcher, False, False, 0)
         self.pack_start(stack, True, True, 0)
-        print(f"MultiChooser childrens: {self.get_children()[1].get_visible_child().idx}")
+        #print(f"MultiChooser childrens: {self.get_children()[1].get_visible_child().idx}")
         self.show_all()
 
         spinbutton = Gtk.SpinButton.new(Gtk.Adjustment.new(0, 0, 1, 1, 0, 0), 1, 0)
