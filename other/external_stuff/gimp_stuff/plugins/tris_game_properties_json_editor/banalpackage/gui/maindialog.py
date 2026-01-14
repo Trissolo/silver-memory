@@ -45,13 +45,41 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         imp_box.pack_end(Gtk.Stack.new(), True, True, 2)
         self.aiut()
         self.build_main_dictionary()
-        #TESTING Multi:
-        #m = MultiChooser(self.raw_vars, self.ntr_vars_kinds)
-        #self.get_content_area().pack_start(m, True, True, 2)
-        #Building GUI:
-        #self.get_content_area().pack_start(VersatileBox().make_kind_selector(self.ntr_depth), False, False, 2)
-        #self.get_content_area().pack_start(SingleChooser(["Uno", "Due", "Tre", "Quattro", "Cinque", "Sei"]), True, True, 2)
-        #self.get_content_area().pack_start(SingleChooser(self.raw_hovernames), True, True, 2)
+        self.bind_widgets()
+
+        temp_as = self.get_content_area().get_children()[0]
+        
+        #for w in temp_as:
+        #    print(w.get_name())
+
+        #Kinds
+        temp_as = self.core_stuff[0]['wid']
+        for button in temp_as.get_children(): #.get_children()[0].get_children():
+            #print(button.get_name())
+            button.connect('clicked', self.paras_kind)
+        
+        #Name on mouse hover
+        temp_as = self.core_stuff[1]['wid']
+        #print("🐢NAME🌍", temp_as.get_children()[1].get_child().get_child().get_name())
+        temp_as.get_children()[1].get_child().get_child().connect('row-activated', self.paras_overname)
+        #print("🌍", temp_as.get_name(), *temp_as.get_children()[0].get_children(), sep="\n")
+
+        #VARS!
+        temp_as = self.core_stuff[2]['wid']
+        vars_wid = temp_as.get_children()[1].get_children()
+        for idx, single in enumerate(vars_wid):
+            list = single.get_children()[1].get_child().get_child()
+            #list.idx = idx
+            list.connect('row-activated', self.paras_vars)
+            #print("🐢VARS🌍", )#[1].get_child().get_child().get_name())
+        #print("First_LEV:", *temp_as, len(temp_as))
+        #print("Widgets in MainBar:", *self.get_content_area().get_children()[0].get_children(), sep="\n")
+        '''
+        print("Follia:")
+        from banalpackage.modules.follia import WidgetTree
+        q = self
+        print(WidgetTree(q).generate())
+        '''
         # Test:
         #check = self.get_content_area()
         #Gtk.Orientation.HORIZONTAL: 0
@@ -89,8 +117,13 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         core_stuff[2]['wid'] = vars_wid
         core_stuff[3]['wid'] = vars_wid
         stack.add_named(vars_wid, "vars")
+
+        # Fake widget
+        fakew = Gtk.Label.new("Select the prop on the left")
+        stack.add_named(fakew, "fake")
         stack.get_parent().show_all()
-        stack.set_visible_child(core_stuff[0]['wid'])
+        #stack.set_visible_child(core_stuff[0]['wid'])
+        stack.set_visible_child(fakew)
         
 
     def _on_destroy(self, widget):
@@ -103,6 +136,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #self.remove_image_references()
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
+    def bind_widgets(self):
+        self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
+    def get_mainbar_box(self):
+        return self.get_content_area().get_children()[0]
     def get_stack(self):
         return self.get_content_area().get_children()[1].get_children()[1]
     def on_active_row(self, treemodel, row_idx, colu):
@@ -114,7 +151,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         other_cells_color = first_cell_color + 1
         for i in range(store.iter_n_children(None)):
             store[i][first_cell_color] = "#777"
-            store[i][other_cells_color] = "666"
+            store[i][other_cells_color] = "#666"
         store[row_idx][first_cell_color] = "#770"
         store[row_idx][other_cells_color] = "#270"
         self.current_sel = self.core_stuff[row_idx.get_indices()[0]]
@@ -159,6 +196,21 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         tw.get_selection().unselect_all()
         tw.set_activate_on_single_click(True)
         tw.connect('row-activated', self.on_active_row)
+    def unpack_current_sel(self):
+        return self.current_sel["prop"], self.current_sel["size"], self.current_sel["wid"]
+    def clicked_update_layer(self, button):
+        self.update_layer()
+        self.get_mainbar_box().get_children()[1].set_text(self.layer.get_name())
+    def paras_kind(self, button):
+        prop, size, wid = self.unpack_current_sel()
+        print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
+        #prop, size, wid = self.unpack_current_sel()
+        #print(prop, size, wid)
+    def paras_overname(self, listbox, row):
+        print(f"Hovernames [{row.idx}]")#listbox, row)
+    def paras_vars(self, listbox, row):
+        prop, size, wid = self.unpack_current_sel()
+        print(f"Vars: [{wid.get_kind_from_child()}, {row.idx}]\nReq. length: {size}")
     def provide_image(self, image):
         self.image = image
         self.layer = None
