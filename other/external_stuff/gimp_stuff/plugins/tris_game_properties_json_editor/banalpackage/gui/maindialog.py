@@ -39,15 +39,22 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.current_sel = None
         #MAINBAR:
         self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
+        #Preview:
+        self.get_content_area().pack_start(VersatileBox().make_preview_bar(), True, False, 2)
         #CONT
         imp_box = Gtk.Box.new(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
+        imp_box.set_name("Imporatnt Box")
         self.get_content_area().pack_start(imp_box, True, True, 2)
         imp_box.pack_end(Gtk.Stack.new(), True, True, 2)
         self.aiut()
         self.build_main_dictionary()
+        #print("Prima di bind_widgets:", *self.get_content_area().get_children())
+        #for elem in self.get_content_area().get_children():
+        #    print(elem.get_name())
+        #print("Prima di bind_widgets:", *self.get_content_area().get_children()[2].get_children())
         self.bind_widgets()
 
-        temp_as = self.get_content_area().get_children()[0]
+        #temp_as = self.get_content_area().get_children()[0]
         
         #for w in temp_as:
         #    print(w.get_name())
@@ -112,7 +119,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         core_stuff[1]['wid'] = names
         stack.add_named(names, "names")
 
-
         vars_wid = MultiChooser(source_variables, source_varcat)
         core_stuff[2]['wid'] = vars_wid
         core_stuff[3]['wid'] = vars_wid
@@ -122,10 +128,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         fakew = Gtk.Label.new("Select the prop on the left")
         stack.add_named(fakew, "fake")
         stack.get_parent().show_all()
-        #stack.set_visible_child(core_stuff[0]['wid'])
         stack.set_visible_child(fakew)
-        
-
     def _on_destroy(self, widget):
         print(f"ON DESTROY CALLED!\n:)" )
         self.remove_image_references()
@@ -141,7 +144,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def get_mainbar_box(self):
         return self.get_content_area().get_children()[0]
     def get_stack(self):
-        return self.get_content_area().get_children()[1].get_children()[1]
+        print("Stack PAth", self.get_content_area().get_children()[2].get_children()[1].get_path())
+        return self.get_content_area().get_children()[2].get_children()[1]
     def on_active_row(self, treemodel, row_idx, colu):
         treemodel.get_selection().unselect_all()
         store = treemodel.get_model()
@@ -189,8 +193,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #column_two.set_name("Column_two")
         #tw.append_column(column_one)
         #tw.append_column(column_two)
-
-        self.get_content_area().get_children()[1].pack_start(tw, False, False, 1)
+        self.get_content_area().get_children()[2].pack_start(tw, False, False, 1)
+        #self.get_content_area().get_children()[1].pack_start(tw, False, False, 1)
         tw.show()
 
         tw.get_selection().unselect_all()
@@ -222,3 +226,18 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.image = None
         self.layer = None
         print("No more reference to .xcf file")
+    # PARASITE STUFF
+    def ary_to_bytes(self, data):
+        '''Encode an array of any integer in a <bytes array> '''
+        return (" ".join([str(el) for el in data])).encode('ascii')
+    def para_data_to_ary(self, data):
+        '''Convert a <bytes array> to a compact int array'''
+        bytes_as_string = str(object=bytes(data), encoding='ascii')
+        return [int(x) for x in bytes_as_string.split(" ")]
+    def get_prop_parasite(self, prop_string):
+        return self.layer.get_parasite(prop_string)
+    def remove_prop_parasite(self, prop_string):
+        if prop_string in self.layer.get_parasite_list(): #old_parasite:
+            self.layer.detach_parasite(prop_string)
+    def has_parasite(self, prop_string):
+        return prop_string in self.layer.get_parasite_list()
