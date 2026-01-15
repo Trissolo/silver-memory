@@ -14,9 +14,10 @@ class SingleChooser(Gtk.Box):
         #print(f"Creating instance {super(SingleChooser, cls)}")
         gag = super(SingleChooser, cls).__new__(cls)
         return gag
-    def __init__(self, myp):
+    def __init__(self, source):
         super().__init__(homogeneous=False, spacing=2)
         self.set_orientation(1)
+        self.source = source
         self.lettererichieste = ""
         search_widget = Gtk.SearchEntry()
         scrolled = Gtk.ScrolledWindow.new(None, None)
@@ -26,7 +27,7 @@ class SingleChooser(Gtk.Box):
         #print(f"SCROOOOOLLLED! Hexpand: {scrolled.get_hexpand()}, valign: {scrolled.get_valign()}") #Gtk.Align)}")
         listbox = Gtk.ListBox.new()
         listbox.set_valign(Gtk.Align.FILL)
-        for idx, item in enumerate(myp):
+        for idx, item in enumerate(source):
             element = Gtk.ListBoxRow.new()
             element.idx = idx
             element.add(Gtk.Label.new(f"{item} ({idx})"))
@@ -48,3 +49,7 @@ class SingleChooser(Gtk.Box):
         self.get_listbox().invalidate_filter()
     def get_listbox(self):
         return self.get_children()[1].get_child().get_child()
+    def get_readable(self, arr, fakeparam=None):
+        return f"{self.source[arr[0]]}"
+        #return res
+        

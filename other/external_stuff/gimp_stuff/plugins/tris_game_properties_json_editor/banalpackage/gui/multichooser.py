@@ -14,10 +14,11 @@ from .singlechooser import SingleChooser
 class MultiChooser(Gtk.Box):
     def __new__(cls, fake_a, fake_b):
         return super(MultiChooser, cls).__new__(cls)
-    def __init__(self, source_ary, names):
+    def __init__(self, source_ary, bnames):
         super().__init__(homogeneous=False, spacing=2)
         self.set_orientation(1)
         self.source = source_ary
+        self.bnames = bnames
         #self.lettererichieste = ""
         stack = Gtk.Stack.new()
         stack.set_transition_type(Gtk.StackTransitionType.NONE)
@@ -25,7 +26,7 @@ class MultiChooser(Gtk.Box):
             #print(f"MULTI: [{idx}]:\n{ary}\n")
             c = SingleChooser(ary)
             c.idx = idx
-            name = names[idx]
+            name = bnames[idx]
             c.set_name(name)
             #print(c.get_name())
             bits_amount = 1<<idx
@@ -89,4 +90,9 @@ class MultiChooser(Gtk.Box):
                 wid = wid.get_parent()
             print(f"From: {fr}")
             wid.greet()
+    def get_readable(self, arr, size):
+        zero = arr[0]
+        uno = arr[1]
+        res = f"({self.bnames[zero]}) {self.source[zero][uno]}"
+        return res if size == 2 else f"If {res} equals {arr[2]}"
             

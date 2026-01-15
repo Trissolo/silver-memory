@@ -29,6 +29,7 @@ class VersatileBox(Gtk.Box):
             self.pack_start(button, True, True, 2)
         self.show_all()
         #[print(elem.val) for elem in self.get_children()]
+        print("​✔️​", self.get_readable([-5]))
         return self
     def make_main_bar(self):
         self.set_name("Mainbar Box")
@@ -64,4 +65,6 @@ class VersatileBox(Gtk.Box):
         self.pack_start(label, True, False, 2)
         self.show_all()
         return self
+    def get_readable(self, arr, fakeparam=None): 
+        return f"{self.source[arr[0]]} ({arr[0]})"
     

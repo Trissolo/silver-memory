@@ -208,6 +208,12 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def paras_kind(self, button):
         prop, size, wid = self.unpack_current_sel()
         print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
+        self.remove_prop_parasite(prop)
+        self.attach_prop_parasite(prop, [button.key])
+        print(f"🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)}")
+        self.ary_from_parasite_name("azz")
+                                                        
+
         #prop, size, wid = self.unpack_current_sel()
         #print(prop, size, wid)
     def paras_overname(self, listbox, row):
@@ -230,14 +236,22 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def ary_to_bytes(self, data):
         '''Encode an array of any integer in a <bytes array> '''
         return (" ".join([str(el) for el in data])).encode('ascii')
-    def para_data_to_ary(self, data):
+    def parasite_data_to_ary(self, parasite):
         '''Convert a <bytes array> to a compact int array'''
-        bytes_as_string = str(object=bytes(data), encoding='ascii')
+        bytes_as_string = str(object=bytes(parasite.get_data()), encoding='ascii')
         return [int(x) for x in bytes_as_string.split(" ")]
     def get_prop_parasite(self, prop_string):
         return self.layer.get_parasite(prop_string)
     def remove_prop_parasite(self, prop_string):
-        if prop_string in self.layer.get_parasite_list(): #old_parasite:
+        if self.has_parasite(prop_string): #prop_string in self.layer.get_parasite_list(): #old_parasite:
             self.layer.detach_parasite(prop_string)
     def has_parasite(self, prop_string):
         return prop_string in self.layer.get_parasite_list()
+    def attach_prop_parasite(self, prop_string, ary):
+        self.remove_prop_parasite(self)
+        self.layer.attach_parasite(Gimp.Parasite.new(prop_string, 1, self.ary_to_bytes(ary)))
+    def ary_from_parasite_name(self, prop_string):
+        if not self.has_parasite(prop_string):
+            print(f"⚠️ \nNo parasite with property '{prop_string}' in the current layer ({self.layer.get_name()})")
+            return None #["Wrong"]
+        return self.parasite_data_to_ary(self.get_prop_parasite(prop_string))
