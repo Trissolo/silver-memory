@@ -37,6 +37,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.connect("destroy", self._on_destroy)
         #self.initialize_internal_stuff()
         self.current_sel = None
+        self._uff_arr = []
+        self.core_stuff = []
         #MAINBAR:
         self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
         #Preview:
@@ -66,14 +68,20 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             list = single.get_children()[1].get_child().get_child()
             #list.idx = idx
             list.connect('row-activated', self.paras_vars)
-            #print("🐢VARS🌍")
+        
+        button_skip = temp_as.get_children()[2].get_children()[1]
+        button_skip.connect('clicked', self.paras_skip)
+        print(f"{button_skip=}")
+
+
+        print(f"🐢Current🌍 {temp_as} {temp_as.get_children()[2].get_children()[1]}")
         '''
         print("Follia:")
         from banalpackage.modules.follia import WidgetTree
         q = self
         print(WidgetTree(q).generate())
         '''
-        self.get_left_liststore()
+        #self.get_left_liststore()
         # Test:
         #check = self.get_content_area()
         #Gtk.Orientation.HORIZONTAL: 0
@@ -90,7 +98,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #json_props_ori = ["kind", "hoverName", "suffix", "skipCond", "animation", "noInteraction"]
         #var_size_ori = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "animation": 1, "noInteraction": 1 }
         var_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3} #, "animation": 1, "noInteraction": 1 }
-        core_stuff = self.core_stuff = []
+        core_stuff = self.core_stuff
         stack = self.get_stack()
         
         for prop, size in var_size.items():
@@ -226,11 +234,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
         self.attach_prop_parasite(prop, [button.key])
         print(f"🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)}")
-        #self.ary_from_parasite_name("azz")
-                                                        
-
-        #prop, size, wid = self.unpack_current_sel()
-        #print(prop, size, wid)
     def paras_overname(self, listbox, row):
         print(f"Hovernames [{row.idx}]")#listbox, row)
         prop, size, wid = self.unpack_current_sel()
@@ -238,11 +241,28 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.attach_prop_parasite(prop, [row.idx])
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
-        print(f"Vars: [{wid.get_kind_from_child()}, {row.idx}]\nReq. length: {size}")
+        #print(f"Vars: [{wid.get_kind_from_child()}, {row.idx}]\nReq. length: {size}")
         temp_ary = [wid.get_kind_from_child(), row.idx]
-        print(f"🍇Vars parasite: '{prop}' - {temp_ary} - {type(temp_ary)}, {temp_ary=}")
-        self.attach_prop_parasite(prop, temp_ary)
-        print(f"MA FUNZIONA? 🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)=}")
+        #print(f"🍇Vars parasite: '{prop}' - {temp_ary} - {type(temp_ary)}, {temp_ary=}")
+        if size == 2:
+            self.attach_prop_parasite(prop, temp_ary)
+        else:
+            temp_ary.append(None)
+            self._uff_arr.clear()
+            [self._uff_arr.append(x) for x in temp_ary]
+            print(f"{self._uff_arr=}")
+            
+            #show spinbutton
+            
+        #print(f"MA FUNZIONA? 🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)=}")
+    def paras_skip(self, button):
+        prop, size, wid = self.unpack_current_sel()
+        print(f"Skip. Oth: {button.get_parent().get_children()=}")
+        spinbutton = button.get_parent().get_children()[0]
+        self._uff_arr[2] = spinbutton.get_value_as_int()
+        self.attach_prop_parasite(prop, self._uff_arr)
+
+
     # Current .xcf stuff
     def provide_image(self, image):
         self.image = image
