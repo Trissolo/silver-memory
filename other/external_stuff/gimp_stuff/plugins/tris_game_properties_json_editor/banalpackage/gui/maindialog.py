@@ -48,28 +48,16 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         imp_box.pack_end(Gtk.Stack.new(), True, True, 2)
         self.aiut()
         self.build_main_dictionary()
-        #print("Prima di bind_widgets:", *self.get_content_area().get_children())
-        #for elem in self.get_content_area().get_children():
-        #    print(elem.get_name())
-        #print("Prima di bind_widgets:", *self.get_content_area().get_children()[2].get_children())
         self.bind_widgets()
-
-        #temp_as = self.get_content_area().get_children()[0]
-        
-        #for w in temp_as:
-        #    print(w.get_name())
 
         #Kinds
         temp_as = self.core_stuff[0]['wid']
-        for button in temp_as.get_children(): #.get_children()[0].get_children():
-            #print(button.get_name())
+        for button in temp_as.get_children():
             button.connect('clicked', self.paras_kind)
         
         #Name on mouse hover
         temp_as = self.core_stuff[1]['wid']
-        #print("🐢NAME🌍", temp_as.get_children()[1].get_child().get_child().get_name())
         temp_as.get_children()[1].get_child().get_child().connect('row-activated', self.paras_overname)
-        #print("🌍", temp_as.get_name(), *temp_as.get_children()[0].get_children(), sep="\n")
 
         #VARS!
         temp_as = self.core_stuff[2]['wid']
@@ -78,15 +66,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             list = single.get_children()[1].get_child().get_child()
             #list.idx = idx
             list.connect('row-activated', self.paras_vars)
-            #print("🐢VARS🌍", )#[1].get_child().get_child().get_name())
-        #print("First_LEV:", *temp_as, len(temp_as))
-        #print("Widgets in MainBar:", *self.get_content_area().get_children()[0].get_children(), sep="\n")
+            #print("🐢VARS🌍")
         '''
         print("Follia:")
         from banalpackage.modules.follia import WidgetTree
         q = self
         print(WidgetTree(q).generate())
         '''
+        self.get_left_liststore()
         # Test:
         #check = self.get_content_area()
         #Gtk.Orientation.HORIZONTAL: 0
@@ -143,15 +130,18 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
     def get_mainbar_box(self):
         return self.get_content_area().get_children()[0]
+    def get_left_liststore(self):
+        #self.greet()
+        return self.get_content_area().get_children()[2].get_children()[0].get_model()
     def get_stack(self):
         print("Stack PAth", self.get_content_area().get_children()[2].get_children()[1].get_path())
         return self.get_content_area().get_children()[2].get_children()[1]
-    def on_active_row(self, treemodel, row_idx, colu):
-        treemodel.get_selection().unselect_all()
-        store = treemodel.get_model()
+    def on_active_row(self, liststore, row_idx, colu):
+        liststore.get_selection().unselect_all()
+        store = liststore.get_model()
         #store[row_idx][1] = letters[randint(0, 25)]*4
         #store[row_idx][2] = letters[randint(0, 25)]*4
-        first_cell_color = treemodel.get_n_columns()
+        first_cell_color = liststore.get_n_columns()
         other_cells_color = first_cell_color + 1
         for i in range(store.iter_n_children(None)):
             store[i][first_cell_color] = "#777"
@@ -186,41 +176,74 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             col = Gtk.TreeViewColumn(name, cell, text= idx, background= min(bg_int, bg_others))
             tw.append_column(col)
             bg_int += 1
-            
-        #column_one = Gtk.TreeViewColumn("Header_Nome", cell_a, text=0, foreground=2, background=3) #, underline=4, size=5)
-        #column_one.set_name("Column_one")
-        #column_two = Gtk.TreeViewColumn("Header_Cognome", cell_a, text=1, foreground=2, background=4)
-        #column_two.set_name("Column_two")
-        #tw.append_column(column_one)
-        #tw.append_column(column_two)
         self.get_content_area().get_children()[2].pack_start(tw, False, False, 1)
-        #self.get_content_area().get_children()[1].pack_start(tw, False, False, 1)
         tw.show()
 
         tw.get_selection().unselect_all()
         tw.set_activate_on_single_click(True)
         tw.connect('row-activated', self.on_active_row)
-    def unpack_current_sel(self):
-        return self.current_sel["prop"], self.current_sel["size"], self.current_sel["wid"]
+    def unpack_current_sel(self, param = None):
+        if param is None:
+            param = self.current_sel
+        return param["prop"], param["size"], param["wid"]
     def clicked_update_layer(self, button):
         self.update_layer()
         self.get_mainbar_box().get_children()[1].set_text(self.layer.get_name())
+        self.refresh_summary()
+    def refresh_summary(self):
+        
+        store = self.get_left_liststore()
+        #print("STORE", store)
+        layer = self.layer
+        for idx, element in enumerate(self.core_stuff):
+            prop, size, wid = self.unpack_current_sel(element)
+            if self.has_parasite(prop):
+                parasite = self.get_parasite_from_propstring(prop)
+
+                ary = self.parasite_data_to_ary(parasite)
+                print(f"PROP: {prop} 🍒ary: {ary}")
+                store[idx][1] = wid.get_readable(ary, size)
+                store[idx][2] = f"{ary}"
+                store[idx][4] = "#270"
+            else:
+                store[idx][1] = "---"
+                store[idx][2] = "---"
+                store[idx][4] = "#666"
+        
+        #prop, size, wid = self.clicked_update_layer()
+        '''
+        para_names_list = self.layer.get_parasite_list()
+        print(f"🍑 Parasite list:")
+        print(f"{para_names_list=}")
+        for pname in para_names_list:
+            parasite = self.layer.get_parasite(pname)
+            print(f"🍊 {pname=}", parasite.get_data())
+            print("🍒First D (parasite_data_to_ary):", self.parasite_data_to_ary(parasite), type(self.parasite_data_to_ary(parasite)))
+        '''
+        
     def paras_kind(self, button):
         prop, size, wid = self.unpack_current_sel()
         print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
-        self.remove_prop_parasite(prop)
         self.attach_prop_parasite(prop, [button.key])
         print(f"🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)}")
-        self.ary_from_parasite_name("azz")
+        #self.ary_from_parasite_name("azz")
                                                         
 
         #prop, size, wid = self.unpack_current_sel()
         #print(prop, size, wid)
     def paras_overname(self, listbox, row):
         print(f"Hovernames [{row.idx}]")#listbox, row)
+        prop, size, wid = self.unpack_current_sel()
+        #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
+        self.attach_prop_parasite(prop, [row.idx])
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
         print(f"Vars: [{wid.get_kind_from_child()}, {row.idx}]\nReq. length: {size}")
+        temp_ary = [wid.get_kind_from_child(), row.idx]
+        print(f"🍇Vars parasite: '{prop}' - {temp_ary} - {type(temp_ary)}, {temp_ary=}")
+        self.attach_prop_parasite(prop, temp_ary)
+        print(f"MA FUNZIONA? 🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)=}")
+    # Current .xcf stuff
     def provide_image(self, image):
         self.image = image
         self.layer = None
@@ -239,8 +262,13 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def parasite_data_to_ary(self, parasite):
         '''Convert a <bytes array> to a compact int array'''
         bytes_as_string = str(object=bytes(parasite.get_data()), encoding='ascii')
-        return [int(x) for x in bytes_as_string.split(" ")]
-    def get_prop_parasite(self, prop_string):
+        print(f"String bytes_as_string: {bytes_as_string} ({type(bytes_as_string)})")
+        test_res = [int(x) for x in bytes_as_string.split(" ")]
+        print(f"Returning: {test_res=}, Type: {type(test_res)}")
+        return test_res
+        #return [int(x) for x in bytes_as_string.split(" ") if print(f"x={x}") == None]
+    def get_parasite_from_propstring(self, prop_string):
+        print(f"Getting parasite for prop {prop_string=}", self.layer.get_parasite(prop_string))
         return self.layer.get_parasite(prop_string)
     def remove_prop_parasite(self, prop_string):
         if self.has_parasite(prop_string): #prop_string in self.layer.get_parasite_list(): #old_parasite:
@@ -248,10 +276,12 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def has_parasite(self, prop_string):
         return prop_string in self.layer.get_parasite_list()
     def attach_prop_parasite(self, prop_string, ary):
-        self.remove_prop_parasite(self)
+        print(f"Ary to attach: {ary=} | type: {type(ary)}")
+        self.remove_prop_parasite(prop_string)
         self.layer.attach_parasite(Gimp.Parasite.new(prop_string, 1, self.ary_to_bytes(ary)))
     def ary_from_parasite_name(self, prop_string):
         if not self.has_parasite(prop_string):
             print(f"⚠️ \nNo parasite with property '{prop_string}' in the current layer ({self.layer.get_name()})")
-            return None #["Wrong"]
-        return self.parasite_data_to_ary(self.get_prop_parasite(prop_string))
+        else:
+            print(f"ary_from_para for PROP '{prop_string}': {self.get_parasite_from_propstring(prop_string)=}")
+            return self.parasite_data_to_ary(self.get_parasite_from_propstring(prop_string))
