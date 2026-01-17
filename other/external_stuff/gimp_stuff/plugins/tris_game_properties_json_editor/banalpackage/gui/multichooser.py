@@ -17,6 +17,7 @@ class MultiChooser(Gtk.Box):
     def __init__(self, source_ary, bnames):
         super().__init__(homogeneous=False, spacing=2)
         self.set_orientation(1)
+        self.set_name("vars")
         self.source = source_ary
         self.bnames = bnames
         #self.lettererichieste = ""

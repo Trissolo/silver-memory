@@ -39,6 +39,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.current_sel = None
         self._uff_arr = []
         self.core_stuff = []
+        self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3} #, "noInteraction": 1, "animation": 1 }
         #MAINBAR:
         self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
         #Preview:
@@ -74,7 +75,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         print(f"{button_skip=}")
 
 
-        print(f"🐢Current🌍 {temp_as} {temp_as.get_children()[2].get_children()[1]}")
+        #print(f"🐢Current🌍 {temp_as} {temp_as.get_children()[2].get_children()[1]}")
         '''
         print("Follia:")
         from banalpackage.modules.follia import WidgetTree
@@ -97,7 +98,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         source_hnames = source_variables.pop()
         #json_props_ori = ["kind", "hoverName", "suffix", "skipCond", "animation", "noInteraction"]
         #var_size_ori = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "animation": 1, "noInteraction": 1 }
-        var_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3} #, "animation": 1, "noInteraction": 1 }
+        var_size = self._json_properties_with_size #{ "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3} #, "animation": 1, "noInteraction": 1 }
         core_stuff = self.core_stuff
         stack = self.get_stack()
         
@@ -130,7 +131,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         for elem in self.core_stuff:
             elem.clear()
         self.core_stuff.clear()
-        self.current_sel = None
+        
+        self._uff_arr.clear()
+        self._json_properties_with_size.clear()
+        self._uff_arr = self.current_sel = self._json_properties_with_size = None 
         #self.remove_image_references()
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
@@ -142,7 +146,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #self.greet()
         return self.get_content_area().get_children()[2].get_children()[0].get_model()
     def get_stack(self):
-        print("Stack PAth", self.get_content_area().get_children()[2].get_children()[1].get_path())
+        #print("Stack PAth", self.get_content_area().get_children()[2].get_children()[1].get_path())
         return self.get_content_area().get_children()[2].get_children()[1]
     def on_active_row(self, liststore, row_idx, colu):
         liststore.get_selection().unselect_all()
@@ -158,24 +162,21 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         store[row_idx][other_cells_color] = "#270"
         self.current_sel = self.core_stuff[row_idx.get_indices()[0]]
         self.get_stack().set_visible_child(self.current_sel['wid'])
+        #vars adjustement
+        print(f"🍕{self.current_sel['wid'].get_name()}")
 
 
     def aiut(self):
-        cont = ['kind', 'hoverName', 'suffix', 'skipCond']# , 'animation', 'noInteraction']
         store = Gtk.ListStore.new([str]*5)
         predef = "---"
-        for pname in cont:
+        for pname in self._json_properties_with_size.keys():
             store.append([pname, predef, predef, "#000", "#888"])
             
-        #store.append(['Germy', 'Moscon', 'QWQW', '#000', '#f44'])
-
         tw = Gtk.TreeView.new()
         tw.set_model(store) #(model=store)
-        #print(tw)
 
         cell = Gtk.CellRendererText.new()
 
-        #props = ['kind', 'hoverName', 'suffix', 'skipCond']# , 'animation', 'noInteraction']
         col_names = ["Prop", "Readable", "Effective"]
         bg_int = len(col_names)
         bg_others = bg_int + 1
