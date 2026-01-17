@@ -23,6 +23,7 @@ from ..modules.datagrabber import DataGrabber
 from .singlechooser import SingleChooser
 from .versatilebox import VersatileBox
 from .multichooser import MultiChooser
+from .binarybox import BinaryBox
 
 class MainDialog(GimpUi.Dialog, DataGrabber):
     def __new__(cls):
@@ -39,7 +40,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.current_sel = None
         self._uff_arr = []
         self.core_stuff = []
-        self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3} #, "noInteraction": 1, "animation": 1 }
+        self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1} #, "animation": 1 }
         #MAINBAR:
         self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
         #Preview:
@@ -110,15 +111,23 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         wkind = VersatileBox().make_kind_selector(source_depths)
         core_stuff[0]['wid'] = wkind
         stack.add_named(wkind, "kind")
-
+        #name:
         names = SingleChooser(source_hnames)
         core_stuff[1]['wid'] = names
         stack.add_named(names, "names")
-
+        #vars
         vars_wid = MultiChooser(source_variables, source_varcat)
         core_stuff[2]['wid'] = vars_wid
         core_stuff[3]['wid'] = vars_wid
         stack.add_named(vars_wid, "vars")
+
+        
+        #no interaction
+        no_interaction_widget = BinaryBox()
+        core_stuff[4]['wid'] = no_interaction_widget
+        no_interaction_widget.get_default_button().connect("clicked", self.paras_nointeraction)
+        stack.add_named(no_interaction_widget, "nointeraction")
+        
 
         # Fake widget
         fakew = Gtk.Label.new("Select the prop on the left")
@@ -262,6 +271,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         spinbutton = button.get_parent().get_children()[0]
         self._uff_arr[2] = spinbutton.get_value_as_int()
         self.attach_prop_parasite(prop, self._uff_arr)
+    def paras_nointeraction(self, button):
+        prop, size, wid = self.unpack_current_sel()
+        #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
+        self.attach_prop_parasite(prop, [button.key])
 
 
     # Current .xcf stuff
