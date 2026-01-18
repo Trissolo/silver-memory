@@ -35,11 +35,11 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.set_title("Tris JSON generator")
         self.set_name("az")
         self.add_button("_Done (Close)", Gtk.ResponseType.CANCEL)
-        self.connect("destroy", self._on_destroy)
-        #self.initialize_internal_stuff()
+        #common stuff
         self.current_sel = None
         self._uff_arr = []
         self.core_stuff = []
+        self.connect("destroy", self._on_destroy)
         self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1} #, "animation": 1 }
         #MAINBAR:
         self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
@@ -70,10 +70,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             list = single.get_children()[1].get_child().get_child()
             #list.idx = idx
             list.connect('row-activated', self.paras_vars)
-        
+        #supplementary vars action 
         button_skip = temp_as.get_children()[2].get_children()[1]
         button_skip.connect('clicked', self.paras_skip)
-        print(f"{button_skip=}")
+        #print(f"{button_skip=}")
 
 
         #print(f"🐢Current🌍 {temp_as} {temp_as.get_children()[2].get_children()[1]}")
@@ -115,20 +115,18 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         names = SingleChooser(source_hnames)
         core_stuff[1]['wid'] = names
         stack.add_named(names, "names")
-        #vars
+        #vars:
         vars_wid = MultiChooser(source_variables, source_varcat)
         core_stuff[2]['wid'] = vars_wid
         core_stuff[3]['wid'] = vars_wid
         stack.add_named(vars_wid, "vars")
-
-        
+ 
         #no interaction
         no_interaction_widget = BinaryBox()
         core_stuff[4]['wid'] = no_interaction_widget
         no_interaction_widget.get_default_button().connect("clicked", self.paras_nointeraction)
         stack.add_named(no_interaction_widget, "nointeraction")
         
-
         # Fake widget
         fakew = Gtk.Label.new("Select the prop on the left")
         stack.add_named(fakew, "fake")
@@ -146,7 +144,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
     def bind_widgets(self):
+        #main bar button: update layers
         self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
+        #main bar button: generate JSON
+        self.get_mainbar_box().get_children()[2].connect("clicked", self.generate_json)
         #button_remove_existing_parasite:
         self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
         #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
@@ -166,7 +167,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             self.refresh_summary()
     def on_active_row(self, liststore, row_idx, colu):
         liststore.get_selection().unselect_all()
-        print("liststore is self.get_treeview()?", liststore is self.get_treeview())
+        #print("liststore is self.get_treeview()?", liststore is self.get_treeview())
         store = liststore.get_model()
         first_cell_color = liststore.get_n_columns()
         other_cells_color = first_cell_color + 1
@@ -308,7 +309,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.update_layer()
     def update_layer(self):
         self.layer = self.image.get_selected_layers()[0]
-        print(f"Layer: {self.layer.get_name()}")
+        #print(f"Layer: {self.layer.get_name()}")
     def remove_image_references(self):
         self.image = None
         self.layer = None
@@ -344,3 +345,54 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         else:
             print(f"ary_from_para for PROP '{prop_string}': {self.get_parasite_from_propstring(prop_string)=}")
             return self.parasite_data_to_ary(self.get_parasite_from_propstring(prop_string))
+    # JSON functions:
+    @staticmethod
+    def manage_area(layer, obj):
+        print(f"Area = {layer.get_name()}")
+        _succ, x, y = layer.get_offsets()
+        obj['rect'] = [x, y, layer.get_width(), layer.get_height()]
+    def manage_coords(layer, obj, kind):
+        _succ, x, y = layer.get_offsets()
+        if kind == 4:
+            obj["x"] = layer.get_width() // 2 + x
+            obj["y"] = y + layer.get_height()
+        else:
+            obj["x"] = x
+            obj["y"] = y
+    def generate_json(self, button):
+        import json
+        #['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction']
+        #  0       1            2         3           4
+        possible_properties = [*self._json_properties_with_size.keys()]
+        #message:
+        print(f"Defining json... {possible_properties} t:{type(possible_properties)}")
+        #return list
+        res = []
+        #iteration:
+        for layer in (l for l in self.image.get_layers() if l.get_visible()):
+            parasites = layer.get_parasite_list()
+            print(f"{layer.get_name()}")
+            if possible_properties[0] in parasites:
+                curr_kind = self.parasite_data_to_ary(layer.get_parasite(possible_properties[0]))[0]
+                obj = {'kind': curr_kind}
+                res.append(obj)
+                #hoverName
+                if possible_properties[1] in parasites:
+                    obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
+                #skipCond
+                if possible_properties[3] in parasites:
+                    obj[possible_properties[3]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
+                # Trigger area
+                if curr_kind == 1: # else print("Standard")
+                    type(self).manage_area(layer, obj)
+                    continue
+                obj["frame"] = layer.get_name().rstrip("0123456789")
+                #suffix
+                if obj["frame"] != layer.get_name() and possible_properties[2] in parasites:
+                    obj[possible_properties[2]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
+                type(self).manage_coords(layer, obj, curr_kind)
+
+            else:
+                print("No kind")
+                continue
+        print("RES:", json.dumps(res, indent = None))
