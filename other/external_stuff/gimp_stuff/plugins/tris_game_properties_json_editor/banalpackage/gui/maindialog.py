@@ -139,16 +139,17 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.remove_image_references()
         for elem in self.core_stuff:
             elem.clear()
-        self.core_stuff.clear()
-        
+        self.core_stuff.clear()      
         self._uff_arr.clear()
         self._json_properties_with_size.clear()
         self._uff_arr = self.current_sel = self._json_properties_with_size = None 
-        #self.remove_image_references()
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
     def bind_widgets(self):
         self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
+        #button_remove_existing_parasite:
+        self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
+        #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
     def get_mainbar_box(self):
         return self.get_content_area().get_children()[0]
     def get_left_liststore(self):
@@ -159,12 +160,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def get_stack(self):
         #print("Stack PAth", self.get_content_area().get_children()[2].get_children()[1].get_path())
         return self.get_content_area().get_children()[2].get_children()[1]
+    def gui_delete_parasite(self, button):
+        if self.current_sel is not None:
+            self.remove_prop_parasite(self.current_sel.get('prop'))
+            self.refresh_summary()
     def on_active_row(self, liststore, row_idx, colu):
         liststore.get_selection().unselect_all()
         print("liststore is self.get_treeview()?", liststore is self.get_treeview())
         store = liststore.get_model()
-        #store[row_idx][1] = letters[randint(0, 25)]*4
-        #store[row_idx][2] = letters[randint(0, 25)]*4
         first_cell_color = liststore.get_n_columns()
         other_cells_color = first_cell_color + 1
         self.refresh_summary(liststore)
@@ -180,7 +183,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def unselect_rows(self):
             self.current_sel = None
             self.get_stack().set_visible_child_name("fake")
-
 
     def aiut(self):
         store = Gtk.ListStore.new([str]*5)
@@ -251,17 +253,26 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             print(f"🍊 {pname=}", parasite.get_data())
             print("🍒First D (parasite_data_to_ary):", self.parasite_data_to_ary(parasite), type(self.parasite_data_to_ary(parasite)))
         '''
-        
+    def manifest_changed_row(self):
+        prop, size, wid = self.unpack_current_sel()
+        parasite = self.get_parasite_from_propstring(prop)
+        ary = self.parasite_data_to_ary(parasite)
+        row = self.get_treeview().get_model()[self.core_stuff.index(self.current_sel)]
+        row[1] = wid.get_readable(ary, size)
+        row[2] = f"{ary}"
     def paras_kind(self, button):
         prop, size, wid = self.unpack_current_sel()
-        print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
+        res = [button.key]
+        #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
         self.attach_prop_parasite(prop, [button.key])
-        print(f"🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)}")
+        #print(f"🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)}")
+        self.manifest_changed_row()
     def paras_overname(self, listbox, row):
         print(f"Hovernames [{row.idx}]")#listbox, row)
         prop, size, wid = self.unpack_current_sel()
-        #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
-        self.attach_prop_parasite(prop, [row.idx])
+        res = [row.idx]
+        self.attach_prop_parasite(prop, res)
+        self.manifest_changed_row()
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
         #print(f"Vars: [{wid.get_kind_from_child()}, {row.idx}]\nReq. length: {size}")
@@ -269,26 +280,26 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #print(f"🍇Vars parasite: '{prop}' - {temp_ary} - {type(temp_ary)}, {temp_ary=}")
         if size == 2:
             self.attach_prop_parasite(prop, temp_ary)
+            self.manifest_changed_row()
         else:
             temp_ary.append(None)
             self._uff_arr.clear()
             [self._uff_arr.append(x) for x in temp_ary]
             print(f"{self._uff_arr=}")
             
-            #show spinbutton
-            
-        #print(f"MA FUNZIONA? 🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)=}")
     def paras_skip(self, button):
         prop, size, wid = self.unpack_current_sel()
-        print(f"Skip. Oth: {button.get_parent().get_children()=}")
         spinbutton = button.get_parent().get_children()[0]
+        print(f"UFFARRAY: {self._uff_arr} Skip. Oth: {button.get_parent().get_children()=}")
         self._uff_arr[2] = spinbutton.get_value_as_int()
         self.attach_prop_parasite(prop, self._uff_arr)
+        self.manifest_changed_row()
     def paras_nointeraction(self, button):
         prop, size, wid = self.unpack_current_sel()
+        res = [button.key]
         #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
-        self.attach_prop_parasite(prop, [button.key])
-
+        self.attach_prop_parasite(prop, res)
+        self.manifest_changed_row()
 
     # Current .xcf stuff
     def provide_image(self, image):
@@ -302,6 +313,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.image = None
         self.layer = None
         print("No more reference to .xcf file")
+    
     # PARASITE STUFF
     def ary_to_bytes(self, data):
         '''Encode an array of any integer in a <bytes array> '''
