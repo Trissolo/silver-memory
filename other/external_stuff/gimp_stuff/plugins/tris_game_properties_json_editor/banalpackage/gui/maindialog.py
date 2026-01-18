@@ -154,25 +154,32 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def get_left_liststore(self):
         #self.greet()
         return self.get_content_area().get_children()[2].get_children()[0].get_model()
+    def get_treeview(self):
+         return self.get_content_area().get_children()[2].get_children()[0]
     def get_stack(self):
         #print("Stack PAth", self.get_content_area().get_children()[2].get_children()[1].get_path())
         return self.get_content_area().get_children()[2].get_children()[1]
     def on_active_row(self, liststore, row_idx, colu):
         liststore.get_selection().unselect_all()
+        print("liststore is self.get_treeview()?", liststore is self.get_treeview())
         store = liststore.get_model()
         #store[row_idx][1] = letters[randint(0, 25)]*4
         #store[row_idx][2] = letters[randint(0, 25)]*4
         first_cell_color = liststore.get_n_columns()
         other_cells_color = first_cell_color + 1
-        for i in range(store.iter_n_children(None)):
-            store[i][first_cell_color] = "#777"
-            store[i][other_cells_color] = "#666"
-        store[row_idx][first_cell_color] = "#770"
-        store[row_idx][other_cells_color] = "#270"
+        self.refresh_summary(liststore)
+        #for i in range(store.iter_n_children(None)):
+        #    store[i][first_cell_color] = "#777"
+        #    store[i][other_cells_color] = "#666"
+        store[row_idx][first_cell_color] = "#447"
+        store[row_idx][other_cells_color] = "#336"
         self.current_sel = self.core_stuff[row_idx.get_indices()[0]]
         self.get_stack().set_visible_child(self.current_sel['wid'])
         #vars adjustement
         print(f"🍕{self.current_sel['wid'].get_name()}")
+    def unselect_rows(self):
+            self.current_sel = None
+            self.get_stack().set_visible_child_name("fake")
 
 
     def aiut(self):
@@ -191,7 +198,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         bg_others = bg_int + 1
 
         for idx, name in enumerate(col_names):
-            col = Gtk.TreeViewColumn(name, cell, text= idx, background= min(bg_int, bg_others))
+            col = Gtk.TreeViewColumn(name, cell, text=idx, background=min(bg_int, bg_others))
             tw.append_column(col)
             bg_int += 1
         self.get_content_area().get_children()[2].pack_start(tw, False, False, 1)
@@ -208,25 +215,31 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.update_layer()
         self.get_mainbar_box().get_children()[1].set_text(self.layer.get_name())
         self.refresh_summary()
-    def refresh_summary(self):
-        
-        store = self.get_left_liststore()
-        #print("STORE", store)
-        layer = self.layer
+        self.unselect_rows()
+    def refresh_summary(self, treeview = None):
+        if treeview is None:
+            treeview = self.get_treeview()
+        #print("🍰 Exploring treeview")
+        #print(treeview.get_n_columns())
+        color_prop_colu = treeview.get_n_columns()
+        other_color = color_prop_colu + 1
+
+        store = treeview.get_model() #self.get_left_liststore()
         for idx, element in enumerate(self.core_stuff):
             prop, size, wid = self.unpack_current_sel(element)
             if self.has_parasite(prop):
                 parasite = self.get_parasite_from_propstring(prop)
-
                 ary = self.parasite_data_to_ary(parasite)
-                print(f"PROP: {prop} 🍒ary: {ary}")
+                #print(f"PROP: {prop} 🍒ary: {ary}")
                 store[idx][1] = wid.get_readable(ary, size)
                 store[idx][2] = f"{ary}"
-                store[idx][4] = "#270"
+                store[idx][color_prop_colu] ="#471"
+                store[idx][other_color] = "#260"
             else:
                 store[idx][1] = "---"
                 store[idx][2] = "---"
-                store[idx][4] = "#666"
+                store[idx][color_prop_colu] = store[idx][other_color] = "#444"
+                #store[idx][other_color] = "#666"
         
         #prop, size, wid = self.clicked_update_layer()
         '''
@@ -296,13 +309,13 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def parasite_data_to_ary(self, parasite):
         '''Convert a <bytes array> to a compact int array'''
         bytes_as_string = str(object=bytes(parasite.get_data()), encoding='ascii')
-        print(f"String bytes_as_string: {bytes_as_string} ({type(bytes_as_string)})")
+        #print(f"String bytes_as_string: {bytes_as_string} ({type(bytes_as_string)})")
         test_res = [int(x) for x in bytes_as_string.split(" ")]
-        print(f"Returning: {test_res=}, Type: {type(test_res)}")
+        #print(f"Returning: {test_res=}, Type: {type(test_res)}")
         return test_res
         #return [int(x) for x in bytes_as_string.split(" ") if print(f"x={x}") == None]
     def get_parasite_from_propstring(self, prop_string):
-        print(f"Getting parasite for prop {prop_string=}", self.layer.get_parasite(prop_string))
+        #print(f"Getting parasite for prop {prop_string=}", self.layer.get_parasite(prop_string))
         return self.layer.get_parasite(prop_string)
     def remove_prop_parasite(self, prop_string):
         if self.has_parasite(prop_string): #prop_string in self.layer.get_parasite_list(): #old_parasite:
