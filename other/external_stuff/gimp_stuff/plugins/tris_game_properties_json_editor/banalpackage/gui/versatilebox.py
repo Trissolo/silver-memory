@@ -41,11 +41,17 @@ class VersatileBox(Gtk.Box):
         self.pack_start(refresh_button, False, False, 2)
         l = Gtk.Label.new(f"Layer name here")
         self.pack_start(l, True, True, 2)
-        button_generate_json = GimpUi.Button.new_from_icon_name(GimpUi.ICON_DOCUMENT_SAVE, 1)
-        button_generate_json.set_name("Btn_generate_json")
+        for a, b in zip((GimpUi.ICON_TOOL_CAGE, GimpUi.ICON_DOCUMENT_SAVE), ("Btn_extract_paths", "Btn_generate_json")):
+            button = GimpUi.Button.new_from_icon_name(a, 1)
+            button.set_name(b)
+            self.pack_end(button, False, False, 2)
+        #button_generate_json = GimpUi.Button.new_from_icon_name(GimpUi.ICON_DOCUMENT_SAVE, 1)
+        #button_generate_json.set_name("Btn_generate_json")
+        #GimpUi.ICON_TOOL_CAGE
+
         #button_generate_json.set_halign(1)
         #button_generate_json.set_valign(1)
-        self.pack_end(button_generate_json, False, False, 2)
+        #self.pack_end(button_generate_json, False, False, 2)
         self.show_all()
         return self
     def gag(self, button):

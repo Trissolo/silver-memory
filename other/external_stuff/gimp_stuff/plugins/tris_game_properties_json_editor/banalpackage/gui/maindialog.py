@@ -9,6 +9,10 @@ from gi.repository import GimpUi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
+
+
 '''
 class MainDialog():
     def __init__(self):
@@ -33,6 +37,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def __init__(self, *args):
         super().__init__(*args)
         self.set_title("Tris JSON generator")
+        self.set_keep_above(True)
         self.set_name("az")
         self.add_button("_Done (Close)", Gtk.ResponseType.CANCEL)
         #common stuff
@@ -148,6 +153,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
         #main bar button: generate JSON
         self.get_mainbar_box().get_children()[2].connect("clicked", self.generate_json)
+        self.get_mainbar_box().get_children()[3].connect("clicked", self.get_polygons)
         #button_remove_existing_parasite:
         self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
         #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
@@ -395,4 +401,26 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             else:
                 print("No kind")
                 continue
-        print("RES:", json.dumps(res, indent = None))
+        print("json Done!")
+        final = json.dumps(res, indent = None)
+        #Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
+        #Gimp.message(final)#json.dumps(final, indent=None))#res, indent = None))
+        #Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
+        tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        tempcl.set_text(final, -1)
+  
+    def get_polygons(self, button):
+        import json
+        polys = {}
+        for path in self.image.get_paths():
+            if len(path.get_strokes()) == 0:
+                continue
+            res = []
+            for curr_stroke in path.get_strokes():
+                bp = path.stroke_get_points(curr_stroke).controlpoints
+                res.append(" ".join([str(int(x)) for pair in zip(bp[0::6], bp[1::6]) for x in pair]))
+            polys[path.get_name()] = res[0] if len(res) == 1 else res
+        #return polys
+        tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        tempcl.set_text(json.dumps(polys, indent = 1), -1)
+
