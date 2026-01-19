@@ -389,7 +389,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
                 if possible_properties[3] in parasites:
                     obj[possible_properties[3]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
                 # Trigger area
-                if curr_kind == 1: # else print("Standard")
+                if curr_kind == 1:
                     type(self).manage_area(layer, obj)
                     continue
                 obj["frame"] = layer.get_name().rstrip("0123456789")
@@ -402,13 +402,11 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
                 print("No kind")
                 continue
         print("json Done!")
-        final = json.dumps(res, indent = None)
+        self.copy_text_to_clipboard(json.dumps(res, indent = None))
+        self.set_internal_message()
         #Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
         #Gimp.message(final)#json.dumps(final, indent=None))#res, indent = None))
         #Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
-        tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        tempcl.set_text(final, -1)
-  
     def get_polygons(self, button):
         import json
         polys = {}
@@ -420,7 +418,11 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
                 bp = path.stroke_get_points(curr_stroke).controlpoints
                 res.append(" ".join([str(int(x)) for pair in zip(bp[0::6], bp[1::6]) for x in pair]))
             polys[path.get_name()] = res[0] if len(res) == 1 else res
-        #return polys
+        self.copy_text_to_clipboard(json.dumps(polys, indent = 1))
+        self.set_internal_message("🔹Paths copied to ClipBoard")
+    def set_internal_message(self, message = "🟢 JSON copied to Clipboard"):
+        self.get_mainbar_box().get_children()[1].set_text(message)
+        #self.unselect_rows()
+    def copy_text_to_clipboard(self, text = "Nothing"):
         tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        tempcl.set_text(json.dumps(polys, indent = 1), -1)
-
+        tempcl.set_text(text, -1)
