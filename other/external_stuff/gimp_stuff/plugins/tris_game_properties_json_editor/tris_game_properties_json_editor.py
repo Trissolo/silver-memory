@@ -118,7 +118,7 @@ class AdventureGameNook(Gimp.PlugIn):
         dialog.destroy()
 
         print("DESTROYED")
-        print(GLib.path_get_dirname(__file__))
+        #print(GLib.path_get_dirname(__file__))
         
         '''
         {
