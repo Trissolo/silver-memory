@@ -151,9 +151,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def bind_widgets(self):
         #main bar button: update layers
         self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
+        self.get_mainbar_box().get_children()[1].connect("clicked", self.expensive_next)
         #main bar button: generate JSON
-        self.get_mainbar_box().get_children()[2].connect("clicked", self.generate_json)
-        self.get_mainbar_box().get_children()[3].connect("clicked", self.get_polygons)
+        self.get_mainbar_box().get_children()[3].connect("clicked", self.generate_json)
+        self.get_mainbar_box().get_children()[4].connect("clicked", self.get_polygons)
         #button_remove_existing_parasite:
         self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
         #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
@@ -222,7 +223,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         return param["prop"], param["size"], param["wid"]
     def clicked_update_layer(self, button):
         self.update_layer()
-        self.get_mainbar_box().get_children()[1].set_text(self.layer.get_name())
+        self.set_internal_message(self.layer.get_name())
         self.refresh_summary()
         self.unselect_rows()
     def refresh_summary(self, treeview = None):
@@ -354,7 +355,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     # JSON functions:
     @staticmethod
     def manage_area(layer, obj):
-        print(f"Area = {layer.get_name()}")
+        #print(f"Area = {layer.get_name()}")
         _succ, x, y = layer.get_offsets()
         obj['rect'] = [x, y, layer.get_width(), layer.get_height()]
     def manage_coords(layer, obj, kind):
@@ -377,7 +378,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
             parasites = layer.get_parasite_list()
-            print(f"{layer.get_name()}")
+            #print(f"{layer.get_name()}")
             if possible_properties[0] in parasites:
                 curr_kind = self.parasite_data_to_ary(layer.get_parasite(possible_properties[0]))[0]
                 obj = {'kind': curr_kind}
@@ -399,7 +400,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
                 type(self).manage_coords(layer, obj, curr_kind)
 
             else:
-                print("No kind")
+                #print("No kind")
                 continue
         print("json Done!")
         self.copy_text_to_clipboard(json.dumps(res, indent = None))
@@ -421,8 +422,19 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.copy_text_to_clipboard(json.dumps(polys, indent = 1))
         self.set_internal_message("🔹Paths copied to ClipBoard")
     def set_internal_message(self, message = "🟢 JSON copied to Clipboard"):
-        self.get_mainbar_box().get_children()[1].set_text(message)
+        self.get_mainbar_box().get_children()[2].set_text(message)
         #self.unselect_rows()
     def copy_text_to_clipboard(self, text = "Nothing"):
         tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         tempcl.set_text(text, -1)
+    def expensive_next(self, button):
+        print("Expensive")
+        layers = self.image.get_layers()
+        if not self.layer or len(layers) < 2:
+            print("Skipping :(")
+        next_idx = layers.index(self.layer) + 1
+        #print(f"Ci sono {len(layers)} layers. Il prossimo è {next_idx}")
+        next_layer = layers[next_idx] if next_idx < len(layers) else layers[0]
+        self.image.set_selected_layers([next_layer])
+        self.clicked_update_layer(None)
+
