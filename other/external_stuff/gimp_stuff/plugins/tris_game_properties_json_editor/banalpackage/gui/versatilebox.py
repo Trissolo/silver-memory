@@ -33,9 +33,12 @@ class VersatileBox(Gtk.Box):
         return self
     def make_main_bar(self):
         self.set_name("Mainbar Box")
-        for a, b in zip((GimpUi.ICON_VIEW_REFRESH, GimpUi.ICON_GO_NEXT), ("Btn_refresh_layer", "Btn_sel_next_layer")):
+        for a, b in zip((GimpUi.ICON_VIEW_REFRESH, GimpUi.ICON_GO_PREVIOUS, GimpUi.ICON_GO_NEXT), ("Btn_refresh_layer", "Btn_sel_prev_layer", "Btn_sel_next_layer")):
             button = GimpUi.Button.new_from_icon_name(a, 1)
             button.set_name(b)
+            print(a, b)
+            if a.startswith("go"):
+                button.dir = -1 if "-p" in a else 1
             self.pack_start(button, False, False, 2)
         #refresh_button.set_halign(1)
         #refresh_button.set_valign(1)

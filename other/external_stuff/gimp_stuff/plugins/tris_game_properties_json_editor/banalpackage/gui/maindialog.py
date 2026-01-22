@@ -152,9 +152,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #main bar button: update layers
         self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
         self.get_mainbar_box().get_children()[1].connect("clicked", self.expensive_next)
+        self.get_mainbar_box().get_children()[2].connect("clicked", self.expensive_next)
         #main bar button: generate JSON
-        self.get_mainbar_box().get_children()[3].connect("clicked", self.generate_json)
-        self.get_mainbar_box().get_children()[4].connect("clicked", self.get_polygons)
+        self.get_mainbar_box().get_children()[4].connect("clicked", self.generate_json)
+        self.get_mainbar_box().get_children()[5].connect("clicked", self.get_polygons)
         #button_remove_existing_parasite:
         self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
         #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
@@ -422,19 +423,19 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.copy_text_to_clipboard(json.dumps(polys, indent = 1))
         self.set_internal_message("🔹Paths copied to ClipBoard")
     def set_internal_message(self, message = "🟢 JSON copied to Clipboard"):
-        self.get_mainbar_box().get_children()[2].set_text(message)
+        self.get_mainbar_box().get_children()[3].set_text(message)
         #self.unselect_rows()
     def copy_text_to_clipboard(self, text = "Nothing"):
         tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         tempcl.set_text(text, -1)
     def expensive_next(self, button):
-        print("Expensive")
+        print(f"Expensive: {button.dir}")
         layers = self.image.get_layers()
         if not self.layer or len(layers) < 2:
             print("Skipping :(")
-        next_idx = layers.index(self.layer) + 1
+            return
+        next_idx = layers.index(self.layer) + button.dir
         #print(f"Ci sono {len(layers)} layers. Il prossimo è {next_idx}")
-        next_layer = layers[next_idx] if next_idx < len(layers) else layers[0]
-        self.image.set_selected_layers([next_layer])
+        #next_layer = layers[next_idx] if next_idx < len(layers) else layers[0]
+        self.image.set_selected_layers([layers[next_idx] if next_idx < len(layers) else layers[0]])
         self.clicked_update_layer(None)
-
