@@ -20,7 +20,7 @@ class VersatileBox(Gtk.Box):
         self.set_orientation(1)
         self.set_name("kindselectorbox")
         for key, value in dictionary.items():
-            button = Gtk.Button.new_with_label(value)
+            button = Gtk.Button.new_with_label(f"{value} ({key})")
             button.key = key
             button.set_halign(1)
             button.set_valign(1)
@@ -45,7 +45,7 @@ class VersatileBox(Gtk.Box):
         #refresh_button.show()
         l = Gtk.Label.new(f"Layer name here")
         self.pack_start(l, True, True, 2)
-        for a, b in zip((GimpUi.ICON_TOOL_CAGE, GimpUi.ICON_DOCUMENT_SAVE), ("Btn_extract_paths", "Btn_generate_json")):
+        for a, b in zip((GimpUi.ICON_FORMAT_JUSTIFY_LEFT, GimpUi.ICON_TOOL_CAGE, GimpUi.ICON_DOCUMENT_SAVE), ("Btn_copy_rscript","Btn_extract_paths", "Btn_generate_json")):
             button = GimpUi.Button.new_from_icon_name(a, 1)
             button.set_name(b)
             self.pack_end(button, False, False, 2)
@@ -55,8 +55,11 @@ class VersatileBox(Gtk.Box):
 
         #button_generate_json.set_halign(1)
         #button_generate_json.set_valign(1)
-        #self.pack_end(button_generate_json, False, False, 2)
         self.show_all()
+        #tech info:
+        for i, elem in enumerate(self.get_children()):
+            print(f"mainbar.get_children()[{i}] = {elem.__class__.__name__:<6} ({elem.get_name()})")
+
         return self
     def gag(self, button):
         #print(*self.source.items())

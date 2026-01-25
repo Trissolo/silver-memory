@@ -44,6 +44,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.current_sel = None
         self._uff_arr = []
         self.core_stuff = []
+        self.rscript = "{}"
         self.connect("destroy", self._on_destroy)
         self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1} #, "animation": 1 }
         #MAINBAR:
@@ -145,7 +146,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.core_stuff.clear()      
         self._uff_arr.clear()
         self._json_properties_with_size.clear()
-        self._uff_arr = self.current_sel = self._json_properties_with_size = None 
+        self._uff_arr = self.current_sel = self._json_properties_with_size = self.rscript = None 
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
     def bind_widgets(self):
@@ -156,6 +157,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #main bar button: generate JSON
         self.get_mainbar_box().get_children()[4].connect("clicked", self.generate_json)
         self.get_mainbar_box().get_children()[5].connect("clicked", self.get_polygons)
+        self.get_mainbar_box().get_children()[6].connect("clicked", self.show_rscript)
         #button_remove_existing_parasite:
         self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
         #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
@@ -375,15 +377,19 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         #message:
         print(f"Defining json... {possible_properties} t:{type(possible_properties)}")
         #return list
-        res = []
+        things_array = []
+        real_res = {'things': things_array}
         #iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
             parasites = layer.get_parasite_list()
             #print(f"{layer.get_name()}")
             if possible_properties[0] in parasites:
                 curr_kind = self.parasite_data_to_ary(layer.get_parasite(possible_properties[0]))[0]
+                if curr_kind == -5:
+                    real_res['bg'] = layer.get_name()
+                    continue
                 obj = {'kind': curr_kind}
-                res.append(obj)
+                things_array.append(obj)
                 #hoverName
                 if possible_properties[1] in parasites:
                     obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
@@ -403,11 +409,13 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
             else:
                 #print("No kind")
                 continue
+        #real_res["basescript"] = self.assemble_basescript(things_array)
+        self.rscript = self.assemble_basescript(things_array)
         print("json Done!")
-        self.copy_text_to_clipboard(json.dumps(res, indent = None))
+        self.copy_text_to_clipboard(json.dumps(real_res, indent = None))
         self.set_internal_message()
         #Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
-        #Gimp.message(final)#json.dumps(final, indent=None))#res, indent = None))
+        #Gimp.message(final)#json.dumps(final, indent=None))#things_array, indent = None))
         #Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
     def get_polygons(self, button):
         import json
@@ -424,18 +432,31 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.set_internal_message("🔹Paths copied to ClipBoard")
     def set_internal_message(self, message = "🟢 JSON copied to Clipboard"):
         self.get_mainbar_box().get_children()[3].set_text(message)
-        #self.unselect_rows()
     def copy_text_to_clipboard(self, text = "Nothing"):
         tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         tempcl.set_text(text, -1)
     def expensive_next(self, button):
-        print(f"Expensive: {button.dir}")
+        #print(f":( Expensive: {button.dir}")
         layers = self.image.get_layers()
         if not self.layer or len(layers) < 2:
-            print("Skipping :(")
+            #print("Skipping :(")
             return
         next_idx = layers.index(self.layer) + button.dir
-        #print(f"Ci sono {len(layers)} layers. Il prossimo è {next_idx}")
-        #next_layer = layers[next_idx] if next_idx < len(layers) else layers[0]
-        self.image.set_selected_layers([layers[next_idx] if next_idx < len(layers) else layers[0]])
+        self.image.set_selected_layers([layers[0] if next_idx == len(layers) else layers[next_idx]])
         self.clicked_update_layer(None)
+    def assemble_basescript(self, things):
+        res = ""
+        nl = "\n"
+        sp = " "
+        frame_prop = "frame"
+        for idx, elem in enumerate(things):
+            comment = elem[frame_prop] if frame_prop in elem else "AREA"
+            res+= f"{sp*4}// {comment}{nl}{sp*4}static {idx}(scene, sprite){{}}{nl*2}"
+        return f"class rs{self.image.get_name()[4:-4]}{nl}{{{nl}{res}}}\n"
+    def show_message(self, message = "Test\ntest"):
+        Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
+        Gimp.message(message)
+        Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
+        return self
+    def show_rscript(self, button):
+        self.copy_text_to_clipboard(self.rscript)
