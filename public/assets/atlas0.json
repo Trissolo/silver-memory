@@ -2,8 +2,8 @@
   "frames": {
     "bg0": {
       "frame": {
-        "x": 1,
-        "y": 1,
+        "x": 0,
+        "y": 0,
         "w": 256,
         "h": 128
       },
@@ -22,8 +22,8 @@
     },
     "bg1": {
       "frame": {
-        "x": 259,
-        "y": 1,
+        "x": 256,
+        "y": 0,
         "w": 141,
         "h": 128
       },
@@ -42,8 +42,8 @@
     },
     "passaggio": {
       "frame": {
-        "x": 402,
-        "y": 1,
+        "x": 397,
+        "y": 0,
         "w": 96,
         "h": 69
       },
@@ -62,8 +62,8 @@
     },
     "vasca": {
       "frame": {
-        "x": 500,
-        "y": 1,
+        "x": 493,
+        "y": 0,
         "w": 68,
         "h": 36
       },
@@ -82,8 +82,8 @@
     },
     "crepa": {
       "frame": {
-        "x": 570,
-        "y": 1,
+        "x": 561,
+        "y": 0,
         "w": 65,
         "h": 36
       },
@@ -102,8 +102,8 @@
     },
     "tubo": {
       "frame": {
-        "x": 637,
-        "y": 1,
+        "x": 626,
+        "y": 0,
         "w": 37,
         "h": 56
       },
@@ -122,8 +122,8 @@
     },
     "striscia": {
       "frame": {
-        "x": 500,
-        "y": 39,
+        "x": 493,
+        "y": 36,
         "w": 33,
         "h": 58
       },
@@ -142,8 +142,8 @@
     },
     "coso_dietro": {
       "frame": {
-        "x": 402,
-        "y": 72,
+        "x": 397,
+        "y": 69,
         "w": 32,
         "h": 43
       },
@@ -162,8 +162,8 @@
     },
     "r1cabinetDoors1": {
       "frame": {
-        "x": 436,
-        "y": 72,
+        "x": 429,
+        "y": 69,
         "w": 30,
         "h": 21
       },
@@ -182,8 +182,8 @@
     },
     "mensole": {
       "frame": {
-        "x": 468,
-        "y": 72,
+        "x": 459,
+        "y": 69,
         "w": 30,
         "h": 14
       },
@@ -200,10 +200,30 @@
         "h": 14
       }
     },
+    "exitEst": {
+      "frame": {
+        "x": 489,
+        "y": 69,
+        "w": 4,
+        "h": 63
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 63
+      },
+      "sourceSize": {
+        "w": 4,
+        "h": 63
+      }
+    },
     "cabinet": {
       "frame": {
-        "x": 468,
-        "y": 88,
+        "x": 459,
+        "y": 83,
         "w": 21,
         "h": 26
       },
@@ -220,15 +240,35 @@
         "h": 26
       }
     },
+    "coperchio0": {
+      "frame": {
+        "x": 480,
+        "y": 83,
+        "w": 9,
+        "h": 3
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 5,
+        "w": 9,
+        "h": 3
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 8
+      }
+    },
     "coperchio1": {
       "frame": {
-        "x": 491,
-        "y": 88,
+        "x": 480,
+        "y": 86,
         "w": 7,
         "h": 8
       },
       "rotated": false,
-      "trimmed": false,
+      "trimmed": true,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
@@ -236,54 +276,14 @@
         "h": 8
       },
       "sourceSize": {
-        "w": 7,
+        "w": 12,
         "h": 8
       }
     },
     "button0": {
       "frame": {
-        "x": 491,
-        "y": 98,
-        "w": 6,
-        "h": 6
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 6,
-        "h": 6
-      },
-      "sourceSize": {
-        "w": 6,
-        "h": 6
-      }
-    },
-    "r1cabinetDoors0": {
-      "frame": {
-        "x": 436,
-        "y": 95,
-        "w": 20,
-        "h": 21
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 7,
-        "y": 0,
-        "w": 20,
-        "h": 21
-      },
-      "sourceSize": {
-        "w": 30,
-        "h": 22
-      }
-    },
-    "button1": {
-      "frame": {
-        "x": 458,
-        "y": 95,
+        "x": 480,
+        "y": 94,
         "w": 6,
         "h": 6
       },
@@ -302,8 +302,8 @@
     },
     "ITcardA": {
       "frame": {
-        "x": 458,
-        "y": 103,
+        "x": 486,
+        "y": 94,
         "w": 3,
         "h": 3
       },
@@ -318,12 +318,52 @@
       "sourceSize": {
         "w": 3,
         "h": 3
+      }
+    },
+    "button1": {
+      "frame": {
+        "x": 480,
+        "y": 100,
+        "w": 6,
+        "h": 6
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      },
+      "sourceSize": {
+        "w": 6,
+        "h": 6
+      }
+    },
+    "r1cabinetDoors0": {
+      "frame": {
+        "x": 429,
+        "y": 90,
+        "w": 20,
+        "h": 21
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 0,
+        "w": 20,
+        "h": 21
+      },
+      "sourceSize": {
+        "w": 30,
+        "h": 22
       }
     },
     "porta0": {
       "frame": {
-        "x": 402,
-        "y": 117,
+        "x": 449,
+        "y": 109,
         "w": 18,
         "h": 27
       },
@@ -338,32 +378,12 @@
       "sourceSize": {
         "w": 18,
         "h": 27
-      }
-    },
-    "coperchio0": {
-      "frame": {
-        "x": 422,
-        "y": 117,
-        "w": 9,
-        "h": 3
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 9,
-        "h": 3
-      },
-      "sourceSize": {
-        "w": 9,
-        "h": 3
       }
     },
     "porta1": {
       "frame": {
-        "x": 535,
-        "y": 39,
+        "x": 429,
+        "y": 111,
         "w": 18,
         "h": 26
       },
@@ -380,10 +400,30 @@
         "h": 26
       }
     },
+    "exitNord": {
+      "frame": {
+        "x": 467,
+        "y": 109,
+        "w": 16,
+        "h": 7
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 7
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 7
+      }
+    },
     "wrench": {
       "frame": {
-        "x": 555,
-        "y": 39,
+        "x": 467,
+        "y": 116,
         "w": 14,
         "h": 7
       },
@@ -402,8 +442,8 @@
     },
     "crate": {
       "frame": {
-        "x": 571,
-        "y": 39,
+        "x": 467,
+        "y": 123,
         "w": 13,
         "h": 10
       },
@@ -419,6 +459,26 @@
         "w": 14,
         "h": 10
       }
+    },
+    "exitWest": {
+      "frame": {
+        "x": 397,
+        "y": 112,
+        "w": 11,
+        "h": 29
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 11,
+        "h": 29
+      },
+      "sourceSize": {
+        "w": 11,
+        "h": 29
+      }
     }
   },
   "meta": {
@@ -427,8 +487,8 @@
     "image": "atlas0.png",
     "format": "RGBA8888",
     "size": {
-      "w": 675,
-      "h": 145
+      "w": 663,
+      "h": 141
     },
     "scale": 1
   }

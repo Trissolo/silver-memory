@@ -1,0 +1,81 @@
+class rs0
+{
+    // wrench
+    static 0(scene, sprite)
+    {
+        console.log()
+    }
+
+    // coperchio
+    static 1(scene, sprite)
+    {
+        console.log()
+    }
+
+    // crate
+    static 2(scene, sprite)
+    {
+        console.log()
+    }
+
+    // coso_dietro
+    static 3(scene, sprite)
+    {
+        console.log()
+    }
+
+    // AREA
+    static 4(scene, sprite)
+    {
+        console.log()
+    }
+
+    // AREA
+    static 5(scene, sprite)
+    {
+        console.log()
+    }
+
+    // crepa
+    static 6(scene, sprite)
+    {
+        console.log()
+    }
+
+    // button
+    static 7(scene, sprite)
+    {
+        console.log()
+    }
+
+    // mensole
+    static 8(scene, sprite)
+    {
+        console.log()
+    }
+
+    // striscia
+    static 9(scene, sprite)
+    {
+        console.log()
+    }
+
+    // porta
+    static 10(scene, sprite)
+    {
+        console.log()
+    }
+
+    // vasca
+    static 11(scene, sprite)
+    {
+        console.log()
+    }
+
+    // tubo
+    static 12(scene, sprite)
+    {
+        console.log()
+    }
+
+}
