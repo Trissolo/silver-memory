@@ -460,3 +460,4 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         return self
     def show_rscript(self, button):
         self.copy_text_to_clipboard(self.rscript)
+        self.set_internal_message("📜 rscript copyed")
