@@ -451,8 +451,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         frame_prop = "frame"
         for idx, elem in enumerate(things):
             comment = elem[frame_prop] if frame_prop in elem else "AREA"
-            res+= f"{sp*4}// {comment}{nl}{sp*4}static {idx}(scene, sprite){{}}{nl*2}"
-        return f"class rs{self.image.get_name()[4:-4]}{nl}{{{nl}{res}}}\n"
+            res+= f"{sp*4}// {comment}{nl}{sp*4}static {idx}(sprite){{console.log(sprite.frame.name);}}{nl*2}"
+        return f"export default class rs{self.image.get_name()[4:-4]}{nl}{{{nl}{res}}}\n"
     def show_message(self, message = "Test\ntest"):
         Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
         Gimp.message(message)
