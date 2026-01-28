@@ -30,6 +30,7 @@ class VersatileBox(Gtk.Box):
         self.show_all()
         #[print(elem.val) for elem in self.get_children()]
         #print("​✔️​", self.get_readable([-5]))
+        self.connect("destroy", self.on_kind_selector_destroy)
         return self
     def make_main_bar(self):
         self.set_name("Mainbar Box")
@@ -80,4 +81,7 @@ class VersatileBox(Gtk.Box):
         return self
     def get_readable(self, arr, fakeparam=None): 
         return f"{self.source[arr[0]]} ({arr[0]})"
+    def on_kind_selector_destroy(self, other):
+        self.source = None
+        #print("🥚 Versatile kind_selector_destroy called")
     
