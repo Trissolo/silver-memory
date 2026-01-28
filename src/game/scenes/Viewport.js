@@ -1,123 +1,235 @@
 import VarManager from '../modules/VarManager.js';
 import RoomScripts from '../roomscripts/roomscripts.js';
-import { Scene } from 'phaser';
-
-const mySignals = {THING_CLICKED: Symbol()}
+import { NONE, Scene } from 'phaser';
 
 export class Viewport extends Scene
 {
+    room_id;
+    roomJson;
+    thingJson;
+    things_container;
+    roomscript;
+    bg;
+    shield;
+
     constructor ()
     {
-    super(
-      {
-        key: 'Viewport',
-        active: false,
-        visible: false,
-        plugins: [
-            'Clock',  //this.time
-            //'DataManagerPlugin',  //this.data
-            'InputPlugin',  //this.input
-            'Loader',  //this.load
-            'TweenManager',  //this.tweens
-            //'LightsPlugin'  //this.lights
-            ],
-        cameras:
+        super(
         {
-            backgroundColor: "#008777" //,
-
-            //y: 11, // 136,
-            //height: 64
-        }
-        })
+            key: 'Viewport',
+            active: false,
+            visible: false,
+            plugins: [
+                'Clock',  //this.time
+                //'DataManagerPlugin',  //this.data
+                'InputPlugin',  //this.input
+                'Loader',  //this.load
+                'TweenManager',  //this.tweens
+                //'LightsPlugin'  //this.lights
+                ],
+            cameras:
+            {
+                backgroundColor: "#008777" //,
+                //y: 11, // 136,
+                //height: 64
+            }
+        });
     } //end constructor
 
     init(data)
     {
-        // console.log("INIIIIT", VarManager);
+        console.dir("INIT", this);
         this.debuCounter = 0;
-        /*
-        for (const elem of VarManager.varContainers.values())
-        {
-            // console.log("EKEM:", elem.typedArray)
-        }*/
-       /*
-       // console.log("SET VALUESTOCA", VarManager.newHandleAny(0,2, 1))
-       // console.log("SET VALUESTOCA", VarManager.newHandleAny(0,2, 0))
-       // console.log("VALUESTOCA GET", VarManager.newHandleAny(0,2))
-       */
     }
 
     create ()
     {
+        // random preliminary stuff:
         this.cameras.main.setBackgroundColor(0x00ff00);
         this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
 
-        this.curr_room_id = null;
-        this.currentThings = null;
-
+        // 1) background image
         this.bg = this.add.image(0, 0, 'atlas0')
         .setDepth(-5)
         .setOrigin(0)
 
+        // 2) Room 'things'
         this.thingsGroup = this.add.group({createCallback: function (thing)
             {
                 thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
-                //console.log("GROUP MAMBER!", thing, thing.eventNames());
-                //thing.on('pointerdown', thing.scene.onthingdown);
+                thing.setVisible(false);
             }
         })
 
-        this.visible_things = new Set();
+        // 2b) container for 'things'
+        this.things_container = new Map();
 
-        this.drawRoom(0);
+
+        // player
+        //this.player = null;
+
+        // shield
+        //this.shield = null
 
 
-        this.input.keyboard.on('keydown-Z', event => {
+        // START
+        this.drawRoom(1);
 
-            this.disableGroupChildren(this.visible_things);
-            this.debuCounter += 1;
-            this.drawRoom(this.debuCounter & 1);
 
-            //const hardcoded_test = VarManager.varContainers.get(0).typedArray;
-            //hardcoded_test[0] = (this.debuCounter & 2)? 0: 255;
 
-        });
+        // code for test
+        this.input.keyboard.on('keydown-Z', this.pressedZ, this);
+
+        this.input.keyboard.on('keydown-Y', this.pressedY, this);
     }
 
-    disableGroupChildren(group = this.thingsGroup)
+    pressedZ(e)
     {
-        console.log("this.visible_things:", this.visible_things)
+        this.clear_room();
+        this.debuCounter += 1;
+        this.drawRoom(this.debuCounter & 1);
+    }
+
+    pressedY(eve)
+    {
+
+    }
+
+    disable_group_things()
+    {
+        /*
+        for (const [a,b] of this.things_container)
+        {
+            console.log(a,b);
+        }*/
         
-        for (const thing of group)//group.children.entries)
+        for (const thing of this.things_container.values())
         {
             thing.disableInteractive()
               .setActive(false)
               .setVisible(false)
-              //  .off('pointerover')//, thing.scene.thingOvered)
-              //  .off('pointerout')//, thing.scene.thingOut)
-              //.off('pointerdown')
               .rid = null
-
         }
 
-        this.visible_things.clear();
+        this.things_container.clear();
     
-    } //end disableGroupChildren
+    } //end disable_group_things
 
-    drawRoom(curr_room_id)
+    clear_room()
+    {
+        this.roomJson = null;
+        this.roomscript = null;
+        this.thingJson  = null;
+        this.room_id = null;
+
+        this.bg.setVisible(false);
+        this.disable_group_things();
+    }
+
+    set_fonsEtOrigo(room_id)
+    {
+        this.roomJson = this.cache.json.get(`room${room_id}`);
+        this.roomscript = RoomScripts[room_id];
+
+        // maybe too redundant
+        this.thingJson  = this.roomJson.things;
+        this.room_id = room_id;
+    }
+
+    render_things()
+    {
+        const atlasKey = `atlas${Math.floor(this.room_id / 3)}`;
+
+        for (const [idx, thingData] of this.roomJson.things.entries())
+        {
+            if (thingData.kind === 1)
+            {
+                continue;
+            }
+                                
+            const tsprite = this.thingsGroup.get(thingData.x, thingData.y);
+            
+            console.log("🫓 Super imp", "Active", tsprite.active, "Visible", tsprite.visible);
+            
+            // set the frame, or, if needed, the texture
+            const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarFromArray(thingData.suffix): ""}`;
+            //console.log(`AtlasKey: ${atlasKey}\nCurrent sprite texture: ${tsprite.texture.key}`)
+            tsprite.texture.key === atlasKey? tsprite.setFrame(assembledFrameName): tsprite.setTexture(atlasKey, assembledFrameName);
+            
+            // Room ID!
+            tsprite.rid = idx;
+            
+            // let's keep this thing in its container
+            this.things_container.set(idx, tsprite);
+            
+            tsprite.setDepth(thingData.kind);//.setActive(true).setVisible(true);
+            tsprite.setActive(true);
+            tsprite.setVisible(true)
+            
+            // if it's a new member, let's associate the listener for user interaction
+            if (!tsprite.listenerCount(Phaser.Input.Events.POINTER_DOWN))
+            {
+                tsprite.on(Phaser.Input.Events.POINTER_DOWN, this.onthingdown);
+            }
+            else
+            {
+                console.log("Thing already has input listeners");
+            }
+            
+            // console.log("eventNames()", tsprite.eventNames(), "pointerdown amount:", tsprite.listenerCount('pointerdown'));
+
+            // deepthsorted?
+            if (thingData.kind === 4)
+            {
+                tsprite.setOrigin(0.5, 1);
+            }
+            else
+            {
+                tsprite.setOrigin(0);
+            }
+            
+            if (thingData.noInteraction)
+            {
+                console.log("...but is input disabled");
+                tsprite.disableInteractive(false);
+                continue;
+            }
+            else
+            {
+                //tsprite.on('pointerdown', this.onthingdown)//RoomScripts[thingData_room_id][idx], this);
+                tsprite.setInteractive();
+            }
+            
+            if (thingData.skipCond && this.conditionIsSatisfied(thingData.skipCond))
+            {
+                console.log("Skipping",thingData);
+                continue;
+            }
+        }
+    }
+
+    drawRoom(id)
+    {
+        console.log("NEW draw room");
+        this.set_fonsEtOrigo(id);
+        this.render_things();
+
+        // hardcoded for now
+        this.bg.setTexture(`atlas${Math.floor(this.room_id / 3)}`, this.roomJson.bg);
+        this.bg.setVisible(true);
+    }
+/*
+    drawRoomOLD(curr_room_id)
     {
         console.log(`** Drawing room: ${curr_room_id}`)
         const currAtlasName = `atlas${Math.floor(curr_room_id / 3) }`
         this.roomscript = RoomScripts[curr_room_id];
-        console.dir(`RS[${curr_room_id}]`, this.roomscript);
         
-        const roomdata = this.cache.json.get(`room${curr_room_id}`)
+        const roomJson = this.cache.json.get(`room${curr_room_id}`)
         this.curr_room_id = curr_room_id;
-        console.log("Roomdata", roomdata, "curr_room_id", curr_room_id);
-        //return false;
-        this.currentThings = roomdata.things;
-        this.bg.setTexture(currAtlasName, roomdata.bg)
-        //const palltextures = this.textures;
+        this.currentThings = roomJson.things;
+        this.bg.setTexture(currAtlasName, roomJson.bg)
+
         for (const [index, curr] of this.currentThings.entries())
         {
             if (curr.skipCond && this.conditionIsSatisfied(curr.skipCond))
@@ -137,7 +249,7 @@ export class Viewport extends Scene
             immy.texture.key === currAtlasName? immy.setFrame(frameuffa): immy.setTexture(currAtlasName, frameuffa);
             immy.setActive(true);
             immy.setVisible(true)
-            this.visible_things.add(immy);
+            this.things_container.set(index, immy);
             immy.rid = index;
             //console.log("immy.texture.key", immy.texture.key, "index", index);
             
@@ -174,7 +286,7 @@ export class Viewport extends Scene
             }
             
         }
-    }
+    }*/
 
     onthingdown(a,b)
     {
