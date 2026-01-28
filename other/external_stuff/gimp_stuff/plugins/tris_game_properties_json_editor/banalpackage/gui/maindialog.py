@@ -160,7 +160,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.get_mainbar_box().get_children()[6].connect("clicked", self.show_rscript)
         #button_remove_existing_parasite:
         self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
-        #print("EEEQUA", button_remove_existing_parasite.get_name(), type(button_remove_existing_parasite))
     def get_mainbar_box(self):
         return self.get_content_area().get_children()[0]
     def get_left_liststore(self):
@@ -286,9 +285,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         self.manifest_changed_row()
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
-        #print(f"Vars: [{wid.get_kind_from_child()}, {row.idx}]\nReq. length: {size}")
         temp_ary = [wid.get_kind_from_child(), row.idx]
-        #print(f"🍇Vars parasite: '{prop}' - {temp_ary} - {type(temp_ary)}, {temp_ary=}")
         if size == 2:
             self.attach_prop_parasite(prop, temp_ary)
             self.manifest_changed_row()
@@ -332,11 +329,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def parasite_data_to_ary(self, parasite):
         '''Convert a <bytes array> to a compact int array'''
         bytes_as_string = str(object=bytes(parasite.get_data()), encoding='ascii')
-        #print(f"String bytes_as_string: {bytes_as_string} ({type(bytes_as_string)})")
         test_res = [int(x) for x in bytes_as_string.split(" ")]
-        #print(f"Returning: {test_res=}, Type: {type(test_res)}")
         return test_res
-        #return [int(x) for x in bytes_as_string.split(" ") if print(f"x={x}") == None]
     def get_parasite_from_propstring(self, prop_string):
         #print(f"Getting parasite for prop {prop_string=}", self.layer.get_parasite(prop_string))
         return self.layer.get_parasite(prop_string)
@@ -346,7 +340,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
     def has_parasite(self, prop_string):
         return prop_string in self.layer.get_parasite_list()
     def attach_prop_parasite(self, prop_string, ary):
-        print(f"Ary to attach: {ary=} | type: {type(ary)}")
         self.remove_prop_parasite(prop_string)
         self.layer.attach_parasite(Gimp.Parasite.new(prop_string, 1, self.ary_to_bytes(ary)))
     def ary_from_parasite_name(self, prop_string):
