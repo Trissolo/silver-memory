@@ -133,7 +133,6 @@ class VarManager
     
                 typedArray[y] |= (newValue << x * container.varSize);
     
-    
                 return newValue;
             }
         }
