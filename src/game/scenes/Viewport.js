@@ -4,10 +4,10 @@ import { NONE, Scene } from 'phaser';
 
 export class Viewport extends Scene
 {
-    room_id;
+    roomId;
     roomJson;
-    thingJson;
-    things_container;
+    thingsJson;
+    thingsContainer;
     roomscript;
     bg;
     shield;
@@ -39,6 +39,7 @@ export class Viewport extends Scene
     init(data)
     {
         console.dir("INIT", this);
+        console.log("Vars", VarManager)
         this.debuCounter = 0;
     }
 
@@ -62,7 +63,7 @@ export class Viewport extends Scene
         })
 
         // 2b) container for 'things'
-        this.things_container = new Map();
+        this.thingsContainer = new Map();
 
 
         // player
@@ -73,37 +74,31 @@ export class Viewport extends Scene
 
 
         // START
-        this.drawRoom(1);
+        this.drawRoom(0);
 
 
 
         // code for test
         this.input.keyboard.on('keydown-Z', this.pressedZ, this);
 
-        this.input.keyboard.on('keydown-Y', this.pressedY, this);
+        this.input.keyboard.on('keydown-X', this.pressedX, this);
     }
 
-    pressedZ(e)
+    pressedZ(eve)
     {
         this.clear_room();
         this.debuCounter += 1;
         this.drawRoom(this.debuCounter & 1);
     }
 
-    pressedY(eve)
+    pressedX(eve)
     {
-
+        console.log("roomId is:", this.roomId);
     }
 
     disable_group_things()
-    {
-        /*
-        for (const [a,b] of this.things_container)
-        {
-            console.log(a,b);
-        }*/
-        
-        for (const thing of this.things_container.values())
+    {      
+        for (const thing of this.thingsContainer.values())
         {
             thing.disableInteractive()
               .setActive(false)
@@ -111,7 +106,7 @@ export class Viewport extends Scene
               .rid = null
         }
 
-        this.things_container.clear();
+        this.thingsContainer.clear();
     
     } //end disable_group_things
 
@@ -119,26 +114,26 @@ export class Viewport extends Scene
     {
         this.roomJson = null;
         this.roomscript = null;
-        this.thingJson  = null;
-        this.room_id = null;
+        this.thingsJson  = null;
+        this.roomId = null;
 
         this.bg.setVisible(false);
         this.disable_group_things();
     }
 
-    set_fonsEtOrigo(room_id)
+    set_fonsEtOrigo(roomId)
     {
-        this.roomJson = this.cache.json.get(`room${room_id}`);
-        this.roomscript = RoomScripts[room_id];
+        this.roomJson = this.getJson(roomId);
+        this.roomscript = RoomScripts[roomId];
 
         // maybe too redundant
-        this.thingJson  = this.roomJson.things;
-        this.room_id = room_id;
+        this.thingsJson  = this.roomJson.things;
+        this.roomId = roomId;
     }
 
     render_things()
     {
-        const atlasKey = `atlas${Math.floor(this.room_id / 3)}`;
+        const atlasKey = `atlas${Math.floor(this.roomId / 3)}`;
 
         for (const [idx, thingData] of this.roomJson.things.entries())
         {
@@ -160,16 +155,16 @@ export class Viewport extends Scene
             tsprite.rid = idx;
             
             // let's keep this thing in its container
-            this.things_container.set(idx, tsprite);
+            this.thingsContainer.set(idx, tsprite);
             
             tsprite.setDepth(thingData.kind);//.setActive(true).setVisible(true);
             tsprite.setActive(true);
-            tsprite.setVisible(true)
+            //tsprite.setVisible(true)
             
             // if it's a new member, let's associate the listener for user interaction
             if (!tsprite.listenerCount(Phaser.Input.Events.POINTER_DOWN))
             {
-                tsprite.on(Phaser.Input.Events.POINTER_DOWN, this.onthingdown);
+                tsprite.on(Phaser.Input.Events.POINTER_DOWN, this.onThingDown);
             }
             else
             {
@@ -196,7 +191,7 @@ export class Viewport extends Scene
             }
             else
             {
-                //tsprite.on('pointerdown', this.onthingdown)//RoomScripts[thingData_room_id][idx], this);
+                //tsprite.on('pointerdown', this.onThingDown)//RoomScripts[thingData_roomId][idx], this);
                 tsprite.setInteractive();
             }
             
@@ -204,6 +199,10 @@ export class Viewport extends Scene
             {
                 console.log("Skipping",thingData);
                 continue;
+            }
+            else
+            {
+                tsprite.setVisible(true);
             }
         }
     }
@@ -215,84 +214,14 @@ export class Viewport extends Scene
         this.render_things();
 
         // hardcoded for now
-        this.bg.setTexture(`atlas${Math.floor(this.room_id / 3)}`, this.roomJson.bg);
+        this.bg.setTexture(`atlas${Math.floor(this.roomId / 3)}`, this.roomJson.bg);
         this.bg.setVisible(true);
     }
-/*
-    drawRoomOLD(curr_room_id)
-    {
-        console.log(`** Drawing room: ${curr_room_id}`)
-        const currAtlasName = `atlas${Math.floor(curr_room_id / 3) }`
-        this.roomscript = RoomScripts[curr_room_id];
-        
-        const roomJson = this.cache.json.get(`room${curr_room_id}`)
-        this.curr_room_id = curr_room_id;
-        this.currentThings = roomJson.things;
-        this.bg.setTexture(currAtlasName, roomJson.bg)
 
-        for (const [index, curr] of this.currentThings.entries())
-        {
-            if (curr.skipCond && this.conditionIsSatisfied(curr.skipCond))
-            {
-                console.log("Skipping",curr);
-                continue;
-            }
-
-            if (curr.kind === 1)
-            {
-                continue;
-            }
-                                
-            const frameuffa = `${curr.frame}${curr.suffix? this.getVarFromArray(curr.suffix): ""}`
-            const immy = this.thingsGroup.get(curr.x, curr.y, currAtlasName, frameuffa, true)
-            immy.setDepth(curr.kind);//.setActive(true).setVisible(true);
-            immy.texture.key === currAtlasName? immy.setFrame(frameuffa): immy.setTexture(currAtlasName, frameuffa);
-            immy.setActive(true);
-            immy.setVisible(true)
-            this.things_container.set(index, immy);
-            immy.rid = index;
-            //console.log("immy.texture.key", immy.texture.key, "index", index);
-            
-            if (!immy.listenerCount(Phaser.Input.Events.POINTER_DOWN))
-            {
-                console.log("Attaching input listeners", Phaser.Input.Events.POINTER_DOWN)
-                immy.on(Phaser.Input.Events.POINTER_DOWN, this.onthingdown);
-            }
-            else
-            {
-                console.log("Thing already has input listeners");
-            }
-            console.log("eventNames()", immy.eventNames(), "pointerdown amount:", immy.listenerCount('pointerdown'));
-
-            if (curr.kind === 4)
-            {
-                immy.setOrigin(0.5, 1);
-            }
-            else
-            {
-                immy.setOrigin(0);
-            }
-            
-            if (curr.noInteraction)
-            {
-                console.log("...but is input disabled");
-                immy.disableInteractive(false);
-                continue;
-            }
-            else
-            {
-                //immy.on('pointerdown', this.onthingdown)//RoomScripts[curr_room_id][index], this);
-                immy.setInteractive();
-            }
-            
-        }
-    }*/
-
-    onthingdown(a,b)
+    onThingDown(a,b)
     {
         const scene = this.scene;
         console.log(`Clicked thing`,this.frame.name);// Math.random());
-        //RoomScripts[scene.curr_room_id][this.rid].call(scene, this);
         scene.roomscript[this.rid].call(scene, this);
 
     }
@@ -307,8 +236,63 @@ export class Viewport extends Scene
         return VarManager.newHandleAny(ary[0], ary[1]) === ary[2];
     }
 
+    setVariable(ary, newValue)
+    {
+        VarManager.newHandleAny(ary[0], ary[1], newValue);
+    }
+
     toggleBit(ary)
     {
         return VarManager.newHandleAny(ary[0], ary[1], null, true);
+    }
+    // unused
+    getRoomJson(roomId)
+    {
+        return roomId === undefined? this.roomJson : this.cache.json.get(`room${roomId}`)
+    }
+     //unused
+    getThingsJson(roomId)
+    {
+        return roomId === undefined? this.thingsJson : this.getRoomJson(roomId).things;
+    }
+
+    getJson(roomId)
+    {
+        console.log(`Getting JSON for room: ${roomId}`);
+        return this.cache.json.get(`room${roomId}`);
+    }
+
+    getExistentThing(rid)
+    {
+        if (!this.thingsContainer.has(rid))
+        {
+            console.warn(`Current room (${this.roomId}) does not contains any Thing with rid ${rid}`);
+            return false
+        }
+        return this.thingsContainer.get(rid);
+    }
+
+    setThingNotVisible(thing)
+    {
+        //rid = typeof thing === "number"? rid : thing.rid;
+        gameObject = null
+        const varAry = this.thingsJson[rid]
+    }
+
+    nextIntInRange(val, minValue = 0, maxAllowed = 9, decrease = false)
+    {
+        if (val < minValue || val > maxAllowed)
+        {
+            console.warn(`nextIntInRange: val (${val}) is out of range ${minValue}-${maxAllowed}`);
+            return false;
+        }
+        if (decrease)
+        {
+            return val === 0? maxAllowed:val-1;
+        }
+        else
+        {
+            return val === maxAllowed?0: val+1;
+        }
     }
 }
