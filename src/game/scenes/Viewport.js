@@ -2,6 +2,9 @@ import VarManager from '../modules/VarManager.js';
 import RoomScripts from '../roomscripts/roomscripts.js';
 import { NONE, Scene } from 'phaser';
 
+// specials
+import Shield from '../modules/Shield.js';
+
 export class Viewport extends Scene
 {
     roomId;
@@ -70,7 +73,7 @@ export class Viewport extends Scene
         //this.player = null;
 
         // shield
-        //this.shield = null
+        this.shield = new Shield(this);
 
 
         // START
@@ -94,6 +97,8 @@ export class Viewport extends Scene
     pressedX(eve)
     {
         console.log("roomId is:", this.roomId);
+        this.shield.active? this.shield.lower(): this.shield.raise();
+        this.cameras.main.shake(650, 0.01);
     }
 
     disable_group_things()
