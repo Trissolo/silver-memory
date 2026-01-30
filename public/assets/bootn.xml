@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<font>
+  <info face="***** Place a name" size="4"/>
+  <common lineHeight="5"/>
+  <chars count="14">
+    <char id="46" x="18" y="5" width="2" height="5" xoffset="0" yoffset="0" xadvance="2"/>
+    <char id="48" x="0" y="0" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="49" x="2" y="0" width="2" height="5" xoffset="0" yoffset="0" xadvance="2"/>
+    <char id="50" x="4" y="0" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="51" x="8" y="0" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="52" x="8" y="5" width="5" height="5" xoffset="0" yoffset="0" xadvance="5"/>
+    <char id="53" x="12" y="0" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="54" x="16" y="0" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="55" x="0" y="5" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="56" x="13" y="5" width="5" height="5" xoffset="0" yoffset="0" xadvance="5"/>
+    <char id="57" x="4" y="5" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="37" x="20" y="5" width="5" height="5" xoffset="0" yoffset="0" xadvance="5"/>
+    <char id="98" x="25" y="5" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+    <char id="97" x="25" y="0" width="4" height="5" xoffset="0" yoffset="0" xadvance="4"/>
+  </chars>
+</font>
