@@ -58,9 +58,8 @@ class VersatileBox(Gtk.Box):
         #button_generate_json.set_valign(1)
         self.show_all()
         #tech info:
-        for i, elem in enumerate(self.get_children()):
-            print(f"mainbar.get_children()[{i}] = {elem.__class__.__name__:<6} ({elem.get_name()})")
-
+        #for i, elem in enumerate(self.get_children()):
+        #    print(f"mainbar.get_children()[{i}] = {elem.__class__.__name__:<6} ({elem.get_name()})")
         return self
     def gag(self, button):
         #print(*self.source.items())

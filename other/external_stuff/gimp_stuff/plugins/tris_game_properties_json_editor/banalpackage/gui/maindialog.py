@@ -403,7 +403,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
                 #print("No kind")
                 continue
         #real_res["basescript"] = self.assemble_basescript(things_array)
-        self.rscript = self.assemble_basescript(things_array)
+        self.rscript = self.assemble_basescript(real_res)
         print("json Done!")
         self.copy_text_to_clipboard(json.dumps(real_res, indent = None))
         self.set_internal_message()
@@ -437,14 +437,18 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         next_idx = layers.index(self.layer) + button.dir
         self.image.set_selected_layers([layers[0] if next_idx == len(layers) else layers[next_idx]])
         self.clicked_update_layer(None)
-    def assemble_basescript(self, things):
+    def assemble_basescript(self, real_res):
         res = ""
         nl = "\n"
         sp = " "
         frame_prop = "frame"
-        for idx, elem in enumerate(things):
+        gen_start = f"{nl}{sp*4}static "
+
+
+        for idx, elem in enumerate(real_res.get('things')):
             comment = elem[frame_prop] if frame_prop in elem else "AREA"
-            res+= f"{sp*4}// {comment}{nl}{sp*4}static {idx}(sprite){{console.log(sprite.frame.name);}}{nl*2}"
+            res+= f"{sp*4}// {comment}{gen_start}{idx}(thing){{console.log(thing.frame.name);}}{nl*2}"
+
         return f"export default class rs{self.image.get_name()[4:-4]}{nl}{{{nl}{res}}}\n"
     def show_message(self, message = "Test\ntest"):
         Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
