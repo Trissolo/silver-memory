@@ -24,12 +24,13 @@ class Altr():
         self.param = param
 '''
 from ..modules.datagrabber import DataGrabber
+from ..modules.crossdisciplinary import CrossDisciplinary
 from .singlechooser import SingleChooser
 from .versatilebox import VersatileBox
 from .multichooser import MultiChooser
 from .binarybox import BinaryBox
 
-class MainDialog(GimpUi.Dialog, DataGrabber):
+class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
     def __new__(cls):
         print("Creating MainDialog")
         gag = super(MainDialog, cls).__new__(cls)
@@ -80,6 +81,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber):
         button_skip = temp_as.get_children()[2].get_children()[1]
         button_skip.connect('clicked', self.paras_skip)
         #print(f"{button_skip=}")
+        print(f"🐢Current🌍")
+        self._iu_message()
+
+        CrossDisciplinary.integer_to_binary(CrossDisciplinary._gather_vcoords(0,1))
 
 
         #print(f"🐢Current🌍 {temp_as} {temp_as.get_children()[2].get_children()[1]}")
