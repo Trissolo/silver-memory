@@ -7,10 +7,10 @@ export class Boot extends Scene
         super('Boot');
     }
     
-    //init(data)
-    //{
-        // console.log("qqq", Phaser.Loader.Events.FILE_KEY_COMPLETE);
-    //}
+    init(data)
+    {
+        console.log("🧁 BOOT SCENE");//, Phaser.Loader.Events.FILE_KEY_COMPLETE);
+    }
        
 
     preload ()

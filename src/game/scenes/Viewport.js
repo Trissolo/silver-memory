@@ -4,9 +4,11 @@ import { NONE, Scene } from 'phaser';
 
 // specials
 import Shield from '../modules/Shield.js';
+import RoomEvents from './RoomEvents/genericRoomEvents.js'
 
 export class Viewport extends Scene
 {
+    roomEmitter;
     roomId;
     roomJson;
     thingsJson;
@@ -26,7 +28,7 @@ export class Viewport extends Scene
                 'Clock',  //this.time
                 //'DataManagerPlugin',  //this.data
                 'InputPlugin',  //this.input
-                'Loader',  //this.load
+                //'Loader',  //this.load
                 'TweenManager',  //this.tweens
                 //'LightsPlugin'  //this.lights
                 ],
@@ -41,9 +43,12 @@ export class Viewport extends Scene
 
     init(data)
     {
-        console.dir("INIT", this);
-        console.log("Vars", VarManager)
+        this.events.once('create', this.scene.get('Controller')._installScene, this.scene.get('Controller'))//, sce.scene.key));
+        // this.events.once(Phaser.Scenes.Events.CREATE, () => console.log("🔮 Viewport CREATE (not READY) called"));
+        console.log(`🍰 Running Vievport 'init'`)//, this);
+        // console.log("Vars", VarManager)
         this.debuCounter = 0;
+        this.events.once('destroy', this.onDestroy, this);
     }
 
     create ()
@@ -68,23 +73,22 @@ export class Viewport extends Scene
         // 2b) container for 'things'
         this.thingsContainer = new Map();
 
-
         // player
         //this.player = null;
 
         // shield
         this.shield = new Shield(this);
 
-
-        // START
-        this.drawRoom(0);
-
-
+        //test text
+        //this.text = this.add.bitmapText(8, 8, "font0", "+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
 
         // code for test
         this.input.keyboard.on('keydown-Z', this.pressedZ, this);
 
         this.input.keyboard.on('keydown-X', this.pressedX, this);
+
+        // START
+        //this.drawRoom(0);
     }
 
     pressedZ(eve)
@@ -101,6 +105,18 @@ export class Viewport extends Scene
         this.cameras.main.shake(650, 0.01);
     }
 
+    onDestroy()
+    {
+        this.thingsContainer.clear();
+        this.roomEmitter = null;
+        this.bg.destroy();
+        this.bg = null;
+        this.shield.destroy();
+        this.shield = null;
+        this.thingsGroup.destroy();
+        this.thingsGroup = null;
+    }
+
     disable_group_things()
     {      
         for (const thing of this.thingsContainer.values())
@@ -108,7 +124,8 @@ export class Viewport extends Scene
             thing.disableInteractive()
               .setActive(false)
               .setVisible(false)
-              .rid = null
+              .setState(null)
+              //.rid = null
         }
 
         this.thingsContainer.clear();
@@ -128,6 +145,7 @@ export class Viewport extends Scene
 
     set_fonsEtOrigo(roomId)
     {
+        this.input.enabled = false;
         this.roomJson = this.getJson(roomId);
         this.roomscript = RoomScripts[roomId];
 
@@ -149,7 +167,7 @@ export class Viewport extends Scene
                                 
             const tsprite = this.thingsGroup.get(thingData.x, thingData.y);
             
-            console.log("🫓 Super imp", "Active", tsprite.active, "Visible", tsprite.visible);
+            console.log("🫓 Super imp", "Active", tsprite.active, "Visible", tsprite.visible, tsprite.state);
             
             // set the frame, or, if needed, the texture
             const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarFromArray(thingData.suffix): ""}`;
@@ -157,7 +175,8 @@ export class Viewport extends Scene
             tsprite.texture.key === atlasKey? tsprite.setFrame(assembledFrameName): tsprite.setTexture(atlasKey, assembledFrameName);
             
             // Room ID!
-            tsprite.rid = idx;
+            //tsprite.rid = idx;
+            tsprite.setState(idx);
             
             // let's keep this thing in its container
             this.thingsContainer.set(idx, tsprite);
@@ -214,20 +233,27 @@ export class Viewport extends Scene
 
     drawRoom(id)
     {
-        console.log("NEW draw room");
+        this.input.enabled = false;
         this.set_fonsEtOrigo(id);
+        
         this.render_things();
+        this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
 
         // hardcoded for now
         this.bg.setTexture(`atlas${Math.floor(this.roomId / 3)}`, this.roomJson.bg);
         this.bg.setVisible(true);
+
+        this.roomEmitter.emit(RoomEvents.READY, this);
+        this.input.enabled = true;
+        //console.log("pollRate", this.input.pollRate)
     }
 
+    //the scope is the GameObject
     onThingDown(a,b)
     {
         const scene = this.scene;
         console.log(`Clicked thing`,this.frame.name);// Math.random());
-        scene.roomscript[this.rid].call(scene, this);
+        scene.roomscript[this.state].call(scene, this);
 
     }
 
@@ -263,7 +289,7 @@ export class Viewport extends Scene
 
     getJson(roomId)
     {
-        console.log(`Getting JSON for room: ${roomId}`);
+        // console.log(`Getting JSON for room: ${roomId}`);
         return this.cache.json.get(`room${roomId}`);
     }
 

@@ -9,8 +9,9 @@ export class Preloader extends Scene
 
     init ()
     {
-        console.log("PRELOADER SCENE");
-        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlas0`, this.preliminary, this)
+        console.log("🥚 PRELOADER SCENE");
+        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlas0`, this.preliminary, this);
+        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-ref_font`, this.makeRetroFont, this)
 
         this.maxLength = 53;
         this.percent =         
@@ -39,8 +40,8 @@ export class Preloader extends Scene
 
     redrawBar(val)
     {
-        console.log(val);
-        //const val = 0.75
+        // console.log(val);
+        // const val = 0.75
         this.bar.setText(`${Math.floor(val*100)}%\n${"a".repeat(Math.floor(this.maxLength * val))}`.padEnd(this.maxLength, "b"));
     }
 
@@ -50,6 +51,7 @@ export class Preloader extends Scene
         this.load.setPath('assets');
 
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
+        this.load.image('ref_font', 'monospaced_font_eng.png');
 
         const maxRooms = 2;
 
@@ -71,7 +73,8 @@ export class Preloader extends Scene
         //this.redrawBar(0.666);
         this.load.off('progress', this.redrawBar, this);
         this.bar.destroy();
-        this.scene.start('Viewport');
+        
+        this.scene.start('Controller');
     }
 
 
@@ -86,8 +89,23 @@ export class Preloader extends Scene
 
         for (const [idx, [x, y]] of hardcodedCoords.entries())
         {
-            console.log(idx, x, y);
+            // console.log(idx, x, y);
             t.add(`pixel${String.fromCharCode(idx + 65)}`, 0, x, y, 1, 1);
         }
+    }
+
+    makeRetroFont()
+    {
+        console.log("...making retro font...");
+        const mainfont_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÈÌÒÙàèìòù 0123456789,.:;"!?+-*/=^<>%()[]{}`_#';
+        const config = {
+            image: 'ref_font',
+            width: 4,
+            height: 6,
+            chars: mainfont_chars,
+            charsPerRow: 26
+        };
+
+        this.cache.bitmapFont.add('font0', Phaser.GameObjects.RetroFont.Parse(this, config));
     }
 }

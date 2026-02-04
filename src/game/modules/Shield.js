@@ -7,12 +7,13 @@ export default class Shield extends Phaser.GameObjects.Image
     this
         .setScale(scene.cameras.main.width, scene.cameras.main.height)
         .setAlpha(0.5)
-        .setDepth(Number.MAX_SAFE_INTEGER)
+        .setDepth(1e8) //Number.MAX_SAFE_INTEGER)
         .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
         .setScrollFactor(0)
         .on("pointerdown", this.clicked)
         .setOrigin(0)
-        .addToDisplayList();
+        .addToDisplayList()
+        .lower();
   }
 
   raise()
@@ -22,6 +23,8 @@ export default class Shield extends Phaser.GameObjects.Image
         .setVisible(true);
         // .scene.igEvents.emit(ShieldEvents.RAISE, this.scene)
         //.emit(ShieldEvents.RAISE, this)
+        console.log("Shield cursor:", this.input.cursor);
+        this.input.cursor =  'url("/assets/cursors/wait3.cur"), pointer'
   }
 
   lower()

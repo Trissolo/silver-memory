@@ -1,4 +1,5 @@
 import { Boot } from './scenes/Boot';
+import { Controller} from './scenes/Controller'
 import { Preloader } from './scenes/Preloader';
 import { Viewport } from './scenes/Viewport';
 import { AUTO, Game } from 'phaser';
@@ -34,6 +35,7 @@ const config = {
     disablePostFX: true,
     scene: [
         Boot,
+        Controller,
         Preloader,
         Viewport
     ]
