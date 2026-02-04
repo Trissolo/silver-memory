@@ -393,6 +393,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                     obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
                 #skipCond
                 if possible_properties[3] in parasites:
+                    compressed_skipcond= self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
+                    print(f"TEST {possible_properties[3]}: {compressed_skipcond} -> {CrossDisciplinary.manage_array(compressed_skipcond)}")
                     obj[possible_properties[3]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
                 # Trigger area
                 if curr_kind == 1:
@@ -401,6 +403,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                 obj["frame"] = layer.get_name().rstrip("0123456789")
                 #suffix
                 if obj["frame"] != layer.get_name() and possible_properties[2] in parasites:
+                    suffix_coords = self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
+                    print(f"TEST merging {possible_properties[2]}: {suffix_coords} {CrossDisciplinary.manage_array(suffix_coords)}")
                     obj[possible_properties[2]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
                 type(self).manage_coords(layer, obj, curr_kind)
 

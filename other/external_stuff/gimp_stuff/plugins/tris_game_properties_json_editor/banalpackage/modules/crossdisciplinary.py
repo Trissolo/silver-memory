@@ -14,3 +14,16 @@ class CrossDisciplinary():
     @staticmethod
     def _disassemble_vcoords(vcoord):
         return [vcoord & 3, vcoord >> 2]
+    @classmethod
+    def manage_array(cls, ary):
+        l = len(ary)
+        if l == 1:
+            return ary[0]
+        vcoords = CrossDisciplinary._gather_vcoords(ary[0], ary[1])
+        if l == 2:
+            return vcoords
+        elif l == 3:
+            return [vcoords, ary[2]]
+        else:
+            raise ValueError(f"Array length ({l}) out of range!")
+        
