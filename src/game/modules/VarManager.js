@@ -74,6 +74,7 @@ class VarManager
 
     static newHandleAny(kind, varIdx, newValue, toggleBit)
     {
+        // console.log(`INSIDE HANDEL ARRAY, kind: ${kind}, varIDX: ${varIdx}, newValue: ${newValue}, toggleBit: ${toggleBit}`);
         const container = this.varContainers.get(kind);
 
         // Quick check
@@ -189,6 +190,18 @@ class VarManager
 
         return {x, y, container};
         
+    }
+
+    static _debug()
+    {
+        for (const elem of this.varContainers.values())
+        {
+            console.log("Vars per element:", elem.varsPerElement)
+            for (const value of elem.typedArray)
+            {
+                console.log(value);
+            }
+        }
     }
 
     

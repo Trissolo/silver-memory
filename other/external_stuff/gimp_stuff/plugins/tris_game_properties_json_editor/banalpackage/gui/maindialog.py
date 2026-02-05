@@ -81,13 +81,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         button_skip = temp_as.get_children()[2].get_children()[1]
         button_skip.connect('clicked', self.paras_skip)
         #print(f"{button_skip=}")
-        print(f"🐢Current🌍")
-        self._iu_message()
-
-        CrossDisciplinary.integer_to_binary(CrossDisciplinary._gather_vcoords(0,1))
-
-
-        #print(f"🐢Current🌍 {temp_as} {temp_as.get_children()[2].get_children()[1]}")
+        #print(f"🐢Current🌍")
+        #self._iu_message()
+        #CrossDisciplinary.integer_to_binary(CrossDisciplinary._gather_vcoords(0,1))
         '''
         print("Follia:")
         from banalpackage.modules.follia import WidgetTree
@@ -104,7 +100,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         #print(f"get_vexpand: {check.get_vexpand()}\nget_hexpand: {check.get_hexpand()}")
     def build_main_dictionary(self):
         #print("🎅TIPO:", self.get_content_area().get_children()[1].get_children()[0].get_name()) #[1].get_children()[0])
-        source_depths = {-5: 'Background', 0: 'Ridiculously Faraway', 1: 'Trigger Area', 2: 'Covered', 3: 'Always Back', 4: 'Depth Sorted', 800: 'Foreground'}
+        source_depths = {-6: 'Hoverable', -5: 'Background', 0: 'Ridiculously Faraway', 1: 'Trigger Area', 2: 'Covered', 3: 'Always Back', 4: 'Depth Sorted', 800: 'Foreground'}
         source_varcat = ["Bool", "Crumble", "Nibble", "Byte"]
         source_variables = self._populate_from_files()
         source_hnames = source_variables.pop()
@@ -160,7 +156,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self.get_mainbar_box().get_children()[1].connect("clicked", self.expensive_next)
         self.get_mainbar_box().get_children()[2].connect("clicked", self.expensive_next)
         #main bar button: generate JSON
-        self.get_mainbar_box().get_children()[4].connect("clicked", self.generate_json)
+        #self.get_mainbar_box().get_children()[4].connect("clicked", self.generate_json)
+        self.get_mainbar_box().get_children()[4].connect('clicked', self.brandnew_generate_json)
         self.get_mainbar_box().get_children()[5].connect("clicked", self.get_polygons)
         self.get_mainbar_box().get_children()[6].connect("clicked", self.show_rscript)
         #button_remove_existing_parasite:
@@ -454,6 +451,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         gen_start = f"{nl}{sp*4}static "
 
 
+
         for idx, elem in enumerate(real_res.get('things')):
             comment = elem[frame_prop] if frame_prop in elem else "AREA"
             res+= f"{sp*4}// {comment}{gen_start}{idx}(thing){{console.log(thing.frame.name);}}{nl*2}"
@@ -466,4 +464,58 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         return self
     def show_rscript(self, button):
         self.copy_text_to_clipboard(self.rscript)
-        self.set_internal_message("📜 rscript copyed")
+        self.set_internal_message("📜 rscript copied" if len(self.rscript) > 2 else "The script is empty. You must generate the JSON first.")
+    def brandnew_generate_json(self, button):
+        import json
+        #['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction']
+        #  0       1            2         3           4
+        possible_properties = [*self._json_properties_with_size.keys()]
+        #message:
+        print(f"Defining json... {possible_properties} t:{type(possible_properties)}")
+        #return list
+        things_array = []
+        real_res = {'things': things_array}
+        #iteration:
+        for layer in (l for l in self.image.get_layers() if l.get_visible()):
+            parasites = layer.get_parasite_list()
+            #print(f"{layer.get_name()}")
+            if possible_properties[0] in parasites:
+                curr_kind = self.parasite_data_to_ary(layer.get_parasite(possible_properties[0]))[0]
+                if curr_kind == -6:
+                    print("the kind is 'Hoverable', but it is not implemented yet.")
+                if curr_kind == -5:
+                    real_res['bg'] = layer.get_name()
+                    continue
+                obj = {'kind': curr_kind}
+                things_array.append(obj)
+                #hoverName
+                if possible_properties[1] in parasites:
+                    obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
+                #skipCond
+                if possible_properties[3] in parasites:
+                    compressed_skipcond = self.qwerty_ary(layer, possible_properties[3]) #self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
+                    #print(f"TEST {possible_properties[3]}: {compressed_skipcond} -> {CrossDisciplinary.manage_array(compressed_skipcond)}")
+                    obj[possible_properties[3]] = CrossDisciplinary.manage_array(compressed_skipcond)
+                # Trigger area
+                if curr_kind == 1:
+                    type(self).manage_area(layer, obj)
+                    continue
+                obj["frame"] = layer.get_name().rstrip("0123456789")
+                #suffix
+                if obj["frame"] != layer.get_name() and possible_properties[2] in parasites:
+                    suffix_coords = self.qwerty_ary(layer, possible_properties[2] )#self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
+                    # print(f"TEST merging {possible_properties[2]}: {suffix_coords} {CrossDisciplinary.manage_array(suffix_coords)}")
+                    obj[possible_properties[2]] = CrossDisciplinary.manage_array(suffix_coords)
+                type(self).manage_coords(layer, obj, curr_kind)
+
+            else:
+                #print("No kind")
+                continue
+        #real_res["basescript"] = self.assemble_basescript(things_array)
+        self.rscript = self.assemble_basescript(real_res)
+        print("json Done!")
+        self.copy_text_to_clipboard(json.dumps(real_res, indent = None))
+        self.set_internal_message()
+    def qwerty_ary(self, layer, property):
+        return self.parasite_data_to_ary(layer.get_parasite(property))
+    

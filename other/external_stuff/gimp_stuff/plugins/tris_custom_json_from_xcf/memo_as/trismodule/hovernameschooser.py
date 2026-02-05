@@ -45,7 +45,7 @@ class hovernamesChooser(Necessary):
         #top container
         self.preview_label = Gtk.Label.new("----")
         self.preview_label.show()
-        self.confirm_button = make_button(GimpUi.ICON_GO_PREVIOUS, "Confirm HoverName Button")# GimpUi.Button.new_from_icon_name(GimpUi.ICON_MENU_LEFT, 1) #Gtk.Button.new_with_label("Click Me")
+        self.confirm_button = make_button(GimpUi.ICON_GO_PREVIOUS, "Confirm HoverName Button")
         self.confirm_button.connect("clicked", self.on_confirm_clicked)
 
         # reset option!

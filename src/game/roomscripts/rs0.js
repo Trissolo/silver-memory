@@ -1,65 +1,76 @@
 export default class rs0
 {
     // wrench
-    static 0(sprite)
-    {
-        const aryvar = this.thingsJson[sprite.rid]?.skipCond;
-        this.setVariable(aryvar, 1);
-        sprite.setVisible(false);
+    static 0(thing){
+        console.log(thing.frame.name);
+        const roomJson = this.getJson(this.roomId);
+        const tjson = roomJson.things[thing.state]
+        console.dir(tjson);
+        console.log("SKIPCOND", tjson.skipCond)
+        this.setAsCondition(tjson.skipCond);
     }
 
     // coperchio
-    static 1(sprite){console.log(sprite.frame.name)}
-
-    // crate
-    static 2(sprite){console.log(sprite.frame.name)}
-
-    // coso_dietro
-    static 3(sprite){console.log(sprite.frame.name)}
-
-    // AREA
-    static 4(sprite){console.log(sprite.frame.name)}
-
-    // AREA
-    static 5(sprite){console.log(sprite.frame.name)}
-
-    // crepa
-    static 6(sprite){console.log(sprite.frame.name)}
-
-    // button
-    static 7(sprite)
-    {
-        //console.log(sprite.frame.name);
-        // this.visible_things.get(3).setVisible(false);
+    static 1(thing){
+        console.log(thing.frame.name);
+        const roomJson = this.getJson(0);
+        const tjson = roomJson.things[thing.state]
+        console.dir(tjson);
+        console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.getVarValue(tjson.suffix)}`)
+        this.toggleBit(tjson.suffix);
+        thing.setFrame(`${tjson.frame}${this.getVarValue(tjson.suffix)}`);
     }
 
+    // crate
+    static 2(thing){console.log(thing.frame.name);}
+
+    // coso_dietro
+    static 3(thing){console.log(thing.frame.name);}
+
+    // AREA
+    static 4(thing){console.log(thing.frame.name);}
+
+    // AREA
+    static 5(thing){console.log(thing.frame.name);}
+
+    // crepa
+    static 6(thing){console.log(thing.frame.name);}
+
+    // button
+    static 7(thing){console.log(thing.frame.name);}
+
     // mensole
-    static 8(sprite){console.log(sprite.frame.name)}
+    static 8(thing){console.log(thing.frame.name);}
 
     // striscia
-    static 9(sprite){console.log(sprite.frame.name)}
+    static 9(thing){console.log(thing.frame.name);}
 
     // porta
-    static 10(sprite)
+    static 10(thing)
     {
-        console.log(sprite.frame.name)
-        const thing_json_data = this.roomJson.things[sprite.rid];
-        console.log("thing_json_data:", thing_json_data.suffix);
-        this.toggleBit(thing_json_data.suffix);
-        sprite.setFrame(`${thing_json_data.frame}${this.getVarFromArray(thing_json_data.suffix)}`);
+        console.log(thing.frame.name);
+        const roomJson = this.getJson(0);
+        const tjson = roomJson.things[thing.state];
+        const {suffix: vcoords_for_suffix} = tjson;
+        console.log(vcoords_for_suffix);
+        const current_value = this.getVarValue(vcoords_for_suffix);
+        if (current_value === 0)
+        {
+            this.setVariable(vcoords_for_suffix, 1);
+        }
+        else
+        {
+            this.setVariable(vcoords_for_suffix, 0);
+        }
+        console.log("Changed to:", this.getVarValue(vcoords_for_suffix));
+        //refresh frame
+        thing.setFrame(`${tjson.frame}${this.getVarValue(vcoords_for_suffix)}`);
+
     }
 
     // vasca
-    static 11(sprite)
-    {
-        //const wrenchSkipVar = [...this.thingsJson[0].skipCond];
-        //wrenchSkipVar.pop();
-        //const variable = 
-        const {skipCond} = this.thingsJson[0]
-        console.log(sprite.frame.name, `WrenchStatus: ${skipCond} (${this.getVarFromArray(skipCond)})`)
-    }
+    static 11(thing){console.log(thing.frame.name);}
 
     // tubo
-    static 12(sprite){console.log(sprite.frame.name)}
-
+    static 12(thing){console.log(thing.frame.name);}
 }

@@ -101,6 +101,7 @@ export class Viewport extends Scene
     pressedX(eve)
     {
         console.log("roomId is:", this.roomId);
+        VarManager._debug();
         this.shield.active? this.shield.lower(): this.shield.raise();
         this.cameras.main.shake(650, 0.01);
     }
@@ -167,10 +168,10 @@ export class Viewport extends Scene
                                 
             const tsprite = this.thingsGroup.get(thingData.x, thingData.y);
             
-            console.log("🫓 Super imp", "Active", tsprite.active, "Visible", tsprite.visible, tsprite.state);
+            console.log("🫓 Super imp", "Active", tsprite.active, "Visible:", tsprite.visible, "State (ex .rid):", tsprite.state);
             
             // set the frame, or, if needed, the texture
-            const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarFromArray(thingData.suffix): ""}`;
+            const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
             //console.log(`AtlasKey: ${atlasKey}\nCurrent sprite texture: ${tsprite.texture.key}`)
             tsprite.texture.key === atlasKey? tsprite.setFrame(assembledFrameName): tsprite.setTexture(atlasKey, assembledFrameName);
             
@@ -257,24 +258,42 @@ export class Viewport extends Scene
 
     }
 
-    getVarFromArray(ary)
+    getVarValue(vcoords)
     {
-        return VarManager.newHandleAny(ary[0], ary[1]);
+        if (Array.isArray(vcoords))
+        {
+            console.warn(`'getVarValue' received an array, then attempted to consider the value at position [0]`, ary)
+            vcoords = vcoords[0];
+        }
+        return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2);
     }
 
     conditionIsSatisfied(ary)
     {
-        return VarManager.newHandleAny(ary[0], ary[1]) === ary[2];
+        console.log(`'conditionIsSatisfied' param length: ${ary.length}`);
+        return VarManager.newHandleAny(ary[0] & 3, ary[0] >>> 2) === ary[1];
     }
 
-    setVariable(ary, newValue)
+    setVariable(vcoords, newValue)
     {
-        VarManager.newHandleAny(ary[0], ary[1], newValue);
+        // if (Array.isArray(ary))
+        // {
+        //    ary = ary[0];
+        // }
+        console.log("'setVariable' Param is array?", Array.isArray(vcoords));
+        // console.log(`Writing the value: ${newValue} to var identified with kind: ${ary&3}, idx: ${ary>>>2}`);
+        VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, newValue);
     }
 
-    toggleBit(ary)
+    setAsCondition(condition_ary)
     {
-        return VarManager.newHandleAny(ary[0], ary[1], null, true);
+        this.setVariable(condition_ary[0], condition_ary[1]);
+    }
+
+    toggleBit(vcoords)
+    {
+        console.log("Toggle param is array? (An INTEGER is required)", Array.isArray(vcoords));
+        return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, null, true);
     }
     // unused
     getRoomJson(roomId)
