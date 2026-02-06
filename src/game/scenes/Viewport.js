@@ -43,7 +43,7 @@ export class Viewport extends Scene
 
     init(data)
     {
-        this.events.once('create', this.scene.get('Controller')._installScene, this.scene.get('Controller'))//, sce.scene.key));
+        //this.events.once('create', this.scene.get('Controller')._installScene, this.scene.get('Controller'))//, sce.scene.key));
         // this.events.once(Phaser.Scenes.Events.CREATE, () => console.log("🔮 Viewport CREATE (not READY) called"));
         console.log(`🍰 Running Vievport 'init'`)//, this);
         // console.log("Vars", VarManager)
@@ -61,6 +61,10 @@ export class Viewport extends Scene
         this.bg = this.add.image(0, 0, 'atlas0')
         .setDepth(-5)
         .setOrigin(0)
+
+        //scriptedAction
+        this.roomEmitter = this.add.timeline();
+        this.roomEmitter.on(Phaser.Time.Events.COMPLETE, this.userInteractionOn, this);
 
         // 2) Room 'things'
         this.thingsGroup = this.add.group({createCallback: function (thing)
@@ -89,7 +93,7 @@ export class Viewport extends Scene
         this.input.keyboard.on('keydown-X', this.pressedX, this);
 
         // START
-        //this.drawRoom(0);
+        this.drawRoom(0);
         ;
     }
 
@@ -102,12 +106,16 @@ export class Viewport extends Scene
 
     pressedX(eve)
     {
+        this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
+        this.scene.switch('Controller');
+        /*
         console.log("roomId is:", this.roomId);
         VarManager._debug();
         this.shield.active? this.shield.lower(): this.shield.raise();
         this.cameras.main.shake(650, 0.01);
         console.log("TEST_this.getVarValue");
         console.log(`${this.getVarValue()} <---`)
+        */
     }
 
     onDestroy()
@@ -120,6 +128,11 @@ export class Viewport extends Scene
         this.shield = null;
         this.thingsGroup.destroy();
         this.thingsGroup = null;
+    }
+
+    getScript(roomId)
+    {
+        return RoomScripts[roomId];
     }
 
     disable_group_things()
@@ -153,7 +166,7 @@ export class Viewport extends Scene
     {
         this.input.enabled = false;
         this.roomJson = this.getJson(roomId);
-        this.roomscript = RoomScripts[roomId];
+        this.roomscript = this.getScript(roomId); ////RoomScripts[roomId];
 
         // maybe too redundant
         this.thingsJson  = this.roomJson.things;
@@ -356,5 +369,62 @@ export class Viewport extends Scene
     {
         //console.log("Number.isInteger", Number.isInteger(quickValue));
         return go.setFrame(`${go.rdata.frame}${this.getVarValue(go.rdata.suffix)}`);
+    }
+
+    _message(m = "Some message")
+    {
+        console.log(m, "THIS:", this);
+    }
+
+    userInteractionOff()
+    {
+        this.shield.raise();
+    }
+
+    userInteractionOn()
+    {
+        this.roomEmitter.clear().events.length = 0;
+        this.shield.lower();
+        this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
+    }
+
+    prepareRoomEvent(ary, raiseshield = true, immediatePlay = true, onceComplete, scope)
+    {
+        const {roomEmitter} = this;
+        if (roomEmitter.events.length)
+        {
+            console.log("Clearing 'roomEmitter");
+            roomEmitter.clear().events.length = 0;
+        }
+
+        if (raiseshield)
+        {
+            roomEmitter.add(
+                {at: 0, target: this, run: this.userInteractionOff});            
+        }
+
+        roomEmitter.add(ary);
+
+        if (roomEmitter.listenerCount('complete') === 1)
+        {
+            console.log("No pending 'colplete' events");
+        }
+        else
+        {
+            console.warn("RoomEmitter still has pending 'complete' events!");
+            console.warn(roomEmitter.listenerCount('complete'))
+        }
+
+        if (onceComplete)
+        {
+            roomEmitter.once(Phaser.Time.Events.COMPLETE, onceComplete, scope)
+        }
+
+        if (immediatePlay)
+        {
+            roomEmitter.play();
+        }
+
+        return roomEmitter;
     }
 }

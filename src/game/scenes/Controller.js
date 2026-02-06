@@ -18,10 +18,21 @@ export class Controller extends Scene
 
     create ()
     {
-        this.roomEmitter = this.add.timeline();
-        this.roomEmitter.on(RoomEvents.READY, this._test_ready, this);
+        //this.roomEmitter = this.add.timeline();
+        //this.roomEmitter.on(RoomEvents.READY, this._test_ready, this);
+        console.log("CONTROLLER", this.roomEmitter);
+        this.text = this.add.bitmapText(8, 8, "font0", "+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
+        this.input.keyboard.on('keydown-C', this.prezzed_c_cont, this);
+        //this.scene.run('Viewport');
+        //const temp_scene = this.scene.get('Viewport')
+        //console.log("CONTROLLE FOUNF:", temp_scene.scene.key);
+        //this.roomEmitter.on(Phaser.Time.Events.COMPLETE, temp_scene.userInteractionOn, temp_scene);
+        //this.roomEmitter.on(Phaser.Time.Events.COMPLETE, () => console.log("TIMED EVENT STOCA ENDED OR NOT?"));
+    }
 
-        this.scene.start('Viewport');
+    prezzed_c_cont()
+    {
+        this.scene.switch('Viewport');
     }
 
     _installScene(recScene)
