@@ -40,7 +40,10 @@ export default class rs0
     static 7(thing){console.log(thing.frame.name);}
 
     // mensole
-    static 8(thing){console.log(thing.frame.name);}
+    static 8(thing)
+    {
+        console.log(`SUFFIX: ${thing.rdata.suffix}`);
+    }
 
     // striscia
     static 9(thing){console.log(thing.frame.name);}
@@ -49,9 +52,10 @@ export default class rs0
     static 10(thing)
     {
         console.log(thing.frame.name);
-        const roomJson = this.getJson(0);
-        const tjson = roomJson.things[thing.state];
-        const {suffix: vcoords_for_suffix} = tjson;
+        //const roomJson = this.getJson(0);
+        //const tjson = roomJson.things[thing.state];
+        //const {suffix: vcoords_for_suffix} = tjson;
+        const {suffix: vcoords_for_suffix} = thing.rdata;
         console.log(vcoords_for_suffix);
         const current_value = this.getVarValue(vcoords_for_suffix);
         if (current_value === 0)
@@ -64,7 +68,7 @@ export default class rs0
         }
         console.log("Changed to:", this.getVarValue(vcoords_for_suffix));
         //refresh frame
-        thing.setFrame(`${tjson.frame}${this.getVarValue(vcoords_for_suffix)}`);
+        thing.setFrame(`${thing.rdata.frame}${this.getVarValue(vcoords_for_suffix)}`);
 
     }
 

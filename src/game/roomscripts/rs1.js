@@ -16,7 +16,13 @@ export default class rs1
     static 4(thing){console.log(thing.frame.name);}
 
     // r1cabinetDoors
-    static 5(thing){console.log(thing.frame.name);}
+    static 5(thing)
+    {
+        const {suffix} = thing.rdata;
+        this.toggleBit(suffix);
+        this.refreshSpriteFrame(thing);
+
+    }
 
     // cabinet
     static 6(thing){console.log(thing.frame.name);}

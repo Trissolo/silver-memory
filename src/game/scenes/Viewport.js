@@ -67,6 +67,7 @@ export class Viewport extends Scene
             {
                 thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
                 thing.setVisible(false);
+                thing.rdata = null;
             }
         })
 
@@ -89,6 +90,7 @@ export class Viewport extends Scene
 
         // START
         //this.drawRoom(0);
+        ;
     }
 
     pressedZ(eve)
@@ -104,6 +106,8 @@ export class Viewport extends Scene
         VarManager._debug();
         this.shield.active? this.shield.lower(): this.shield.raise();
         this.cameras.main.shake(650, 0.01);
+        console.log("TEST_this.getVarValue");
+        console.log(`${this.getVarValue()} <---`)
     }
 
     onDestroy()
@@ -126,6 +130,7 @@ export class Viewport extends Scene
               .setActive(false)
               .setVisible(false)
               .setState(null)
+              .rdata = null;
               //.rid = null
         }
 
@@ -178,6 +183,7 @@ export class Viewport extends Scene
             // Room ID!
             //tsprite.rid = idx;
             tsprite.setState(idx);
+            tsprite.rdata = thingData;
             
             // let's keep this thing in its container
             this.thingsContainer.set(idx, tsprite);
@@ -344,5 +350,11 @@ export class Viewport extends Scene
         {
             return val === maxAllowed?0: val+1;
         }
+    }
+
+    refreshSpriteFrame(go) //, quickValue)
+    {
+        //console.log("Number.isInteger", Number.isInteger(quickValue));
+        return go.setFrame(`${go.rdata.frame}${this.getVarValue(go.rdata.suffix)}`);
     }
 }
