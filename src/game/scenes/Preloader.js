@@ -11,7 +11,8 @@ export class Preloader extends Scene
     {
         console.log("🥚 PRELOADER SCENE");
         this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlas0`, this.preliminary, this);
-        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-ref_font`, this.makeRetroFont, this)
+        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this);
+        // this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-ref_font`, this.makeRetroFont, this)
 
         this.maxLength = 53;
         this.percent =         
@@ -50,6 +51,7 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
+        this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
         this.load.image('ref_font', 'monospaced_font_eng.png');
 
@@ -73,8 +75,16 @@ export class Preloader extends Scene
         //this.redrawBar(0.666);
         this.load.off('progress', this.redrawBar, this);
         this.bar.destroy();
-        
+
+        //this.input.keyboard.once('keydown-Z', ()=> this.scene.start('Controller'));
         this.scene.start('Controller');
+    }
+
+    onatlasbase()
+    {
+        
+        console.log("atlasbase Loaded!");
+        this.makeRetroFont();
     }
 
 
@@ -96,16 +106,26 @@ export class Preloader extends Scene
 
     makeRetroFont()
     {
+        const {cutX, cutY, x, y} = this.textures.get('atlasbase').get('monospaced-font-eng');
+        
         console.log("...making retro font...");
         const mainfont_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÈÌÒÙàèìòù 0123456789,.:;"!?+-*/=^<>%()[]{}`_#';
         const config = {
-            image: 'ref_font',
+            image: 'atlasbase',
             width: 4,
             height: 6,
             chars: mainfont_chars,
             charsPerRow: 26
+            // 'offset.x': cutX,
+            // 'offset.y': cutY  
         };
 
         this.cache.bitmapFont.add('font0', Phaser.GameObjects.RetroFont.Parse(this, config));
+        
+        // hardcode add the ' character:
+        const newfont = this.cache.bitmapFont.get('font0');
+
+        newfont.data.chars[39] = newfont.data.chars[96];
+        //console.log(newfont.data.chars, typeof newfont.data.chars)
     }
 }
