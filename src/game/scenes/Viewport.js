@@ -262,8 +262,6 @@ export class Viewport extends Scene
         this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
 
         this.bg.assignTexture(id);
-        // hardcoded for now
-        //this.bg.setTexture(`atlas${Math.floor(this.roomId / 3)}`, this.roomJson.bg);
         console.log(this.bg.show().name);//setVisible(true);
 
         this.roomEmitter.emit(RoomEvents.READY, this);

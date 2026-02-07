@@ -174,6 +174,7 @@ export class Preloader extends Scene
         }
 
         console.log("ANIMS:", anims);
+        // console.log(framename.slice(0, framename.at(-4) === "_"? -3:-4));
     }
 
     testAnim(key, animation)
