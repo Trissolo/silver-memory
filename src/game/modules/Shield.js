@@ -2,7 +2,7 @@ export default class Shield extends Phaser.GameObjects.Image
 {
   constructor(scene)
   {
-    super(scene, 0, 0, 'atlas0', 'pixelB');
+    super(scene, 0, 0, 'atlasbase', 'pixelA');
 
     this
         .setScale(scene.cameras.main.width, scene.cameras.main.height)

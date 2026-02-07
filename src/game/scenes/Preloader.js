@@ -2,6 +2,8 @@ import { Scene } from 'phaser';
 
 export class Preloader extends Scene
 {
+    tempx = 8;
+    tempy = 14;
     constructor ()
     {
         super('Preloader');
@@ -10,33 +12,17 @@ export class Preloader extends Scene
     init ()
     {
         console.log("🥚 PRELOADER SCENE");
-        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlas0`, this.preliminary, this);
+        // this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlas0`, this.preliminary, this);
         this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this);
+        this.anims.on(Phaser.Animations.Events.ADD_ANIMATION, this.testAnim, this);
         // this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-ref_font`, this.makeRetroFont, this)
 
         this.maxLength = 53;
-        this.percent =         
+        //this.percent = 0;
         this.bar = this.add.bitmapText(22, 80, 'bootm', `\n${"a".repeat(this.maxLength)}`);
         this.redrawBar();
         this.load.on('progress', this.redrawBar, this);
-        //this.load.once(Phaser.Loader.Events.COMPLETE, this.complete, this); //() => console.log("LOAD COMPLETE"));
-    
-        //  We loaded this image in our Boot Scene, so we can display it here
-        //this.add.image(512, 384, 'background');
-
-        //  A simple progress bar. This is the outline of the bar.
-        //this.add.rectangle(11, 22, 168, 32).setStrokeStyle(1, 0xffffff).setOrigin(0);
-
-        //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
-        //const bar = this.add.rectangle(11+1, 22+2, 4, 28, 0xffffff).setOrigin(0);
-
-        //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
-        //this.load.on('progress', (progress) => {
-
-            //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
-            //bar.width = 4 + (160 * progress);
-
-        //});
+        
     }
 
     redrawBar(val)
@@ -53,8 +39,7 @@ export class Preloader extends Scene
 
         this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
-        this.load.image('ref_font', 'monospaced_font_eng.png');
-
+    
         const maxRooms = 2;
 
         for (let i = 0; i < maxRooms; i++)
@@ -66,18 +51,14 @@ export class Preloader extends Scene
 
     create()
     {
-        //this.add.bitmapText(80, 80, 'bootm', "123456R%a7890b");
-
-        //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
-        //  For example, you can define global animations here, so we can use them in other scenes.
-
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        //this.redrawBar(0.666);
         this.load.off('progress', this.redrawBar, this);
         this.bar.destroy();
 
-        //this.input.keyboard.once('keydown-Z', ()=> this.scene.start('Controller'));
-        this.scene.start('Controller');
+         this.input.keyboard.once('keydown-Z', ()=> {
+            this.anims.off(Phaser.Animations.Events.ADD_ANIMATION);
+            this.scene.start('Controller');
+        });
+        //this.scene.start('Controller');
     }
 
     onatlasbase()
@@ -85,24 +66,36 @@ export class Preloader extends Scene
         
         console.log("atlasbase Loaded!");
         this.makeRetroFont();
+        this.generateAnimations();
+
+        const t =  this.textures.get('atlasbase');
+        t.add(`pixel${String.fromCharCode(65)}`, 0, 56, 118, 1, 1);
     }
 
 
-    preliminary(a,b,c)
-    {
-        // console.log("******************Preliminary called");
-        const t =  this.textures.get('atlas0');
-        const hardcodedCoords = [
-                [400, 0],
-                [438, 132]
-            ];
+    // preliminary(a,b,c)
+    // {
+    //     console.log("******************Preliminary called");
+    //     const t =  this.textures.get('atlas0');
+    //     const hardcodedCoords = [
+    //             [400, 0],
+    //             [438, 132]
+    //         ];
 
-        for (const [idx, [x, y]] of hardcodedCoords.entries())
-        {
-            // console.log(idx, x, y);
-            t.add(`pixel${String.fromCharCode(idx + 65)}`, 0, x, y, 1, 1);
-        }
-    }
+    //     for (const [idx, [x, y]] of hardcodedCoords.entries())
+    //     {
+    //         // console.log(idx, x, y);
+    //         t.add(`pixel${String.fromCharCode(idx + 65)}`, 0, x, y, 1, 1);
+    //     }
+    //     // button animation just for test
+    //         /* this.anims.create({
+    //             key: 'blinkingButton',
+    //             defaultTextureKey: 'atlas0',
+    //             frames: [550, 222].map( (el, idx) => ({frame: `button${idx}`, duration: el})  ),
+    //             repeat: -1//,
+    //             //frameRate:10
+    //         }); */
+    // }
 
     makeRetroFont()
     {
@@ -127,5 +120,72 @@ export class Preloader extends Scene
 
         newfont.data.chars[39] = newfont.data.chars[96];
         //console.log(newfont.data.chars, typeof newfont.data.chars)
+    }
+
+    generateAnimations()
+    {
+        const {anims} = this;
+        const tempMap = new Map();
+        tempMap.set('robot', [0, 1, 2, 3]);
+        tempMap.set('guy', [0, 1, 2, 3]);
+        const cardinalsPoints = ["W", "NW", "N", "NE", "E", "SE", "S", "SW"];
+
+        let isRobot = true
+        for (const [costume, frameNumbers] of tempMap)
+        {
+            // walk animations:
+            for (const direction of cardinalsPoints)
+            {
+                const animkey = `${costume}_walk_${direction}`;
+
+                anims.create(
+                    {
+                        key: animkey,
+                        defaultTextureKey: 'atlasbase',
+                        frames :  frameNumbers.map(  el => ({frame: `${animkey}_${el}`})  ),
+                        skipMissedFrames: false,
+                        repeat: -1,
+                        frameRate: isRobot? 8: 6
+                    });
+
+                // interact animation (Not sure if is needed in game - maybe a simple 'setFrame'?)
+                anims.create({
+                    key: `${costume}_interact_${direction}`,
+                    frames: ['interactCenter', 'walk'].map((action, idx) => ({frame: `${costume}_${action}_${direction}_0`, duration: idx===0?960:80})),
+                    defaultTextureKey: 'atlasbase',
+                    skipMissedFrames: false,
+                    repeat: 0 //,
+                    //frameRate: 10
+                    });
+                    
+            }
+
+            // rotation clockwise
+            anims.create({
+                        key: `${costume}_rotate`,
+                        defaultTextureKey: 'atlasbase',
+                        frames: cardinalsPoints.map(  el => ({ frame: `${costume}_walk_${el}_${isRobot?0:3}` })  ),
+                        skipMissedFrames: false,
+                        repeat: -1,
+                        frameRate: 10
+                    });
+
+            isRobot = false
+        }
+
+        console.log("ANIMS:", anims);
+    }
+
+    testAnim(key, animation)
+    {
+      //const {Between} = Phaser.Math
+      const qqq = this.add.sprite(this.tempx, this.tempy).play(key).setOrigin(0); //Between(20, 240), Between(30, 100)).play(key)
+      this.tempx += 30;
+      if (this.tempx > 250)
+      {
+        this.tempx = 8;
+        this.tempy += 28;
+      }
+      console.log(`Playing: ${key}`, qqq.x-8);
     }
 }

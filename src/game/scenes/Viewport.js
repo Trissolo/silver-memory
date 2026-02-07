@@ -3,6 +3,7 @@ import RoomScripts from '../roomscripts/roomscripts.js';
 import { NONE, Scene } from 'phaser';
 
 // specials
+import RoomBackground from '../modules/RoomBackground.js';
 import Shield from '../modules/Shield.js';
 import RoomEvents from './RoomEvents/genericRoomEvents.js'
 
@@ -58,9 +59,10 @@ export class Viewport extends Scene
         this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
 
         // 1) background image
-        this.bg = this.add.image(0, 0, 'atlas0')
-        .setDepth(-5)
-        .setOrigin(0)
+        this.bg = new RoomBackground(this);
+        //this.add.image(0, 0, 'atlas0')
+        //.setDepth(-5)
+        //.setOrigin(0)
 
         //scriptedAction
         this.roomEmitter = this.add.timeline();
@@ -158,7 +160,7 @@ export class Viewport extends Scene
         this.thingsJson  = null;
         this.roomId = null;
 
-        this.bg.setVisible(false);
+        this.bg.hide() //setVisible(false);
         this.disable_group_things();
     }
 
@@ -259,9 +261,10 @@ export class Viewport extends Scene
         this.render_things();
         this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
 
+        this.bg.assignTexture(id);
         // hardcoded for now
-        this.bg.setTexture(`atlas${Math.floor(this.roomId / 3)}`, this.roomJson.bg);
-        this.bg.setVisible(true);
+        //this.bg.setTexture(`atlas${Math.floor(this.roomId / 3)}`, this.roomJson.bg);
+        console.log(this.bg.show().name);//setVisible(true);
 
         this.roomEmitter.emit(RoomEvents.READY, this);
         this.input.enabled = true;
