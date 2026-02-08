@@ -1,0 +1,10 @@
+# standard
+rm merged.json
+for i in {0..3}; do
+  cat "room$i.json" >> merged.json
+done
+
+# loop C-like
+for ((i=1; i<=5; i++)); do
+  echo "$i"
+done
