@@ -3,9 +3,10 @@ export default class Shield extends Phaser.GameObjects.Image
   constructor(scene)
   {
     super(scene, 0, 0, 'atlasbase', 'pixelA');
+    const {width, height} =  this.scene.scale.baseSize
 
     this
-        .setScale(scene.cameras.main.width, scene.cameras.main.height)
+        .setScale(width, height)  //scene.cameras.main.width, scene.cameras.main.height)
         .setAlpha(0.5)
         .setDepth(1e8) //Number.MAX_SAFE_INTEGER)
         .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
@@ -14,6 +15,8 @@ export default class Shield extends Phaser.GameObjects.Image
         .setOrigin(0)
         .addToDisplayList()
         .lower();
+        //console.log('Scene Scale', this.scene.scale.baseSize);
+        //console.log('Main camera size', this.scene.cameras.main.width, this.scene.cameras.main.height);
   }
 
   raise()
@@ -23,7 +26,7 @@ export default class Shield extends Phaser.GameObjects.Image
         .setVisible(true);
         // .scene.igEvents.emit(ShieldEvents.RAISE, this.scene)
         //.emit(ShieldEvents.RAISE, this)
-        console.log("Shield cursor:", this.input.cursor);
+        //console.log("Shield cursor:", this.input.cursor);
         this.input.cursor =  'url("/assets/cursors/wait3.cur"), pointer'
   }
 

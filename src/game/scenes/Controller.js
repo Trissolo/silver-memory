@@ -20,7 +20,7 @@ export class Controller extends Scene
     {
         //this.roomEmitter = this.add.timeline();
         //this.roomEmitter.on(RoomEvents.READY, this._test_ready, this);
-        console.log("CONTROLLER", this.roomEmitter);
+        console.log("CONTROLLER") //, this.roomEmitter);
         this.text = this.add.bitmapText(8, 8, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
         this.input.keyboard.on('keydown-C', this.prezzed_c_cont, this);
         //this.scene.run('Viewport');

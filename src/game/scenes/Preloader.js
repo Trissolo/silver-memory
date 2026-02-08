@@ -173,7 +173,7 @@ export class Preloader extends Scene
             isRobot = false
         }
 
-        console.log("ANIMS:", anims);
+        // console.log("ANIMS:", anims);
         // console.log(framename.slice(0, framename.at(-4) === "_"? -3:-4));
     }
 
@@ -187,6 +187,6 @@ export class Preloader extends Scene
         this.tempx = 8;
         this.tempy += 28;
       }
-      console.log(`Playing: ${key}`, qqq.x-8);
+      // console.log(`Playing: ${key}`, qqq.x-8);
     }
 }
