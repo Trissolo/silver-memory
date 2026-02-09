@@ -122,6 +122,7 @@ export class Viewport extends Scene
 
     onDestroy()
     {
+        super.destroy();
         this.thingsContainer.clear();
         this.roomEmitter = null;
         this.bg.destroy();

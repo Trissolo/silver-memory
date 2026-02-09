@@ -3,11 +3,13 @@ export default class rs0
     // wrench
     static 0(thing){
         console.log(thing.frame.name);
-        const roomJson = this.getJson(this.roomId);
-        const tjson = roomJson.things[thing.state]
-        console.dir(tjson);
-        console.log("SKIPCOND", tjson.skipCond)
-        this.setAsCondition(tjson.skipCond);
+        // const roomJson = this.getJson(this.roomId);
+        // const tjson = roomJson.things[thing.state]
+        // console.dir(tjson);
+        // console.log("SKIPCOND", tjson.skipCond)
+        this.setAsCondition(thing.rdata.skipCond);
+        // ADD ITEM IN INV HERE;
+        thing.setVisible(false);
     }
 
     // coperchio
