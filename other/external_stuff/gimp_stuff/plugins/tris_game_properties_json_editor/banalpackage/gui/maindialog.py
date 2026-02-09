@@ -47,7 +47,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self.core_stuff = []
         self.rscript = "{}"
         self.connect("destroy", self._on_destroy)
-        self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1} #, "animation": 1 }
+        self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1, "roomStatus": 8, "roomVariable": 8} #, "animation": 1 }
         #MAINBAR:
         self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
         #Preview:
@@ -139,6 +139,11 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         stack.add_named(fakew, "fake")
         stack.get_parent().show_all()
         stack.set_visible_child(fakew)
+
+        # 'Room Status' parasite 
+        core_stuff[5]['wid'] = vars_wid
+        # 'Room Var' parasite
+        core_stuff[6]['wid'] = vars_wid
     def _on_destroy(self, widget):
         print(f"ON DESTROY CALLED!\n:)" )
         self.remove_image_references()
@@ -174,6 +179,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         return self.get_content_area().get_children()[2].get_children()[1]
     def gui_delete_parasite(self, button):
         if self.current_sel is not None:
+            if self.current_sel.get('size') == 8:
+                print('You want remove a ROOM Parasite')
+                return
             self.remove_prop_parasite(self.current_sel.get('prop'))
             self.refresh_summary()
     def on_active_row(self, liststore, row_idx, colu):
@@ -241,8 +249,15 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         store = treeview.get_model() #self.get_left_liststore()
         for idx, element in enumerate(self.core_stuff):
             prop, size, wid = self.unpack_current_sel(element)
+            if size == 8:
+                print(f"{prop} is a ROOM parasite")
+                store[idx][1] = prop
+                store[idx][2] = "stoca"  #f"{ary}"
+                store[idx][color_prop_colu] ="#471"
+                store[idx][other_color] = "#260"
+                continue
             if self.has_parasite(prop):
-                parasite = self.get_parasite_from_propstring(prop)
+                parasite = self.get_parasite_from_propstring(prop)#, size)
                 ary = self.parasite_data_to_ary(parasite)
                 #print(f"PROP: {prop} 🍒ary: {ary}")
                 store[idx][1] = wid.get_readable(ary, size)
@@ -291,11 +306,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         if size == 2:
             self.attach_prop_parasite(prop, temp_ary)
             self.manifest_changed_row()
-        else:
+        elif size == 3:
             temp_ary.append(None)
             self._uff_arr.clear()
             [self._uff_arr.append(x) for x in temp_ary]
             print(f"{self._uff_arr=}")
+        elif size == 8:
+            print("This is a room parasite, non a layer parasite")
+            # self.attach_image_parasite(prop, temp_ary)
             
     def paras_skip(self, button):
         prop, size, wid = self.unpack_current_sel()
@@ -474,7 +492,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         print(f"Defining json... {possible_properties} t:{type(possible_properties)}")
         #return list
         things_array = []
-        real_res = {'things': things_array}
+        real_res = {'things': things_array, 'id': int(self.image.get_name()[4:-4])}
         #iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
             parasites = layer.get_parasite_list()
