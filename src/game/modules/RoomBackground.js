@@ -69,7 +69,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
   }
   destroy()
   {
-    super.destroy();
     this._floorVec = null;
+    super.destroy();
   }
 }
