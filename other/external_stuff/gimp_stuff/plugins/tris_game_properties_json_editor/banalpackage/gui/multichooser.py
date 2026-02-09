@@ -98,4 +98,5 @@ class MultiChooser(Gtk.Box):
         res = f"({self.bnames[zero]}) {self.source[zero][uno]}"
         return res
         #return res if size == 2 else f"If {res} equals {arr[2]}"
+        
             

@@ -179,10 +179,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         return self.get_content_area().get_children()[2].get_children()[1]
     def gui_delete_parasite(self, button):
         if self.current_sel is not None:
-            if self.current_sel.get('size') == 8:
-                print('You want remove a ROOM Parasite')
-                return
-            self.remove_prop_parasite(self.current_sel.get('prop'))
+            self.agnostic_remove_parasite(self.current_sel.get('prop'), self.current_sel.get('size'))
             self.refresh_summary()
     def on_active_row(self, liststore, row_idx, colu):
         liststore.get_selection().unselect_all()
@@ -249,20 +246,12 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         store = treeview.get_model() #self.get_left_liststore()
         for idx, element in enumerate(self.core_stuff):
             prop, size, wid = self.unpack_current_sel(element)
-            if size == 8:
-                print(f"{prop} is a ROOM parasite")
-                store[idx][1] = prop
-                store[idx][2] = "stoca"  #f"{ary}"
-                store[idx][color_prop_colu] ="#471"
-                store[idx][other_color] = "#260"
-                continue
-            if self.has_parasite(prop):
-                parasite = self.get_parasite_from_propstring(prop)#, size)
+            if self.agnostic_has_parasite(prop, size):
+                parasite = self.agnostic_get_parasite(prop, size)
                 ary = self.parasite_data_to_ary(parasite)
-                #print(f"PROP: {prop} 🍒ary: {ary}")
                 store[idx][1] = wid.get_readable(ary, size)
                 store[idx][2] = f"{ary}"
-                store[idx][color_prop_colu] ="#471"
+                store[idx][color_prop_colu] ="#471" if size!=8 else"#132"
                 store[idx][other_color] = "#260"
             else:
                 store[idx][1] = "---"
@@ -282,7 +271,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         '''
     def manifest_changed_row(self):
         prop, size, wid = self.unpack_current_sel()
-        parasite = self.get_parasite_from_propstring(prop)
+        parasite = self.agnostic_get_parasite(prop, size)#self.get_parasite_from_propstring(prop)
         ary = self.parasite_data_to_ary(parasite)
         row = self.get_treeview().get_model()[self.core_stuff.index(self.current_sel)]
         row[1] = wid.get_readable(ary, size)
@@ -291,20 +280,20 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         prop, size, wid = self.unpack_current_sel()
         res = [button.key]
         #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
-        self.attach_prop_parasite(prop, [button.key])
+        self.attach_prop_parasite(prop, [button.key], size)
         #print(f"🇿🇼 The parasite contains {self.ary_from_parasite_name(prop)}")
         self.manifest_changed_row()
     def paras_overname(self, listbox, row):
         print(f"Hovernames [{row.idx}]")#listbox, row)
         prop, size, wid = self.unpack_current_sel()
         res = [row.idx]
-        self.attach_prop_parasite(prop, res)
+        self.attach_prop_parasite(prop, res), size
         self.manifest_changed_row()
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
         temp_ary = [wid.get_kind_from_child(), row.idx]
         if size == 2:
-            self.attach_prop_parasite(prop, temp_ary)
+            self.attach_prop_parasite(prop, temp_ary, size)
             self.manifest_changed_row()
         elif size == 3:
             temp_ary.append(None)
@@ -312,21 +301,21 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
             [self._uff_arr.append(x) for x in temp_ary]
             print(f"{self._uff_arr=}")
         elif size == 8:
-            print("This is a room parasite, non a layer parasite")
-            # self.attach_image_parasite(prop, temp_ary)
+            self.attach_prop_parasite(prop, temp_ary, size)
+            self.manifest_changed_row()
             
     def paras_skip(self, button):
         prop, size, wid = self.unpack_current_sel()
         spinbutton = button.get_parent().get_children()[0]
         print(f"UFFARRAY: {self._uff_arr} Skip. Oth: {button.get_parent().get_children()=}")
         self._uff_arr[2] = spinbutton.get_value_as_int()
-        self.attach_prop_parasite(prop, self._uff_arr)
+        self.attach_prop_parasite(prop, self._uff_arr, size)
         self.manifest_changed_row()
     def paras_nointeraction(self, button):
         prop, size, wid = self.unpack_current_sel()
         res = [button.key]
         #print(f"Attaching --{prop}: [{button.key}] ({wid.source[button.key]})")
-        self.attach_prop_parasite(prop, res)
+        self.attach_prop_parasite(prop, res, size)
         self.manifest_changed_row()
 
     # Current .xcf stuff
@@ -355,13 +344,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         #print(f"Getting parasite for prop {prop_string=}", self.layer.get_parasite(prop_string))
         return self.layer.get_parasite(prop_string)
     def remove_prop_parasite(self, prop_string):
-        if self.has_parasite(prop_string): #prop_string in self.layer.get_parasite_list(): #old_parasite:
+        if self.has_parasite(prop_string):
             self.layer.detach_parasite(prop_string)
     def has_parasite(self, prop_string):
         return prop_string in self.layer.get_parasite_list()
-    def attach_prop_parasite(self, prop_string, ary):
+    def attach_prop_parasite(self, prop_string, ary, size = 1):
+        element = self.image if size == 8 else self.layer
         self.remove_prop_parasite(prop_string)
-        self.layer.attach_parasite(Gimp.Parasite.new(prop_string, 1, self.ary_to_bytes(ary)))
+        element.attach_parasite(Gimp.Parasite.new(prop_string, 1, self.ary_to_bytes(ary)))
     def ary_from_parasite_name(self, prop_string):
         if not self.has_parasite(prop_string):
             print(f"⚠️ \nNo parasite with property '{prop_string}' in the current layer ({self.layer.get_name()})")
@@ -493,6 +483,15 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         #return list
         things_array = []
         real_res = {'things': things_array, 'id': int(self.image.get_name()[4:-4])}
+        # room_props:
+        image_parasites = self.image.get_parasite_list()
+        if len(image_parasites):
+            for room_prop in image_parasites:
+                if room_prop in possible_properties:
+                    image_prop_ary = self.qwerty_ary(self.image, room_prop)
+                    print(f"{room_prop}: {image_prop_ary}")
+                    real_res[room_prop] = CrossDisciplinary.manage_array(image_prop_ary)
+
         #iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
             parasites = layer.get_parasite_list()
@@ -511,7 +510,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                     obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
                 #skipCond
                 if possible_properties[3] in parasites:
-                    compressed_skipcond = self.qwerty_ary(layer, possible_properties[3]) #self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
+                    compressed_skipcond = self.qwerty_ary(layer, possible_properties[3]) 
                     #print(f"TEST {possible_properties[3]}: {compressed_skipcond} -> {CrossDisciplinary.manage_array(compressed_skipcond)}")
                     obj[possible_properties[3]] = CrossDisciplinary.manage_array(compressed_skipcond)
                 # Trigger area
@@ -536,4 +535,19 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self.set_internal_message()
     def qwerty_ary(self, layer, property):
         return self.parasite_data_to_ary(layer.get_parasite(property))
+    def agnostic_has_parasite(self, prop, size):
+         element = self.image if size == 8 else self.layer
+         #print("HAS PARA", prop, size, element.get_name())
+         return prop in element.get_parasite_list()
+    def agnostic_remove_parasite(self, prop, size):
+        element = self.image if size == 8 else self.layer
+        if prop in element.get_parasite_list():
+            element.detach_parasite(prop)
+    def agnostic_get_parasite(self, prop, size):
+        element = self.image if size == 8 else self.layer
+        return element.get_parasite(prop) if self.agnostic_has_parasite(prop, size) else None
+
+             
+
+    
     
