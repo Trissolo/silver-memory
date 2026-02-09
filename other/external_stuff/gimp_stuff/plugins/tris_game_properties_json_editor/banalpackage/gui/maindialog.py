@@ -378,8 +378,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         #  0       1            2         3           4
         possible_properties = [*self._json_properties_with_size.keys()]
         #message:
-        print(f"Defining json... {possible_properties} t:{type(possible_properties)}")
-        #return list
+        #print(f"Defining json... {possible_properties}")
         things_array = []
         real_res = {'things': things_array}
         #iteration:
@@ -484,13 +483,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         things_array = []
         real_res = {'things': things_array, 'id': int(self.image.get_name()[4:-4])}
         # room_props:
-        image_parasites = self.image.get_parasite_list()
-        if len(image_parasites):
-            for room_prop in image_parasites:
-                if room_prop in possible_properties:
-                    image_prop_ary = self.qwerty_ary(self.image, room_prop)
-                    print(f"{room_prop}: {image_prop_ary}")
-                    real_res[room_prop] = CrossDisciplinary.manage_array(image_prop_ary)
+        image_parasites = [prop for prop in self.image.get_parasite_list() if prop in possible_properties]   
+        for room_prop in image_parasites:
+            image_prop_ary = self.qwerty_ary(self.image, room_prop)
+            real_res[room_prop] = CrossDisciplinary.manage_array(image_prop_ary)
 
         #iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
