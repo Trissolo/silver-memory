@@ -47,9 +47,10 @@ from gi.repository import GObject
 
 from gi.repository import Gio
 
-print("++++++++++++++")
 # constants:
-
+ARGU_FOLDER = "tris_user_folder"
+ARGU_BOOL_EXPERIMENTAL = "Check_parasite"
+'''
 class CONSTS:
     FILE_NAME = "tris-save-layers-png" # GLib.path_get_basename(__file__).removesuffix(".py")
     TEXT = "QWE"
@@ -58,7 +59,6 @@ class CONSTS:
     ARGU_TEXT = "tris_user_text"
     ARGU_INTEGER = "tris_user_integer"
     ARGU_FOLDER = "tris_user_folder"
-
 
 # Helper class
 class Tris_Helper:
@@ -97,12 +97,12 @@ class FileGenerator:
         # Close the file stream
         output_stream.close()
         print(f"File successfully written to {self.path}")
-
+'''
 
 # our plugin class
 class SaveLayersPng(Gimp.PlugIn):
     def do_query_procedures(self):
-        return [CONSTS.FILE_NAME]
+        return ["tris-save-layers-png"] #CONSTS.FILE_NAME]
 
     def do_set_i18n(self, name):
         return False
@@ -160,13 +160,21 @@ class SaveLayersPng(Gimp.PlugIn):
         """
         procedure.add_file_argument(
             # GimpProcedure* procedure,
-            CONSTS.ARGU_FOLDER,  # const gchar* name,
+            ARGU_FOLDER,  # const gchar* name,
             "Destination folder for .png",  # const gchar* nick,
             None,  # const gchar* blurb,
             Gimp.FileChooserAction.SELECT_FOLDER,  # GimpFileChooserAction action,
             True,  # gboolean none_ok,
             None,  # GFile* default_file,
             GObject.ParamFlags.READWRITE,  # GParamFlags flags
+        )
+
+        procedure.add_boolean_argument(
+            ARGU_BOOL_EXPERIMENTAL,
+            "Check Layer Parasite (experimental)",
+            "Skip the layer if it has a CERTAIN parasite (default: Enabled)",
+            True,
+            GObject.ParamFlags.READWRITE,
         )
 
         return procedure
@@ -202,17 +210,21 @@ class SaveLayersPng(Gimp.PlugIn):
 
     def show_starting_dialog(self, procedure, config, title_test = "Save visible layers"):
         dialog = GimpUi.ProcedureDialog.new(procedure, config, title_test)
-        dialog.fill([CONSTS.ARGU_FOLDER])
+        dialog.fill([ARGU_FOLDER, ARGU_BOOL_EXPERIMENTAL])
+
         # show the plugin Dialog:
         action_on_dialog = dialog.run()
         dialog.destroy()
         return action_on_dialog
+    
+    # def onDestroy(self):
+    #     print(self, self.__class__)
 
 
     def run(self, procedure, run_mode, image, drawables, config, run_data):
         #print(f"Args:, \nprocedure: {procedure},\nrun_mode: {run_mode},\nimage: {image},\ndrawables: {drawables},\nconfig: {config},\nrun_data: {run_data}")
-        procarg = procedure.get_arguments()[2]
-        print(f"+++debu {procarg}")
+        #procarg = procedure.get_arguments()[2]
+        #print(f"+++debu", *procedure.get_arguments())
         # just for debug: not required for the plugin purpose 
         Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
 
@@ -223,7 +235,9 @@ class SaveLayersPng(Gimp.PlugIn):
         action_on_dialog = self.show_starting_dialog(procedure, config)
 
         # let's start doing stuff! 
-        user_selected_folder = config.get_property(CONSTS.ARGU_FOLDER)
+        user_selected_folder = config.get_property(ARGU_FOLDER)
+        experimental_bool = config.get_property(ARGU_BOOL_EXPERIMENTAL)
+        print('🍊 Bool is True' if experimental_bool else '⚫️ Bool is False')
 
         # Should we stop here?
         if not action_on_dialog or user_selected_folder is None:
@@ -241,11 +255,14 @@ class SaveLayersPng(Gimp.PlugIn):
                 self.save_single_layer(layer, dest_image, pdb_proc, pconf, user_selected_folder)
 
             dest_image.delete()
+            Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX)
+            Gimp.message(f"\n ✔️ Procedure complete!") #\nThe user_selected_folder was '{user_selected_folder}'")
+            Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
 
-        (
-        Tris_Helper.add_message(f"\nDone!\nThe user_selected_folder was '{user_selected_folder}'")
-            .show_message()
-        )
+        # (
+        # Tris_Helper.add_message(f"\nDone!\nThe user_selected_folder was '{user_selected_folder}'")
+        #     .show_message()
+        # )
 
         #file_generator = FileGenerator(user_selected_folder + sep + "ooops.txt", "This is a test.\nYay!")
         #file_generator.generate_file()
