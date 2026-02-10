@@ -172,7 +172,7 @@ class SaveLayersPng(Gimp.PlugIn):
         procedure.add_boolean_argument(
             ARGU_BOOL_EXPERIMENTAL,
             "Check Layer Parasite (experimental)",
-            "Skip the layer if it has a CERTAIN parasite (default: Enabled)",
+            "Skip the layer if it has a CERTAIN parasite (default: Enabled).\nConversely, if it is False (unchecked), all visible layers will be saved, regardless of the parasite.",
             True,
             GObject.ParamFlags.READWRITE,
         )
@@ -193,9 +193,6 @@ class SaveLayersPng(Gimp.PlugIn):
         return pdb_proc, pconf
 
     def save_single_layer(self, layer, dest, pdb_proc, pconf, folder_path):
-        if not layer.get_visible():
-            return False
-        
         dest_layer = Gimp.Layer.new_from_drawable(layer, dest)
         dest.insert_layer(dest_layer, None, 0)
         dest.resize_to_layers()
@@ -248,24 +245,24 @@ class SaveLayersPng(Gimp.PlugIn):
         user_selected_folder = user_selected_folder.get_path()
 
         # Iterate layers:
-        if len(image.get_layers()) > 0:
+        ##message = ""
+        if len(image.get_layers()):
             dest_image = Gimp.Image.new(1, 1, 0)
             pdb_proc, pconf = self.prepare_pdb_procedure(dest_image)
-            for layer in image.get_layers():
+            for layer in (l for l in image.get_layers() if l.get_visible()):
+                if experimental_bool and "kind" in layer.get_parasite_list() and layer.get_parasite('kind').get_data()[0] == 49:
+                    print(f"Skipping: {layer.get_name()} because it is a Trigger Area")
+                    continue
                 self.save_single_layer(layer, dest_image, pdb_proc, pconf, user_selected_folder)
 
             dest_image.delete()
-            Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX)
-            Gimp.message(f"\n ✔️ Procedure complete!") #\nThe user_selected_folder was '{user_selected_folder}'")
-            Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
-
-        # (
-        # Tris_Helper.add_message(f"\nDone!\nThe user_selected_folder was '{user_selected_folder}'")
-        #     .show_message()
-        # )
-
-        #file_generator = FileGenerator(user_selected_folder + sep + "ooops.txt", "This is a test.\nYay!")
-        #file_generator.generate_file()
+        # else:
+        #     message = "This .xcf file has no layer"
+            
+        # End message
+        Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX)
+        Gimp.message(f"✔️ Procedure complete!\n") #\nThe user_selected_folder was '{user_selected_folder}'")
+        Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
         
         # At this point, all is ok: return Success
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
