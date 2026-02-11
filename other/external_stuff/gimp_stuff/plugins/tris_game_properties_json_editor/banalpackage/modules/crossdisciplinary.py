@@ -93,4 +93,35 @@ test_dialog.show_all()
 
 
 #test_dialog.destroy()
+
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
+def salva_dati_layer(layer, lista_interi):
+    # Converte [300, 150, 10] -> "300 150 10"
+    stringa_dati = " ".join(map(str, lista_interi))
+    
+    # Crea il parassita. 
+    # In GIMP 3, i dati devono essere passati come bytes o GLib.Bytes
+    dati_bytes = stringa_dati.encode('utf-8')
+    nuovo_parassita = Gimp.Parasite.new("mio_gioco_dati", Gimp.PARASITE_PERSISTENT, dati_bytes)
+    
+    layer.attach_parasite(nuovo_parassita)
+
+def leggi_dati_layer(layer):
+    parasite = layer.get_parasite("mio_gioco_dati")
+    if not parasite:
+        return []
+
+    # 1. Ottieni i byte e decodificali in stringa "300 150 10"
+    raw_data = parasite.get_data()
+    stringa_dati = bytes(raw_data).decode('utf-8')
+    
+    # 2. Trasforma la stringa in una lista di interi [300, 150, 10]
+    try:
+        lista_interi = [int(n) for n in stringa_dati.split()]
+        return lista_interi
+    except ValueError:
+        return []
 '''

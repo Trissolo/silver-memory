@@ -291,7 +291,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self.manifest_changed_row()
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
-        temp_ary = [wid.get_kind_from_child(), row.idx]
+        #temp_ary = [wid.get_kind_from_child(), row.idx]
+        temp_ary = [listbox.var_kind, row.idx]
         if size == 2:
             self.attach_prop_parasite(prop, temp_ary, size)
             self.manifest_changed_row()
@@ -364,7 +365,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         #print(f"Area = {layer.get_name()}")
         _succ, x, y = layer.get_offsets()
         obj['rect'] = [x, y, layer.get_width(), layer.get_height()]
+    @staticmethod
     def manage_coords(layer, obj, kind):
+        print(f"Manage coords {layer.get_name()} {kind=}")
         _succ, x, y = layer.get_offsets()
         if kind == 4:
             obj["x"] = layer.get_width() // 2 + x

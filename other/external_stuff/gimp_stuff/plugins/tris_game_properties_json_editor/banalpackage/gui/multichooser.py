@@ -25,13 +25,13 @@ class MultiChooser(Gtk.Box):
         stack.set_transition_type(Gtk.StackTransitionType.NONE)
         for idx, ary in enumerate(source_ary):
             #print(f"MULTI: [{idx}]:\n{ary}\n")
-            c = SingleChooser(ary)
-            c.idx = idx
+            c = SingleChooser(ary, idx)
+            #c.idx = idx
             name = bnames[idx]
             c.set_name(name)
             #print(c.get_name())
-            bits_amount = 1<<idx
-            c.maximum = (1<<bits_amount)-1
+            bits_amount = 1 << idx
+            c.maximum = (1 << bits_amount) -1
             stack.add_titled(c, name, f"{name} (0-{(1<<bits_amount)-1})")
             #stack.add_named(c, name)
         

@@ -10,11 +10,11 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 class SingleChooser(Gtk.Box):
-    def __new__(cls, b):
+    def __new__(cls, b, c=None):
         #print(f"Creating instance {super(SingleChooser, cls)}")
         gag = super(SingleChooser, cls).__new__(cls)
         return gag
-    def __init__(self, source):
+    def __init__(self, source, var_kind = None):
         super().__init__(homogeneous=False, spacing=2)
         self.set_orientation(1)
         self.source = source
@@ -27,6 +27,8 @@ class SingleChooser(Gtk.Box):
         #print(f"SCROOOOOLLLED! Hexpand: {scrolled.get_hexpand()}, valign: {scrolled.get_valign()}") #Gtk.Align)}")
         listbox = Gtk.ListBox.new()
         listbox.set_valign(Gtk.Align.FILL)
+        if type(var_kind) is int:
+            listbox.var_kind = var_kind
         for idx, item in enumerate(source):
             element = Gtk.ListBoxRow.new()
             element.idx = idx
