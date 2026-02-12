@@ -49,9 +49,11 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self.connect("destroy", self._on_destroy)
         self._json_properties_with_size = { "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1, "roomStatus": 8, "roomVariable": 8} #, "animation": 1 }
         #MAINBAR:
-        self.get_content_area().pack_start(VersatileBox().make_main_bar(), False, False, 2)
+        self.build_mainbar()
         #Preview:
         self.get_content_area().pack_start(VersatileBox().make_preview_bar(), True, False, 2)
+        # bind the button in previeW bar here :/
+        self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
         #CONT
         imp_box = Gtk.Box.new(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
         imp_box.set_name("Imporatnt Box")
@@ -59,7 +61,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         imp_box.pack_end(Gtk.Stack.new(), True, True, 2)
         self.aiut()
         self.build_main_dictionary()
-        self.bind_widgets()
 
         #Kinds
         temp_as = self.core_stuff[0]['wid']
@@ -155,18 +156,45 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self._uff_arr = self.current_sel = self._json_properties_with_size = self.rscript = None 
     def greet(self):
         print(f"Hi from {self.get_name()} 😎!")
-    def bind_widgets(self):
+    def build_mainbar(self):
+
+        subdiv = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
+        self.get_content_area().pack_start(subdiv, False, False, 1)
+        for p in (
+            (GimpUi.ICON_VIEW_REFRESH, self.clicked_update_layer, "refresh_layer"),
+            (GimpUi.ICON_GO_PREVIOUS, self.expensive_next, "sel_prev_layer", "dir", -1),
+            (GimpUi.ICON_GO_NEXT, self.expensive_next, "sel_next_layer", "dir", 1),
+            (GimpUi.ICON_DOCUMENT_SAVE, self.brandnew_generate_json, "generate_json"),
+            (GimpUi.ICON_TOOL_CAGE, self.get_polygons, "extract_paths"),
+            (GimpUi.ICON_FORMAT_JUSTIFY_LEFT, self.show_rscript, "copy_rscript")
+            ):
+            icon, action, name, *other = p
+            button = GimpUi.Button.new_from_icon_name(icon, 1)
+            button.connect('clicked', action)
+            button.set_name(f'Btn_{name}')
+            button.set_halign(1)
+            button.set_valign(1)
+            if len(other):
+                button.__dict__[other[0]] = other[1]
+            subdiv.pack_start(button, False, False, 2)
+
+        # label
+        label = Gtk.Label.new("Layer name")
+        subdiv.pack_start(label, True, True, 2)
+        subdiv.set_center_widget(label)
+        subdiv.reorder_child(label, 3)
+        subdiv.show_all()
+
         #main bar button: update layers
-        self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
-        self.get_mainbar_box().get_children()[1].connect("clicked", self.expensive_next)
-        self.get_mainbar_box().get_children()[2].connect("clicked", self.expensive_next)
-        #main bar button: generate JSON
-        #self.get_mainbar_box().get_children()[4].connect("clicked", self.generate_json)
-        self.get_mainbar_box().get_children()[4].connect('clicked', self.brandnew_generate_json)
-        self.get_mainbar_box().get_children()[5].connect("clicked", self.get_polygons)
-        self.get_mainbar_box().get_children()[6].connect("clicked", self.show_rscript)
+        # self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
+        # self.get_mainbar_box().get_children()[1].connect("clicked", self.expensive_next)
+        # self.get_mainbar_box().get_children()[2].connect("clicked", self.expensive_next)
+        # #main bar button: generate JSON
+        # self.get_mainbar_box().get_children()[4].connect('clicked', self.brandnew_generate_json)
+        # self.get_mainbar_box().get_children()[5].connect("clicked", self.get_polygons)
+        # self.get_mainbar_box().get_children()[6].connect("clicked", self.show_rscript)
         #button_remove_existing_parasite:
-        self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
+        #self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
     def get_mainbar_box(self):
         return self.get_content_area().get_children()[0]
     def get_left_liststore(self):
