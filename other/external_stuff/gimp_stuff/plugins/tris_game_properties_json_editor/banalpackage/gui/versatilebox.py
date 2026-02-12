@@ -44,4 +44,24 @@ class VersatileBox(Gtk.Box):
     def on_kind_selector_destroy(self, other):
         self.source = None
         #print("🥚 Versatile kind_selector_destroy called")
+
+#alternative
+# class MyCustomBox(Gtk.Box):
+#     def __init__(self):
+#         # Initialize the parent Gtk.Box
+#         # We set orientation to vertical and spacing to 10 pixels
+#         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        
+#         # Add a Label
+#         self.label = Gtk.Label(label="This is a subclassed Box")
+#         self.pack_start(self.label, True, True, 0)
+        
+#         # Add a Button
+#         self.button = Gtk.Button(label="Click Me")
+#         self.button.connect("clicked", self.on_button_clicked)
+#         self.pack_start(self.button, True, True, 0)
+#         self.show_all()
+    
+#     def on_button_clicked(self, widget):
+#         print("Button inside the custom box was clicked!")
     
