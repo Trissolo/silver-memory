@@ -1,0 +1,95 @@
+{
+  "frames": {
+    "bg4": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 251,
+        "h": 168
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 251,
+        "h": 168
+      },
+      "sourceSize": {
+        "w": 251,
+        "h": 168
+      }
+    },
+    "platform": {
+      "frame": {
+        "x": 251,
+        "y": 0,
+        "w": 70,
+        "h": 31
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 70,
+        "h": 31
+      },
+      "sourceSize": {
+        "w": 70,
+        "h": 31
+      }
+    },
+    "panela": {
+      "frame": {
+        "x": 321,
+        "y": 0,
+        "w": 68,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 68,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 68,
+        "h": 15
+      }
+    },
+    "panelb": {
+      "frame": {
+        "x": 321,
+        "y": 0,
+        "w": 68,
+        "h": 15
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 68,
+        "h": 15
+      },
+      "sourceSize": {
+        "w": 68,
+        "h": 15
+      }
+    }
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "atlas1.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 389,
+      "h": 168
+    },
+    "scale": 1
+  }
+}

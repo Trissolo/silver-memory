@@ -39,11 +39,16 @@ export class Preloader extends Scene
 
         this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
+        this.load.atlas('atlas1', 'atlas1.png', 'atlas1.json');
     
-        const maxRooms = 3;
+        const maxRooms = 5;
 
         for (let i = 0; i < maxRooms; i++)
         {
+            if (i == 3)
+            {
+                continue
+            }
             this.load.json(`room${i}`, `jsons/room${i}.json`)
         }
         

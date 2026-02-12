@@ -105,7 +105,11 @@ export class Viewport extends Scene
     pressedZ(eve)
     {
         this.clear_room();
-        this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 2, false); //+= 1;
+        this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false); //+= 1;
+        if (this.debuCounter === 3)
+        {
+            this.debuCounter = 4;
+        }
         this.drawRoom(this.debuCounter); // & 1);
     }
 
