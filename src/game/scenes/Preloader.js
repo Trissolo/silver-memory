@@ -40,7 +40,7 @@ export class Preloader extends Scene
         this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
     
-        const maxRooms = 2;
+        const maxRooms = 3;
 
         for (let i = 0; i < maxRooms; i++)
         {
@@ -54,10 +54,10 @@ export class Preloader extends Scene
         this.load.off('progress', this.redrawBar, this);
         this.bar.destroy();
 
-         this.input.keyboard.once('keydown-Z', ()=> {
+        // this.input.keyboard.once('keydown-Z', ()=> {
             this.anims.off(Phaser.Animations.Events.ADD_ANIMATION);
             this.scene.start('Controller');
-        });
+        //});
         //this.scene.start('Controller');
     }
 

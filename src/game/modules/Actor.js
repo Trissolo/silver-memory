@@ -10,14 +10,18 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this
         .setActive(false)
         .setVisible(false)
+        //.addToUpdateList()
         .addToDisplayList();
+        this.setOrigin(0.5, 1);
         this.costume = costume;
         this.id = id;
+
+        // console.log("🇮🇹 SUPER", this.scene.sys.updateList)
     }
 
     preUpdate(time, delta)
     {
-        super.preUpdate(time, delta)
+        super.preUpdate(time, delta);
     }
     destroy()
     {

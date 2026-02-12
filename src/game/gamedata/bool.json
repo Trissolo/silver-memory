@@ -6,5 +6,6 @@
   "r1#cabinetIsOpen",
   "r1#redCardTaken",
   "r1#buttonIsPressed",
-  "r2#bridgeActive"
+  "r2#bridgeActive",
+  "r2#buttonBridge"
 ]

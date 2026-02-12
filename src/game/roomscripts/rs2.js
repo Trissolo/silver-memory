@@ -21,7 +21,10 @@ export default class rs2
     static 2(thing){console.log(thing.frame.name);}
 
     // siglight
-    static 3(thing){console.log(thing.frame.name);}
+    static 3(thing)
+    {
+        this.scrollSpriteFrame(thing, 2);
+    }
 
     // AREA
     static 4(thing){console.log(thing.frame.name);}

@@ -27,7 +27,13 @@ export default class rs0
     static 2(thing){console.log(thing.frame.name);}
 
     // coso_dietro
-    static 3(thing){console.log(thing.frame.name);}
+    static 3(thing)
+    {
+        console.log(thing.frame.name);
+        console.log(`Thing.y ${thing.y} - Robot: ${this.player.y}`)
+        thing.setDepth(thing.y);
+        this.player.setDepth(this.player.y);
+    }
 
     // AREA
     static 4(thing){console.log(thing.frame.name);}

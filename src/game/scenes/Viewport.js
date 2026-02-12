@@ -5,6 +5,7 @@ import { NONE, Scene } from 'phaser';
 // specials
 import RoomBackground from '../modules/RoomBackground.js';
 import Shield from '../modules/Shield.js';
+import Actor from '../modules/Actor.js';
 import RoomEvents from './RoomEvents/genericRoomEvents.js'
 
 export class Viewport extends Scene
@@ -17,6 +18,8 @@ export class Viewport extends Scene
     roomscript;
     bg;
     shield;
+    player;
+    varyingDepthSprites = new Set();
 
     constructor ()
     {
@@ -60,9 +63,6 @@ export class Viewport extends Scene
 
         // 1) background image
         this.bg = new RoomBackground(this);
-        //this.add.image(0, 0, 'atlas0')
-        //.setDepth(-5)
-        //.setOrigin(0)
 
         //scriptedAction
         this.roomEmitter = this.add.timeline();
@@ -81,13 +81,16 @@ export class Viewport extends Scene
         this.thingsContainer = new Map();
 
         // player
-        //this.player = null;
+        this.player = new Actor(this, 'robot', 0);
 
         // shield
         this.shield = new Shield(this);
 
         //test text
         //this.text = this.add.bitmapText(8, 8, "font0", "+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
+
+        // Depth sorting
+        this.events.on('prerender', this.sortByHeight, this);
 
         // code for test
         this.input.keyboard.on('keydown-Z', this.pressedZ, this);
@@ -102,8 +105,8 @@ export class Viewport extends Scene
     pressedZ(eve)
     {
         this.clear_room();
-        this.debuCounter += 1;
-        this.drawRoom(this.debuCounter & 1);
+        this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 2, false); //+= 1;
+        this.drawRoom(this.debuCounter); // & 1);
     }
 
     pressedX(eve)
@@ -161,7 +164,12 @@ export class Viewport extends Scene
         this.thingsJson  = null;
         this.roomId = null;
 
+        this.varyingDepthSprites.clear();
+
         this.bg.hide() //setVisible(false);
+
+        this.player.setVisible(false);
+
         this.disable_group_things();
     }
 
@@ -224,10 +232,11 @@ export class Viewport extends Scene
             if (thingData.kind === 4)
             {
                 tsprite.setOrigin(0.5, 1);
+                this.varyingDepthSprites.add(tsprite);
             }
             else
             {
-                tsprite.setOrigin(0);
+                tsprite.setOrigin(0, 0);
             }
             
             if (thingData.noInteraction)
@@ -263,7 +272,9 @@ export class Viewport extends Scene
         this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
 
         this.bg.assignTexture(id);
-        console.log(this.bg.show().name);//setVisible(true);
+        console.log(this.bg.show().name);
+
+        this.handleActors();
 
         this.roomEmitter.emit(RoomEvents.READY, this);
         this.input.enabled = true;
@@ -279,6 +290,7 @@ export class Viewport extends Scene
 
     }
 
+    // varsvars
     getVarValue(vcoords)
     {
         if (Array.isArray(vcoords))
@@ -313,15 +325,23 @@ export class Viewport extends Scene
 
     toggleBit(vcoords)
     {
-        console.log("Toggle param is array? (An INTEGER is required)", Array.isArray(vcoords));
+        //console.log("Toggle param is array? (An INTEGER is required)", Array.isArray(vcoords));
+        if (Array.isArray(vcoords))
+        {
+            vcoords = vcoords[0];
+        }
         return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, null, true);
     }
+
+    // end varsvars
+
     // unused
     getRoomJson(roomId)
     {
         return roomId === undefined? this.roomJson : this.cache.json.get(`room${roomId}`)
     }
-     //unused
+
+    // unused
     getThingsJson(roomId)
     {
         return roomId === undefined? this.thingsJson : this.getRoomJson(roomId).things;
@@ -333,6 +353,7 @@ export class Viewport extends Scene
         return this.cache.json.get(`room${roomId}`);
     }
 
+    // used
     getExistentThing(rid)
     {
         if (!this.thingsContainer.has(rid))
@@ -343,12 +364,13 @@ export class Viewport extends Scene
         return this.thingsContainer.get(rid);
     }
 
-    setThingNotVisible(thing)
-    {
-        //rid = typeof thing === "number"? rid : thing.rid;
-        gameObject = null
-        const varAry = this.thingsJson[rid]
-    }
+    // unused
+    // setThingNotVisible(thing)
+    // {
+    //     //rid = typeof thing === "number"? rid : thing.rid;
+    //     gameObject = null
+    //     const varAry = this.thingsJson[rid]
+    // }
 
     nextIntInRange(val, minValue = 0, maxAllowed = 9, decrease = false)
     {
@@ -367,10 +389,18 @@ export class Viewport extends Scene
         }
     }
 
-    refreshSpriteFrame(go) //, quickValue)
+    refreshSpriteFrame(go)
     {
         //console.log("Number.isInteger", Number.isInteger(quickValue));
         return go.setFrame(`${go.rdata.frame}${this.getVarValue(go.rdata.suffix)}`);
+    }
+
+    scrollSpriteFrame(go, maxLimit = 1, backwards = false)
+    {
+        const vcoord = go.rdata.suffix;
+        const value = this.getVarValue(vcoord);
+        this.setVariable(vcoord, this.nextIntInRange(value, 0, maxLimit, backwards));
+        this.refreshSpriteFrame(go);
     }
 
     _message(m = "Some message")
@@ -428,5 +458,35 @@ export class Viewport extends Scene
         }
 
         return roomEmitter;
+    }
+
+    handleActors()
+    {
+        const {player} = this;
+        player.setPosition(165, 125);
+        const animName = `${this.player.costume}_rotate`;
+        // console.dir(this.anims.anims.entries);
+        this.player.setActive(true)
+        .setVisible(true)
+        .play(animName)
+        //.setFrame('robot_walk_NE_0')
+        this.varyingDepthSprites.add(this.player);
+        // this.tweens.add({
+        //     targets: player,
+        //     y: 118,
+        //     yoyo: true,
+        //     duration: 3000,
+        //     repeat: -1
+        // });
+    }
+
+    sortByHeight()
+    {
+        for (const elem of this.varyingDepthSprites)
+        {
+            // console.log(elem.frame.name, elem.depth, elem.y);
+            elem.setDepth(elem.y);
+        }
+        //this.children.depthSort();
     }
 }
