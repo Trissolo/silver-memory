@@ -195,8 +195,12 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         store[row_idx][other_cells_color] = "#336"
         self.current_sel = self.core_stuff[row_idx.get_indices()[0]]
         self.get_stack().set_visible_child(self.current_sel['wid'])
+        #print("Checking Wid is Multichooser",self.current_sel.get('size'))#type(self.current_sel['wid']) is MultiChooser)
+        # deduce_bottom_box_visibility_by_size
         #vars adjustement
         print(f"🍕{self.current_sel['wid'].get_name()}")
+        if type(self.current_sel['wid']) is MultiChooser:
+            self.current_sel['wid'].deduce_bottom_box_visibility_by_size(self.current_sel.get('size'))
     def unselect_rows(self):
             self.current_sel = None
             self.get_stack().set_visible_child_name("fake")
@@ -291,7 +295,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         self.manifest_changed_row()
     def paras_vars(self, listbox, row):
         prop, size, wid = self.unpack_current_sel()
-        #temp_ary = [wid.get_kind_from_child(), row.idx]
         temp_ary = [listbox.var_kind, row.idx]
         if size == 2:
             self.attach_prop_parasite(prop, temp_ary, size)

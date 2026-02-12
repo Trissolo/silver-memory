@@ -67,6 +67,9 @@ class MultiChooser(Gtk.Box):
         return self.get_children()[1].get_visible_child()
     def get_bottom_box(self):
          return self.get_children()[2]
+    def deduce_bottom_box_visibility_by_size(self, size):
+        print(f'Receiving {size}, so the bottom box visibility will be set to {size==3}')
+        self.get_bottom_box().set_visible(size==3)
     def get_spinbutton(self):
          print("Accessing:", self.get_bottom_box().get_children()[0].get_name())
          return self.get_bottom_box().get_children()[0]
