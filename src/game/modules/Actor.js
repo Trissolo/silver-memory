@@ -6,7 +6,9 @@ export default class Actor extends Phaser.GameObjects.Sprite
     id;
     inventory;
     _rotAnim;
-    _rotFrames;
+    _framesByAcronym = new Map();
+    rotateBeforeWalk = false;
+    rotationInProgress = false;
 
     constructor(scene, costume, id)
     {
@@ -20,11 +22,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.costume = costume;
         this.id = id;
 
-        // TEST - delete when done!
-        this._rotAnim = this.scene.anims.anims.get(`${this.costume}_rotate`);
-        this._rotFrames = this._rotAnim.frames;
-        console.log(this._rotFrames);
-        console.log("🇮🇹 ROT", RotationHelper._isDestroyed)
+        this.enableRotation();
     }
 
     preUpdate(time, delta)
@@ -33,8 +31,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
     }
     destroy()
     {
-        this._rotAnim = null;
-        this._rotFrames = null;
+        this.disableRotation();
+        this._rotAnim = this._framesByAcronym = undefined;
         super.destroy();
     }
 
@@ -60,67 +58,85 @@ export default class Actor extends Phaser.GameObjects.Sprite
         .setVisible(true)
     }
 
-    relativeAngle(vec)
+    enableRotation()
     {
-        const dirInRadians = RotationHelper.getRelativeCardinal(this, vec)
-        console.log(`relativeAngle: ${RotationHelper.cardinals.get(dirInRadians)} (${dirInRadians})`);
-        return dirInRadians;
+        // quick access to the rotation anim
+        this._rotAnim = this.scene.anims.anims.get(`${this.costume}_rotate`);
+
+        // easily obtainable animation frames
+        for (const frame of this._rotAnim.frames)
+        {
+            this._framesByAcronym.set(frame.textureFrame.split("_")[2], frame);
+        }
+
+        // Event that fires when _rotAnim has reached its end. Used to enable walking
+        this.on(Phaser.Animations.Events.ANIMATION_STOP, e => console.log("Animation stopped"));
+
+        // A 'switch' that indicates whether pre-walk rotation is active
+        this.rotateBeforeWalk = true;
     }
 
-    setupRotation(vec)
+    disableRotation()
     {
+        this._framesByAcronym.clear();
+        this._rotAnim = null;
+        this.off(Phaser.Animations.Events.ANIMATION_STOP);
+        this.rotateBeforeWalk = false;
+    }
+
+    relativeAngle(vec)
+    {
+        return RotationHelper.getRelativeCardinal(this, vec);
+        // const dirInRadians = RotationHelper.getRelativeCardinal(this, vec);
+        // console.log(`(relativeAngle method): ${RotationHelper.cardinals.get(dirInRadians)} (${dirInRadians})`);
+        // return dirInRadians;
+    }
+
+    rotateToVec(vec)
+    {
+        // Target Angle
         const targetInRadians = this.relativeAngle(vec);
-        const targetAcronym = RotationHelper.cardinals.get(targetInRadians)
 
-        console.log(`Destination ${targetAcronym}`);
-         
+        // Target Acronym
+        const targetAcronym = RotationHelper.cardinals.get(targetInRadians);
 
-
-        const facingString = this.frame.name.split("_")[2]
-        console.log("curr Frame:", this.frame.name, facingString);
+        // Start Acronym
+        const startAcronym = this.frame.name.split("_")[2]
         
+        // Start Angle 
         let currfacing = null;
         for (const [r, stDir] of RotationHelper.cardinals)
         {
-            if (stDir === facingString)
+            if (stDir === startAcronym)
             {
                 currfacing = r;
                 break;
             }
         }
+        
+        // console.log(`🍐 Data so far:\nStart Angle: ${currfacing}\nStart Acronym: ${startAcronym}\nTarget Angle: ${targetInRadians}\nTarget Acronym: ${targetAcronym}`)
 
-        let fromFrame = null;
-
-
+        // Distance
         const gap = Phaser.Math.Angle.GetShortestDistance(currfacing, targetInRadians);
-        if (Math.abs(gap) < 1.5707963267948966)
+
+        // Skip if too close
+        if (Math.abs(gap) < 1) //.5707963267948966)
         {
             console.log("No rotation needed.");
+            // In standard condition we must return now.
+            // Changing frame just for fun...
+            this.setFrame(`${this.costume}_walk_${targetAcronym}_0`);
             return;
         }
+
+        // rot direction
         const clockwise = gap >= 0;
 
-        // console.log("🍐 ", targetCardinalString, targetInRadians);
-        let realFrame ;
-        for (const [idx, frame] of this._rotFrames.entries())
-        {
-            console.log("...Iterating", idx, frame.textureFrame);
-            if (frame.textureFrame === `${this.costume}_walk_${facingString}_0`)
-            {
-                fromFrame = idx;
-                //realFrame = frame;
-                
-            }
-            
-            
-            if (frame.textureFrame === `${this.costume}_walk_${targetAcronym}_0`)
-            {
-                realFrame = frame;
-            }
-            
-        }
+        
+        let realFrame = this._framesByAcronym.get(targetAcronym);
+        let fromFrame = this._framesByAcronym.get(startAcronym).index - 1;
 
-        console.log("REALFRAME LAST", realFrame, fromFrame);
+        console.log("Start From idx:", fromFrame, "REALFRAME name LAST", realFrame.textureFrame);
         
         clockwise ? this.play({key: `${this.costume}_rotate`, startFrame: fromFrame}): this.playReverse({key: `${this.costume}_rotate`, startFrame: fromFrame})
         this.stopOnFrame(realFrame);

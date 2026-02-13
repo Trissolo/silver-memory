@@ -20,6 +20,7 @@ export class Viewport extends Scene
     shield;
     player;
     varyingDepthSprites = new Set();
+    Rnd = Phaser.Math.RND
 
     constructor ()
     {
@@ -471,9 +472,8 @@ export class Viewport extends Scene
         // player.setPosition(165, 125);
         player.setPosition(60, 80);
         const animName = `${this.player.costume}_rotate`;
-        // console.dir(this.anims.anims.entries);
         this.player.show()
-        .setFrame(Phaser.Utils.Array.GetRandom(this.player._rotFrames).textureFrame);
+        .setFrame(Phaser.Utils.Array.GetRandom([...this.player._framesByAcronym.values()]).textureFrame);
         //.play(animName)
         //.setFrame('robot_walk_NE_0')
         this.varyingDepthSprites.add(this.player);
@@ -492,7 +492,6 @@ export class Viewport extends Scene
     {
         for (const elem of this.varyingDepthSprites)
         {
-            // console.log(elem.frame.name, elem.depth, elem.y);
             elem.setDepth(elem.y);
         }
         //this.children.depthSort();
