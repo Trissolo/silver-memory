@@ -64,4 +64,3 @@ class VersatileBox(Gtk.Box):
     
 #     def on_button_clicked(self, widget):
 #         print("Button inside the custom box was clicked!")
-    
