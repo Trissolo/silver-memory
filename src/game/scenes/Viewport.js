@@ -115,8 +115,9 @@ export class Viewport extends Scene
 
     pressedX(eve)
     {
-        this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
-        this.scene.switch('Controller');
+        //this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
+        //this.scene.switch('Controller');
+        this.player.testRot();
         /*
         console.log("roomId is:", this.roomId);
         VarManager._debug();
@@ -172,7 +173,7 @@ export class Viewport extends Scene
 
         this.bg.hide() //setVisible(false);
 
-        this.player.setVisible(false);
+        this.player.hide();
 
         this.disable_group_things();
     }
@@ -289,7 +290,7 @@ export class Viewport extends Scene
     onThingDown(a,b)
     {
         const scene = this.scene;
-        console.log(`Clicked thing`,this.frame.name);// Math.random());
+        console.log(`Clicked thing`,this.frame.name);
         scene.roomscript[this.state].call(scene, this);
 
     }
@@ -467,14 +468,17 @@ export class Viewport extends Scene
     handleActors()
     {
         const {player} = this;
-        player.setPosition(165, 125);
+        // player.setPosition(165, 125);
+        player.setPosition(60, 80);
         const animName = `${this.player.costume}_rotate`;
         // console.dir(this.anims.anims.entries);
-        this.player.setActive(true)
-        .setVisible(true)
-        .play(animName)
+        this.player.show()
+        .setFrame(Phaser.Utils.Array.GetRandom(this.player._rotFrames).textureFrame);
+        //.play(animName)
         //.setFrame('robot_walk_NE_0')
         this.varyingDepthSprites.add(this.player);
+
+        //console.log(this.anims.anims.entries)
         // this.tweens.add({
         //     targets: player,
         //     y: 118,
