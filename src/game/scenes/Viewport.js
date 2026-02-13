@@ -478,10 +478,10 @@ export class Viewport extends Scene
     {
         const {player} = this;
         // player.setPosition(165, 125);
-        player.setPosition(40, 90);
+        player.setPosition(180, 76);
         const animName = `${this.player.costume}_rotate`;
         this.player.show()
-        .setFrame(Phaser.Utils.Array.GetRandom([...this.player._framesByAcronym.values()]).textureFrame);
+        .setFrame(Phaser.Utils.Array.GetRandom([...this.player.cardStringToFrame.values()]).textureFrame);
         //.play(animName)
         //.setFrame('robot_walk_NE_0')
         this.varyingDepthSprites.add(this.player);

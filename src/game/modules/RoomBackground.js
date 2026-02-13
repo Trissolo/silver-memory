@@ -22,15 +22,18 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         this.game_basesize_width = this.scene.scale.baseSize.width;
         this.game_basesize_height = this.scene.scale.baseSize.height;
   }
+
   hide()
   {
     return this.setVisible(false);  
   }
+
   show()
   {
     // console.log(this.input);
     return this.setVisible(true);
   }
+
   assignTexture(roomId)//frame, atlasKey)
   {
     console.log(`Old BG key: ${this.texture.key}`);
@@ -60,15 +63,17 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     }
 
   }
+
   clickOnBg(pointer, screenX, screenY, {stopPropagation})
   {
     this._floorVec(this.clickVector.setTo(pointer.worldX, pointer.worldY));
     console.log(`Clicked BG! World coords: ${this.clickVector.x}, ${this.clickVector.y}`); //, Phaser.Math.RND);
     // console.log(`Screen coords: ${screenX}, ${screenY}, original WorldCoords:`, pointer.worldX, pointer.worldY);
 
-    this.scene.player.rotateToVec(this.clickVector);//relativeAngle(this.clickVector);
+    this.scene.player.rotateToVec(this.clickVector);
     
   }
+
   destroy()
   {
     this._floorVec = null;
@@ -78,21 +83,29 @@ export default class RoomBackground extends Phaser.GameObjects.Image
   benchmarkRotation()
   {
     const {scene} = this;
-    const aryCoords = new Phaser.Geom.Circle(scene.player.x, scene.player.y, 22).getPoints(88);
+    const aryCoords = new Phaser.Geom.Circle(scene.player.x, scene.player.y - 10, 30).getPoints(68);
+
     Phaser.Utils.Array.Shuffle(aryCoords);
+
     console.log("Points coords:", aryCoords);
-    //let i = 0;
+
+    const gra = scene.add.graphics().setDepth(300).fillStyle(0xadadfa, 1);
+    aryCoords.forEach(v => gra.fillRect(v.x, v.y, 3, 3));
     const timedEvent = scene.time.addEvent({ delay: 1200, repeat: -1, callback: () =>  {
-      const v = aryCoords.pop();
-      scene.player.rotateToVec(v); 
-      console.log(`Remaining: ${aryCoords.length}`);
-      if (!aryCoords.length)
-      {
-        timedEvent.remove(false);
-        console.log("YEAH! BENCHDONE! ;)");
-      }
-    }
+        const v = aryCoords.pop();
+        gra.clear();
+        gra.fillRect(v.x-1, v.y-1, 3, 3)
+        scene.player.rotateToVec(v); 
+            console.log(`Remaining: ${aryCoords.length}`);
+            if (!aryCoords.length)
+            {
+                timedEvent.remove(false);
+                gra.destroy();
+                console.log("YEAH! BENCHDONE! ;)");
+            }
+        }
     });
     // scene.player.rotateToVec(this.clickVector)
   }
+
 }

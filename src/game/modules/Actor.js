@@ -6,7 +6,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     id;
     inventory;
     _rotAnim;
-    _framesByAcronym = new Map();
+    cardStringToFrame = new Map();
     rotateBeforeWalk = false;
     rotationInProgress = false;
 
@@ -32,7 +32,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     destroy()
     {
         this.disableRotation();
-        this._rotAnim = this._framesByAcronym = undefined;
+        this._rotAnim = this.cardStringToFrame = undefined;
         super.destroy();
     }
 
@@ -66,7 +66,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         // easily obtainable animation frames
         for (const frame of this._rotAnim.frames)
         {
-            this._framesByAcronym.set(frame.textureFrame.split("_")[2], frame);
+            this.cardStringToFrame.set(frame.textureFrame.split("_")[2], frame);
         }
 
         // Event that fires when _rotAnim has reached its end. Used to enable walking
@@ -78,7 +78,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     disableRotation()
     {
-        this._framesByAcronym.clear();
+        this.cardStringToFrame.clear();
         this._rotAnim = null;
         this.off(Phaser.Animations.Events.ANIMATION_STOP);
         this.rotateBeforeWalk = false;
@@ -87,9 +87,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
     relativeAngle(vec)
     {
         return RotationHelper.getRelativeCardinal(this, vec);
-        // const dirInRadians = RotationHelper.getRelativeCardinal(this, vec);
-        // console.log(`(relativeAngle method): ${RotationHelper.angleToCardinalAcronym.get(dirInRadians)} (${dirInRadians})`);
-        // return dirInRadians;
     }
 
     rotateToVec(vec)
@@ -98,28 +95,14 @@ export default class Actor extends Phaser.GameObjects.Sprite
         const targetInRadians = this.relativeAngle(vec);
 
         // Target Acronym
-        const targetAcronym = RotationHelper.getAcronyn(targetInRadians); //RotationHelper.angleToCardinalAcronym.get(targetInRadians);
+        const targetAcronym = RotationHelper.getAcronym(targetInRadians); //RotationHelper.angleToCardinalAcronym.get(targetInRadians);
 
         // Start Acronym
         const startAcronym = this.frame.name.split("_")[2];
         
-        //console.log("HMM", startAcronym, RotationHelper.cardinalAcronymToAngle.has(startAcronym))
-
         // Start Angle
         const startAngle = RotationHelper.getAngle(startAcronym);//RotationHelper.cardinalAcronymToAngle.get(startAcronym);
-        // let startAngle = null;
-        // for (const [r, stDir] of RotationHelper.angleToCardinalAcronym)
-        // {
-        //     if (stDir === startAcronym)
-        //     {
-        //         startAngle = r;
-        //         break;
-        //     }
-        // }
-        
-        // console.log(`🍒 Start Angle: ${startAngle} ${Math.floor(Math.abs(startAngle))}`);//  ${Math.abs(Math.floor(startAngle))}`);
-        //console.log(`🍐 Data so far:\nStart Angle: ${startAngle}\nStart Acronym: ${startAcronym}\nTarget Angle: ${targetInRadians}\nTarget Acronym: ${targetAcronym}`)
-        // console.log(targetAcronym === RotationHelper.angleToCardinalAcronym.get(targetInRadians));
+        // console.log(`🍒 🍐`);
 
         // Distance
         const gap = Phaser.Math.Angle.GetShortestDistance(startAngle, targetInRadians);
@@ -136,37 +119,13 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         // rot direction
         // const clockwise = gap >= 0;
-
         
-        let realFrame = this._framesByAcronym.get(targetAcronym);
-        let fromFrame = this._framesByAcronym.get(startAcronym).index - 1;
+        const realFrame = this.cardStringToFrame.get(targetAcronym);
 
-        // console.log("Start From idx:", fromFrame, "REALFRAME name LAST", realFrame.textureFrame);
-        
+        const fromFrame = this.cardStringToFrame.get(startAcronym).index - 1;
+
         (gap >= 0) ? this.play({key: `${this.costume}_rotate`, startFrame: fromFrame}): this.playReverse({key: `${this.costume}_rotate`, startFrame: fromFrame})
         this.stopOnFrame(realFrame);
     }
 
-    // calcRotation(from, to)
-    // {
-    //     const {angleToCardinalAcronym} = RotationHelper;
-    //     let gap = Phaser.Math.Angle.GetShortestDistance(from, to);
-    //     const clockwise = gap >= 0;
-    //     console.log(`\nFrom: ${angleToCardinalAcronym.get(from)} to ${angleToCardinalAcronym.get(to)}`);
-    //     console.log("Maybe useless?", Math.abs(gap) < 1.5707963267948966);
-    //     console.log(`Distance: ${gap} (in senso ${clockwise? "orario": "antiorario"})`); 
-    // }
-
-    // testRot()
-    // {
-    //     console.log("Gen angleToCardinalAcronym", RotationHelper)
-    //     const dirs = [...RotationHelper.angleToCardinalAcronym.keys()];
-    //     for (const from of dirs)
-    //     {
-    //         for (const to of dirs)
-    //         {
-    //             this.calcRotation(from, to);
-    //         }
-    //     }
-    // }
 }
