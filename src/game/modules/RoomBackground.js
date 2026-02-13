@@ -74,4 +74,25 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     this._floorVec = null;
     super.destroy();
   }
+
+  benchmarkRotation()
+  {
+    const {scene} = this;
+    const aryCoords = new Phaser.Geom.Circle(scene.player.x, scene.player.y, 22).getPoints(88);
+    Phaser.Utils.Array.Shuffle(aryCoords);
+    console.log("Points coords:", aryCoords);
+    //let i = 0;
+    const timedEvent = scene.time.addEvent({ delay: 1200, repeat: -1, callback: () =>  {
+      const v = aryCoords.pop();
+      scene.player.rotateToVec(v); 
+      console.log(`Remaining: ${aryCoords.length}`);
+      if (!aryCoords.length)
+      {
+        timedEvent.remove(false);
+        console.log("YEAH! BENCHDONE! ;)");
+      }
+    }
+    });
+    // scene.player.rotateToVec(this.clickVector)
+  }
 }

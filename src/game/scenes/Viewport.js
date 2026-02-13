@@ -98,9 +98,17 @@ export class Viewport extends Scene
 
         this.input.keyboard.on('keydown-X', this.pressedX, this);
 
+        this.input.keyboard.once('keydown-C', this.pressedC, this);
+
         // START
         this.drawRoom(0);
         ;
+    }
+
+    pressedC()
+    {
+        console.clear();
+        this.bg.benchmarkRotation();
     }
 
     pressedZ(eve)
@@ -470,7 +478,7 @@ export class Viewport extends Scene
     {
         const {player} = this;
         // player.setPosition(165, 125);
-        player.setPosition(60, 80);
+        player.setPosition(40, 90);
         const animName = `${this.player.costume}_rotate`;
         this.player.show()
         .setFrame(Phaser.Utils.Array.GetRandom([...this.player._framesByAcronym.values()]).textureFrame);

@@ -1,10 +1,11 @@
 export default class RotationHelper
 {
-    static cardinals;
+    static angleToCardinalAcronym;
+    static cardinalAcronymToAngle
     static ARC = Math.PI / 4;
     static _isDestroyed = false;
     static {
-        this.cardinals = new Map( [
+        this.angleToCardinalAcronym = new Map( [
         [2.356194490192345, "SW"],
         [1.5707963267948966, "S"],
         [0.7853981633974483, "SE"],
@@ -15,12 +16,56 @@ export default class RotationHelper
         [-3.141592653589793, "W"],
         [3.141592653589793, "W"]
         ]);
-        console.log("cardinals", this.cardinals);
+        console.log("angleToCardinalAcronym", this.angleToCardinalAcronym, [...this.angleToCardinalAcronym.values()]);
+
+        // opposite:
+        const cardinalAcronymToAngle = new Map();
+        let angle = Math.PI;
+        for (const dirString of [ "W", "SW", "S", "SE", "E", "NE", "N", "NW", "W" ])
+        {
+            if (this.angleToCardinalAcronym.has(angle) && this.angleToCardinalAcronym.get(angle) === dirString)
+            {
+                cardinalAcronymToAngle.set(dirString, angle);
+                console.log(`Cool! ${dirString} - ${angle}`);
+                angle -= this.ARC;
+            }
+            else
+            {
+                console.log("Something wrong happens...");
+            }
+        }
+
+        this.cardinalAcronymToAngle = cardinalAcronymToAngle;
+
+        console.log(`cardinalAcronymToAngle --> ${this.cardinalAcronymToAngle.size}`);
+        for (const [a, b] of this.cardinalAcronymToAngle)
+        {
+            console.log(a, b);
+        }
+
+        console.log(`this.angleToCardinalAcronym --> ${this.angleToCardinalAcronym.size}`);
+        for (const [a, b] of this.angleToCardinalAcronym)
+        {
+            console.log(a, b);
+        }
+
     }
 
     static getRelativeCardinal({x: ax, y: ay}, {x: vecX, y: vecY})
     {
         return Phaser.Math.Snap.To(Phaser.Math.Angle.Between(ax, ay, vecX, vecY), this.ARC);
+    }
+
+    static getAcronyn(angle)
+    {
+        console.assert(this.angleToCardinalAcronym.has(angle), `Number: ${angle} not in angleToCardinalAcronym.`);
+        return this.angleToCardinalAcronym.get(angle);
+    }
+
+    static getAngle(cardinalString)
+    {
+        console.assert(this.cardinalAcronymToAngle.has(cardinalString), `String: ${cardinalString} not in cardinalAcronymToAngle.`);
+        return this.cardinalAcronymToAngle.get(cardinalString);
     }
 
     static destroy()

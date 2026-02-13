@@ -2,8 +2,8 @@ import { Scene } from 'phaser';
 
 export class Preloader extends Scene
 {
-    tempx = 8;
-    tempy = 14;
+    tempx = 2;
+    tempy = 0;
     constructor ()
     {
         super('Preloader');
@@ -37,7 +37,8 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
+        // this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
+        this.load.atlas('atlasbase', 'atlasbase_tp.png', 'atlasbase_tp.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
         this.load.atlas('atlas1', 'atlas1.png', 'atlas1.json');
     
@@ -59,10 +60,10 @@ export class Preloader extends Scene
         this.load.off('progress', this.redrawBar, this);
         this.bar.destroy();
 
-        // this.input.keyboard.once('keydown-Z', ()=> {
+        this.input.keyboard.once('keydown-Z', ()=> {
             this.anims.off(Phaser.Animations.Events.ADD_ANIMATION);
             this.scene.start('Controller');
-        //});
+        });
         //this.scene.start('Controller');
     }
 
@@ -75,6 +76,7 @@ export class Preloader extends Scene
 
         const t =  this.textures.get('atlasbase');
         t.add(`pixel${String.fromCharCode(65)}`, 0, 56, 118, 1, 1);
+        // this.add.bitmapText(50, 50, 'font0', "ESFT£");
     }
 
 
@@ -104,18 +106,22 @@ export class Preloader extends Scene
 
     makeRetroFont()
     {
-        const {cutX, cutY, x, y} = this.textures.get('atlasbase').get('monospaced-font-eng');
+        const fontFrame = this.textures.get('atlasbase').get('monospaced_font_eng');
         
-        console.log("...making retro font...");
+        const {cutX, cutY} = fontFrame;
+
+        // console.dir("DOUBT:", fontFrame,`cutX: ${cutX}, cutY: ${cutY}`);
+
+        console.log("...Making retro font...");
         const mainfont_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÈÌÒÙàèìòù 0123456789,.:;"!?+-*/=^<>%()[]{}`_#';
         const config = {
             image: 'atlasbase',
             width: 4,
             height: 6,
             chars: mainfont_chars,
-            charsPerRow: 26
-            // 'offset.x': cutX,
-            // 'offset.y': cutY  
+            charsPerRow: 26,
+            'offset.x': cutX - 1,
+            'offset.y': cutY - 1  
         };
 
         this.cache.bitmapFont.add('font0', Phaser.GameObjects.RetroFont.Parse(this, config));
@@ -184,14 +190,18 @@ export class Preloader extends Scene
 
     testAnim(key, animation)
     {
-      //const {Between} = Phaser.Math
-      const qqq = this.add.sprite(this.tempx, this.tempy).play(key).setOrigin(0); //Between(20, 240), Between(30, 100)).play(key)
-      this.tempx += 30;
-      if (this.tempx > 250)
-      {
-        this.tempx = 8;
-        this.tempy += 28;
-      }
-      // console.log(`Playing: ${key}`, qqq.x-8);
+        // if (key.startsWith('guy'))
+        // {
+            //const {Between} = Phaser.Math
+            const qqq = this.add.sprite(this.tempx, this.tempy).play(key).setOrigin(0); //Between(20, 240), Between(30, 100)).play(key)
+            this.tempx += 30;
+            if (this.tempx > 240)
+            {
+                this.tempx = 2;
+                this.tempy += 26;
+            }
+        //}
+
+        //console.log(`Playing: ${key}`, animation);
     }
 }
