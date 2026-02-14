@@ -2,25 +2,30 @@ import WalkEvents from "./walkEvents";
 
 export default class WalkComponent
 {
+    parent;
+
+    //basically 'Walk isPaused'
+    aTargetExists = false;
+
+    destinations = [];
+
+    highestIndex = 0;
+
+    startCoords = new Phaser.Math.Vector2();
+
+    endCoords = new Phaser.Math.Vector2();
+
+    velocity = new Phaser.Math.Vector2();
+
+    maxDistAllowed = 0;
+
+    speed;
+
+    _inProgress = false;
+
     constructor(parent, speed = 60)
     {
         this.parent = parent;
-
-        //basically 'isPaused'
-        this.aTargetExists = false;
-
-        this.destinations = [];
-        this.highestIndex = 0;
-        
-        this.automaticStart = false;
-
-        this.startCoords = new Phaser.Math.Vector2();
-
-        this.endCoords = new Phaser.Math.Vector2();
-
-        this.velocity = new Phaser.Math.Vector2();
-
-        this.maxDistAllowed = 0;
 
         // this.defaultSpeed = this.calcSpeed(speed)
         this.speed = this.calcSpeed(speed) // speed * 0.001
@@ -33,6 +38,8 @@ export default class WalkComponent
         this.aTargetExists = false;
 
         this.destinations.length = 0;
+
+        this._inProgress = false;
     }
 
     pause()
@@ -89,6 +96,9 @@ export default class WalkComponent
                 .subtract(this.startCoords)
                 .normalize();
             
+            // set this totally unused bool
+            this._inProgress = true;
+            
             if (this.destinations.length === this.highestIndex)
             {
                 this.parent.emit(WalkEvents.WALK_START, this.parent, this.startCoords, this.endCoords);
@@ -132,6 +142,8 @@ export default class WalkComponent
 
                 if (this.destinations.length === 0)
                 {
+                    this._inProgress = false;
+
                     this.parent.emit(WalkEvents.WALK_COMPLETE, this.parent);
                 }
                 else

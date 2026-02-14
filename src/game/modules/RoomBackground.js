@@ -81,7 +81,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     //const test_coords = new Phaser.Geom.Circle(this.game_basesize_width/2, this.game_basesize_height/2, 45).getPoints(9);
     // this.scene.player.walkTo([this.clickVector, ...test_coords]);
 
-     this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(40,20)]);
+     this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(41,20)]);
     // rotation test
     // this.benchmarkRotation();
     

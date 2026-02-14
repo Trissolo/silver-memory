@@ -4,6 +4,8 @@ export default class RotationHelper
     static directionAngles
     static ARC = Math.PI / 4;
     static _isDestroyed = false;
+    static snapTo = Phaser.Math.Snap.To;
+    static angleBetween = Phaser.Math.Angle.Between;
     static {
         const cardinalPointStrings = new Map();
 
@@ -36,7 +38,7 @@ export default class RotationHelper
         return Phaser.Math.Snap.To(Phaser.Math.Angle.Between(ax, ay, vecX, vecY), this.ARC);
     }
 
-    static getAcronym(angle)
+    static _getAcronym(angle)
     {
         console.assert(this.cardinalPointStrings.has(angle), `Number: ${angle} not in cardinalPointStrings.`);
 
@@ -60,6 +62,10 @@ export default class RotationHelper
         this.cardinalPointStrings.clear();
         
         this.directionAngles.clear();
+
+        this.snapTo = undefined;
+
+        this.angleBetween = undefined;
     }
 
 }

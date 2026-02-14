@@ -98,7 +98,7 @@ export class Viewport extends Scene
 
         this.input.keyboard.on('keydown-X', this.pressedX, this);
 
-        this.input.keyboard.once('keydown-C', this.pressedC, this);
+        this.input.keyboard.on('keydown-C', this.pressedC, this);
 
         // START
         this.drawRoom(0);
@@ -108,6 +108,7 @@ export class Viewport extends Scene
     pressedC()
     {
         console.clear();
+        this.player.turnAndStayStill("N")
         //this.player.setState(1);
         //this.bg.benchmarkRotation();
     }
