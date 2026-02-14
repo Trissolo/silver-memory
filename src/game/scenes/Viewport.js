@@ -108,7 +108,8 @@ export class Viewport extends Scene
     pressedC()
     {
         console.clear();
-        this.bg.benchmarkRotation();
+        this.player.setState(1);
+        // this.bg.benchmarkRotation();
     }
 
     pressedZ(eve)

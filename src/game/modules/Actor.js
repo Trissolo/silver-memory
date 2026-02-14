@@ -1,5 +1,6 @@
 import RotationHelper from "./actorStuff/rotationHelper";
-
+import WalkEvents from "./actorStuff/walkEvents";
+import WalkComponent from "./actorStuff/walkComponent";
 export default class Actor extends Phaser.GameObjects.Sprite
 {
     costume;
@@ -25,24 +26,48 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.enableRotation();
 
+        this.walk = new WalkComponent(this);
+
+        this.setWalkEventsJustWalk();
+
+        console.log("🍒", this.walkTo.toString());
+
+        // this.timedEvent
+
         // console.log(`🍒 🍐`);
+        // this[0] = this.updStateZero;
+        // this[1] = this.updStateOne;
     }
 
     preUpdate(time, delta)
     {
         super.preUpdate(time, delta);
+
+        if (this.walk.aTargetExists)
+        {
+            this.walk.update(time, delta);
+        }
+
+        // this[this.state]();
+
     }
     destroy()
     {
         this.disableRotation();
+
         this.rotationAnim = this.rotFrames = undefined;
+
         super.destroy();
+
         RotationHelper.destroy();
     }
 
     setIdle()
     {
         this.anims.stop();
+
+        this.walk.stopAndClear();
+
         return this;
     }
 
@@ -57,7 +82,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
     show()
     {
         return this
-        //.setIdle()
         .setActive(true)
         .setVisible(true);
     }
@@ -110,7 +134,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
         // Distance
         const gap = Phaser.Math.Angle.GetShortestDistance(startAngle, targetInRadians);
 
-        console.log(gap, startAcronym, targetAcronym, Math.abs(gap) === Math.PI, Math.PI);
         // Skip if too close
         if (Math.abs(gap) < 1) //.5707963267948966)
         {
@@ -139,5 +162,38 @@ export default class Actor extends Phaser.GameObjects.Sprite
     {
         // console.log("Rotation Done");
     }
+
+    setWalkEventsJustWalk()
+    {
+        this.on(WalkEvents.WALK_START, this.startWalking, this);
+        this.on(WalkEvents.WALK_SUBSTART, this.startWalking, this);
+        this.on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+    }
+
+    startWalking()
+    {
+        this.walk.aTargetExists = true;
+    }
+
+    walkTo(path)
+    {
+        console.log("Received path", path)
+        if (!Array.isArray(path))
+        {
+            path = [path];
+        }
+
+        this.walk.setPath(path);
+    }
+
+    // updStateZero()
+    // {
+    //     console.log("0");
+    // }
+
+    // updStateOne()
+    // {
+    //     console.log("1");
+    // }
 
 }

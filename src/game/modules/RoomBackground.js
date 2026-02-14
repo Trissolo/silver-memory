@@ -70,7 +70,8 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     console.log(`Clicked BG! World coords: ${this.clickVector.x}, ${this.clickVector.y}`); //, Phaser.Math.RND);
     // console.log(`Screen coords: ${screenX}, ${screenY}, original WorldCoords:`, pointer.worldX, pointer.worldY);
 
-    this.scene.player.rotateToVec(this.clickVector);
+    //this.scene.player.rotateToVec(this.clickVector);
+    this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(126, 48), new Phaser.Math.Vector2(158, 66)]);
     
   }
 
