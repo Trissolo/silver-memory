@@ -5,24 +5,27 @@ export default class Actor extends Phaser.GameObjects.Sprite
     costume;
     id;
     inventory;
-    _rotAnim;
-    cardStringToFrame = new Map();
+    rotationAnim;
+    rotFrames = new Map();
     rotateBeforeWalk = false;
     rotationInProgress = false;
 
-    constructor(scene, costume, id)
+    constructor(scene, id, costume)
     {
         super(scene, 0, 0, 'atlasbase', 'pixelA');
         this
         .setActive(false)
         .setVisible(false)
-        //.addToUpdateList()
+        .setOrigin(0.5, 1)
         .addToDisplayList();
-        this.setOrigin(0.5, 1);
-        this.costume = costume;
+
         this.id = id;
+        
+        this.costume = costume;
 
         this.enableRotation();
+
+        // console.log(`🍒 🍐`);
     }
 
     preUpdate(time, delta)
@@ -32,8 +35,9 @@ export default class Actor extends Phaser.GameObjects.Sprite
     destroy()
     {
         this.disableRotation();
-        this._rotAnim = this.cardStringToFrame = undefined;
+        this.rotationAnim = this.rotFrames = undefined;
         super.destroy();
+        RotationHelper.destroy();
     }
 
     setIdle()
@@ -47,7 +51,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         return this
         .setIdle()
         .setActive(false)
-        .setVisible(false)
+        .setVisible(false);
     }
 
     show()
@@ -55,22 +59,22 @@ export default class Actor extends Phaser.GameObjects.Sprite
         return this
         //.setIdle()
         .setActive(true)
-        .setVisible(true)
+        .setVisible(true);
     }
 
     enableRotation()
     {
-        // quick access to the rotation anim
-        this._rotAnim = this.scene.anims.anims.get(`${this.costume}_rotate`);
+        // a reference to the rotation animation for quick access
+        this.rotationAnim = this.scene.anims.anims.get(`${this.costume}_rotate`);
 
         // easily obtainable animation frames
-        for (const frame of this._rotAnim.frames)
+        for (const frame of this.rotationAnim.frames)
         {
-            this.cardStringToFrame.set(frame.textureFrame.split("_")[2], frame);
+            this.rotFrames.set(frame.textureFrame.split("_")[2], frame);
         }
 
-        // Event that fires when _rotAnim has reached its end. Used to enable walking
-        this.on(Phaser.Animations.Events.ANIMATION_STOP, e => e); //console.log("Animation stopped"));
+        // Event that fires when rotationAnim has reached its end. Used to enable walking
+        this.on(Phaser.Animations.Events.ANIMATION_STOP, this.onStopEvent, this);
 
         // A 'switch' that indicates whether pre-walk rotation is active
         this.rotateBeforeWalk = true;
@@ -78,8 +82,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     disableRotation()
     {
-        this.cardStringToFrame.clear();
-        this._rotAnim = null;
+        this.rotFrames.clear();
+        this.rotationAnim = null;
         this.off(Phaser.Animations.Events.ANIMATION_STOP);
         this.rotateBeforeWalk = false;
     }
@@ -95,18 +99,18 @@ export default class Actor extends Phaser.GameObjects.Sprite
         const targetInRadians = this.relativeAngle(vec);
 
         // Target Acronym
-        const targetAcronym = RotationHelper.getAcronym(targetInRadians); //RotationHelper.angleToCardinalAcronym.get(targetInRadians);
+        const targetAcronym = RotationHelper.getAcronym(targetInRadians); //RotationHelper.cardinalPointStrings.get(targetInRadians);
 
         // Start Acronym
         const startAcronym = this.frame.name.split("_")[2];
         
         // Start Angle
-        const startAngle = RotationHelper.getAngle(startAcronym);//RotationHelper.cardinalAcronymToAngle.get(startAcronym);
-        // console.log(`🍒 🍐`);
+        const startAngle = RotationHelper.getAngle(startAcronym); //RotationHelper.directionAngles.get(startAcronym);
 
         // Distance
         const gap = Phaser.Math.Angle.GetShortestDistance(startAngle, targetInRadians);
 
+        console.log(gap, startAcronym, targetAcronym, Math.abs(gap) === Math.PI, Math.PI);
         // Skip if too close
         if (Math.abs(gap) < 1) //.5707963267948966)
         {
@@ -117,15 +121,23 @@ export default class Actor extends Phaser.GameObjects.Sprite
             return;
         }
 
-        // rot direction
+        // determine the direction of rotation
         // const clockwise = gap >= 0;
         
-        const realFrame = this.cardStringToFrame.get(targetAcronym);
+        const realFrame = this.rotFrames.get(targetAcronym);
 
-        const fromFrame = this.cardStringToFrame.get(startAcronym).index - 1;
+        const fromFrame = this.rotFrames.get(startAcronym).index - 1;
 
-        (gap >= 0) ? this.play({key: `${this.costume}_rotate`, startFrame: fromFrame}): this.playReverse({key: `${this.costume}_rotate`, startFrame: fromFrame})
+        (gap >= 0) ? this.play({key: this.rotationAnim.key, startFrame: fromFrame})
+                : this.playReverse({key: this.rotationAnim.key, startFrame: fromFrame})
+        
+        // 'stopOnFrame' must be called *after* the animation has started playing!
         this.stopOnFrame(realFrame);
+    }
+
+    onStopEvent()
+    {
+        // console.log("Rotation Done");
     }
 
 }

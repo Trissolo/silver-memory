@@ -1,57 +1,33 @@
 export default class RotationHelper
 {
-    static angleToCardinalAcronym;
-    static cardinalAcronymToAngle
+    static cardinalPointStrings;
+    static directionAngles
     static ARC = Math.PI / 4;
     static _isDestroyed = false;
     static {
-        console.log("Removed hardcoded map! ;)");
-        const angleToCardinalAcronym = new Map(); // [
-        // [2.356194490192345, "SW"],
-        // [1.5707963267948966, "S"],
-        // [0.7853981633974483, "SE"],
-        // [0, "E"],
-        // [-0.7853981633974483, "NE"],
-        // [-1.5707963267948966, "N"],
-        // [-2.356194490192345, "NW"],
-        // [-3.141592653589793, "W"],
-        // [3.141592653589793, "W"]
-        // ]);
-        // console.log("angleToCardinalAcronym", this.angleToCardinalAcronym, [...this.angleToCardinalAcronym.values()]);
+        const cardinalPointStrings = new Map();
 
-        // opposite:
-        const cardinalAcronymToAngle = new Map();
+        const directionAngles = new Map();
+
         let angle = Math.PI;
+
         for (const dirString of [ "W", "SW", "S", "SE", "E", "NE", "N", "NW", "W" ])
         {
-            //if (this.angleToCardinalAcronym.has(angle) && this.angleToCardinalAcronym.get(angle) === dirString)
-            //{
-                angleToCardinalAcronym.set(angle, dirString);
-                cardinalAcronymToAngle.set(dirString, angle);
-                //console.log(`Cool! ${dirString} - ${angle}`);
+                cardinalPointStrings.set(angle, dirString);
+
+                directionAngles.set(dirString, angle);
+
                 angle -= this.ARC;
-            //}
-            //else
-            //{
-                // console.log("Something wrong happens...");
-            //}
         }
 
-        this.angleToCardinalAcronym = angleToCardinalAcronym;
-        this.cardinalAcronymToAngle = cardinalAcronymToAngle;
+        this.cardinalPointStrings = cardinalPointStrings;
 
-        console.log(`cardinalAcronymToAngle --> ${this.cardinalAcronymToAngle.size}`);
-        // for (const [a, b] of this.cardinalAcronymToAngle)
-        // {
-        //     console.log(a, b);
-        // }
+        this.directionAngles = directionAngles;
 
-        // console.log(`this.angleToCardinalAcronym --> ${this.angleToCardinalAcronym.size}`);
-        // for (const [a, b] of this.angleToCardinalAcronym)
-        // {
-        //     console.log(a, b);
-        // }
-        console.assert(angleToCardinalAcronym.has(Math.PI) && angleToCardinalAcronym.has(-Math.PI), "Due volte");
+
+        // console.log(`directionAngles --> ${this.directionAngles.size}`);
+
+        // console.assert(cardinalPointStrings.has(Math.PI) && cardinalPointStrings.has(-Math.PI), "Due volte");
 
     }
 
@@ -62,24 +38,28 @@ export default class RotationHelper
 
     static getAcronym(angle)
     {
-        console.assert(this.angleToCardinalAcronym.has(angle), `Number: ${angle} not in angleToCardinalAcronym.`);
-        return this.angleToCardinalAcronym.get(angle);
+        console.assert(this.cardinalPointStrings.has(angle), `Number: ${angle} not in cardinalPointStrings.`);
+
+        return this.cardinalPointStrings.get(angle);
     }
 
     static getAngle(cardinalString)
     {
-        console.assert(this.cardinalAcronymToAngle.has(cardinalString), `String: ${cardinalString} not in cardinalAcronymToAngle.`);
-        return this.cardinalAcronymToAngle.get(cardinalString);
+        console.assert(this.directionAngles.has(cardinalString), `String: ${cardinalString} not in directionAngles.`);
+
+        return this.directionAngles.get(cardinalString);
     }
 
     static destroy()
     {
         if (this._isDestroyed)
         {
-            return
+            return;
         }
-        this.testary.length = 0;
-        this.testary = null;
+
+        this.cardinalPointStrings.clear();
+        
+        this.directionAngles.clear();
     }
 
 }

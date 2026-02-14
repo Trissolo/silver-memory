@@ -82,7 +82,7 @@ export class Viewport extends Scene
         this.thingsContainer = new Map();
 
         // player
-        this.player = new Actor(this, 'robot', 0);
+        this.player = new Actor(this, 0, 'robot');
 
         // shield
         this.shield = new Shield(this);
@@ -481,7 +481,7 @@ export class Viewport extends Scene
         player.setPosition(180, 76);
         const animName = `${this.player.costume}_rotate`;
         this.player.show()
-        .setFrame(Phaser.Utils.Array.GetRandom([...this.player.cardStringToFrame.values()]).textureFrame);
+        .setFrame(Phaser.Utils.Array.GetRandom([...this.player.rotFrames.values()]).textureFrame);
         //.play(animName)
         //.setFrame('robot_walk_NE_0')
         this.varyingDepthSprites.add(this.player);
