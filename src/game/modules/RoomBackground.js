@@ -3,7 +3,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
   clickVector = new Phaser.Math.Vector2();
   game_basesize_width;
   game_basesize_height;
-  _floorVec = Phaser.Geom.Point.Floor;
+  floorVecUtility = Phaser.Geom.Point.Floor;
 
   constructor(scene)
   {
@@ -66,18 +66,30 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
   clickOnBg(pointer, screenX, screenY, {stopPropagation})
   {
-    this._floorVec(this.clickVector.setTo(pointer.worldX, pointer.worldY));
+    this.floorVecUtility(this.clickVector.setTo(pointer.worldX, pointer.worldY));
+
     console.log(`Clicked BG! World coords: ${this.clickVector.x}, ${this.clickVector.y}`); //, Phaser.Math.RND);
     // console.log(`Screen coords: ${screenX}, ${screenY}, original WorldCoords:`, pointer.worldX, pointer.worldY);
 
-    //this.scene.player.rotateToVec(this.clickVector);
-    this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(126, 48), new Phaser.Math.Vector2(158, 66)]);
+    // test Rotation:
+    // this.scene.player.turnAndStayStill(this.clickVector);
+
+    // Test Walk:
+    // this.scene.player.walkTo([this.clickVector]);  //, new Phaser.Math.Vector2(126, 48), new Phaser.Math.Vector2(158, 66)]);
+
+    // quick test:
+    //const test_coords = new Phaser.Geom.Circle(this.game_basesize_width/2, this.game_basesize_height/2, 45).getPoints(9);
+    // this.scene.player.walkTo([this.clickVector, ...test_coords]);
+
+     this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(40,20)]);
+    // rotation test
+    // this.benchmarkRotation();
     
   }
 
   destroy()
   {
-    this._floorVec = null;
+    this.floorVecUtility = null;
     super.destroy();
   }
 
@@ -96,7 +108,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         const v = aryCoords.pop();
         gra.clear();
         gra.fillRect(v.x-1, v.y-1, 3, 3)
-        scene.player.rotateToVec(v); 
+        scene.player.turnAndStayStill(v); 
             console.log(`Remaining: ${aryCoords.length}`);
             if (!aryCoords.length)
             {
@@ -106,7 +118,6 @@ export default class RoomBackground extends Phaser.GameObjects.Image
             }
         }
     });
-    // scene.player.rotateToVec(this.clickVector)
   }
 
 }

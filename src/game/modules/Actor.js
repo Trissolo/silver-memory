@@ -9,7 +9,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     rotationAnim;
     rotFrames = new Map();
     rotateBeforeWalk = false;
-    rotationInProgress = false;
+    walkAfterRotation = false;
 
     constructor(scene, id, costume)
     {
@@ -28,7 +28,9 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.walk = new WalkComponent(this);
 
-        this.setWalkEventsJustWalk();
+        // this.setWalkEventsJustWalk();
+        // this.setWalkEventsFacing();
+        this.setWalkEventsRotate();
 
         console.log("🍒", this.walkTo.toString());
 
@@ -54,6 +56,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
     destroy()
     {
         this.disableRotation();
+
+        this.removeWalkEvents();
 
         this.rotationAnim = this.rotFrames = undefined;
 
@@ -98,7 +102,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         }
 
         // Event that fires when rotationAnim has reached its end. Used to enable walking
-        this.on(Phaser.Animations.Events.ANIMATION_STOP, this.onStopEvent, this);
+        this.on(Phaser.Animations.Events.ANIMATION_STOP, this.manageStoppedRot, this);
 
         // A 'switch' that indicates whether pre-walk rotation is active
         this.rotateBeforeWalk = true;
@@ -112,18 +116,23 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.rotateBeforeWalk = false;
     }
 
-    relativeAngle(vec)
+    relativeAngle(extVec)
     {
-        return RotationHelper.getRelativeCardinal(this, vec);
+        return RotationHelper.getRelativeCardinal(this, extVec);
     }
 
-    rotateToVec(vec)
+    getAcronymFromSnappedAngle(snappedAngle)
+    {
+        return RotationHelper.getAcronym(snappedAngle);
+    }
+
+    _calcRotation(vec)
     {
         // Target Angle
         const targetInRadians = this.relativeAngle(vec);
 
         // Target Acronym
-        const targetAcronym = RotationHelper.getAcronym(targetInRadians); //RotationHelper.cardinalPointStrings.get(targetInRadians);
+        const targetAcronym = this.getAcronymFromSnappedAngle(targetInRadians); //RotationHelper.cardinalPointStrings.get(targetInRadians);
 
         // Start Acronym
         const startAcronym = this.frame.name.split("_")[2];
@@ -133,15 +142,16 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         // Distance
         const gap = Phaser.Math.Angle.GetShortestDistance(startAngle, targetInRadians);
+        // console.log("☀️ GAP!", gap, startAcronym, targetAcronym, targetInRadians === startAngle);
 
         // Skip if too close
         if (Math.abs(gap) < 1) //.5707963267948966)
         {
-            // console.log("No rotation needed.");
-            // In standard condition we must return now.
+            //console.log("You asked to play the RotationAnimation, ☀️ but ☀️ no rotation is needed anymore.");
+            console.log("☀️ No need to play the Animation. walkAfterRotation:", this.walkAfterRotation)
+            return this.manageStoppedRot();
             // Changing frame just for fun...
-            this.setFrame(`${this.costume}_walk_${targetAcronym}_0`);
-            return;
+            //this.setFrame(`${this.costume}_walk_${targetAcronym}_0`);
         }
 
         // determine the direction of rotation
@@ -158,16 +168,52 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.stopOnFrame(realFrame);
     }
 
-    onStopEvent()
+    manageStoppedRot(animation, frame, gameObject, frameKey)
     {
-        // console.log("Rotation Done");
+        console.log(`Rotation Stopped. walkAfterRotation is ${this.walkAfterRotation}`);
+        if (this.rotateBeforeWalk && this.walkAfterRotation)
+        {
+            this.walkAfterRotation = false;
+
+            this.playFacingAndStartWalk(null, null, this.walk.endCoords);
+        }
+    }
+
+    removeWalkEvents()
+    {
+        for (const walkEventName of Object.values(WalkEvents))
+        {
+            this.off(walkEventName);
+        }
+
+        return this;
     }
 
     setWalkEventsJustWalk()
     {
-        this.on(WalkEvents.WALK_START, this.startWalking, this);
-        this.on(WalkEvents.WALK_SUBSTART, this.startWalking, this);
-        this.on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+        this
+            .removeWalkEvents()
+            .on(WalkEvents.WALK_START, this.startWalking, this)
+            .on(WalkEvents.WALK_SUBSTART, this.startWalking, this)
+            .on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+    }
+
+    setWalkEventsFacing()
+    {
+        this
+            .removeWalkEvents()
+            .on(WalkEvents.WALK_START, this.playFacingAndStartWalk, this)
+            .on(WalkEvents.WALK_SUBSTART, this.playFacingAndStartWalk, this)
+            .on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+    }
+
+    setWalkEventsRotate()
+    {
+        this
+            .removeWalkEvents()
+            .on(WalkEvents.WALK_START, this.rotateThenWalk, this)
+            .on(WalkEvents.WALK_SUBSTART, this.playFacingAndStartWalk, this)
+            .on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
     }
 
     startWalking()
@@ -177,13 +223,30 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     walkTo(path)
     {
-        console.log("Received path", path)
         if (!Array.isArray(path))
         {
             path = [path];
         }
 
         this.walk.setPath(path);
+    }
+
+    playFacingAndStartWalk(actor, startVec, destVec)
+    {
+        this.play(`${this.costume}_walk_${this.getAcronymFromSnappedAngle(this.relativeAngle(destVec))}`)
+        this.startWalking();
+    }
+
+    rotateThenWalk(actor, startVec, destVec)
+    {
+        this.walkAfterRotation = true;
+        this._calcRotation(destVec);
+    }
+
+    turnAndStayStill(destVec)
+    {
+        this.walkAfterRotation = false;
+        this._calcRotation(destVec);
     }
 
     // updStateZero()

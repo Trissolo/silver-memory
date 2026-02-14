@@ -88,7 +88,7 @@ export default class WalkComponent
                 .copy(this.endCoords)
                 .subtract(this.startCoords)
                 .normalize();
-
+            
             if (this.destinations.length === this.highestIndex)
             {
                 this.parent.emit(WalkEvents.WALK_START, this.parent, this.startCoords, this.endCoords);
@@ -145,12 +145,7 @@ export default class WalkComponent
     }
 
   destroy()
-  {
-  	for (const walkEventName of Object.values(WalkEvents))
-    {
-    	this.parent.off(walkEventName);
-    }
-    
+  {   
     this.aTargetExists = undefined;
     this.parent = undefined;
     this.destinations.length = 0;
