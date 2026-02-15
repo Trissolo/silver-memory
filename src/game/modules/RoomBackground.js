@@ -68,7 +68,12 @@ export default class RoomBackground extends Phaser.GameObjects.Image
   {
     this.floorVecUtility(this.clickVector.setTo(pointer.worldX, pointer.worldY));
 
-    console.log(`Clicked BG! World coords: ${this.clickVector.x}, ${this.clickVector.y}`); //, Phaser.Math.RND);
+    console.log(`Clicked BG! World Coords: x: ${this.clickVector.x}, y: ${this.clickVector.y}`); //, Phaser.Math.RND);
+
+    const {player} = this.scene;
+    player.clearMission().walkTo([this.clickVector]);
+    
+
     // console.log(`Screen coords: ${screenX}, ${screenY}, original WorldCoords:`, pointer.worldX, pointer.worldY);
 
     // test Rotation:
@@ -81,7 +86,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     //const test_coords = new Phaser.Geom.Circle(this.game_basesize_width/2, this.game_basesize_height/2, 45).getPoints(9);
     // this.scene.player.walkTo([this.clickVector, ...test_coords]);
 
-     this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(41,20)]);
+    // this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(41,20)]);
     // rotation test
     // this.benchmarkRotation();
     

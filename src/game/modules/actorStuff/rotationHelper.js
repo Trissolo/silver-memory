@@ -35,7 +35,7 @@ export default class RotationHelper
 
     static getRelativeCardinal({x: ax, y: ay}, {x: vecX, y: vecY})
     {
-        return Phaser.Math.Snap.To(Phaser.Math.Angle.Between(ax, ay, vecX, vecY), this.ARC);
+        return this.snapTo(this.angleBetween(ax, ay, vecX, vecY), this.ARC);
     }
 
     static _getAcronym(angle)
@@ -59,13 +59,12 @@ export default class RotationHelper
             return;
         }
 
-        this.cardinalPointStrings.clear();
+        this.cardinalPointStrings = this.cardinalPointStrings.clear();
         
-        this.directionAngles.clear();
+        this.directionAngles = this.directionAngles.clear();
 
         this.snapTo = undefined;
 
         this.angleBetween = undefined;
     }
-
 }

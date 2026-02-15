@@ -45,7 +45,13 @@ export default class rs0
     static 6(thing){console.log(thing.frame.name);}
 
     // button
-    static 7(thing){console.log(thing.frame.name);}
+    static 7(thing)
+    {
+        console.log("This ROOMSCRIPT", "RoomId:", this.roomId);
+
+        this.player.assignMission(this.getScript(this.roomId).pressButton);
+        this.player.walkTo([{x: 161, y: 68}]);
+    }
 
     // mensole
     static 8(thing)
@@ -85,4 +91,40 @@ export default class rs0
 
     // tubo
     static 12(thing){console.log(thing.frame.name);}
+
+    static pressButton()
+    {
+        const {player} = this;
+        const buttonSprite = this.getExistentThing(7);
+
+        this.prepareRoomEvent([
+            {
+                    at: 0,
+                    target: this,
+                    run: this.userInteractionOff
+                },
+                {
+                    at: 300,
+                    // target: player,
+                    run: () => player.turnAndStayStill("NE")
+                },
+                {
+                    at: 560,
+                    run: () => {console.log("SETTING INTERACT FRAME");player.setFrame(`${player.costume}_interactCenter_NE_0`)}
+                },
+                {
+                    at: 600,
+                    run: () => {
+                        this.toggleBit(buttonSprite.rdata.suffix);
+                        this.refreshSpriteFrame(buttonSprite);
+                    }
+                    
+                },
+                {
+                    at: 1500,
+                    run: () => {console.log("SETTING IDLE FRAME"); player.setFrame(`${player.costume}_walk_NE_0`)}
+                }
+        ], /*raiseshield =*/ true, /*immediatePlay =*/ true);  //, onceComplete, scope)
+    
+    }
 }

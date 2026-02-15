@@ -7,9 +7,11 @@ export default class Actor extends Phaser.GameObjects.Sprite
     id;
     inventory;
     rotationAnim;
+    pendingFunc = null;
     rotFrames = new Map();
     rotateBeforeWalk = false;
     walkAfterRotation = false;
+
 
     constructor(scene, id, costume)
     {
@@ -128,10 +130,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     _calcRotation(vec)
     {
-        console.log("_CalcRotation receiving param:", vec, typeof vec);
         // Target Angle
         const finalAngle = typeof vec === 'object'? this.relativeAngle(vec): vec;
-        console.log("FinalAngle", finalAngle, typeof finalAngle);
 
         // Target Acronym
         const finalAcronym = this.getAcronym(finalAngle); //RotationHelper.cardinalPointStrings.get(finalAngle);
@@ -196,7 +196,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             .removeWalkEvents()
             .on(WalkEvents.WALK_START, this.startWalking, this)
             .on(WalkEvents.WALK_SUBSTART, this.startWalking, this)
-            .on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+            .on(WalkEvents.WALK_COMPLETE, this.walkCompleteListener, this);
     }
 
     setWalkEventsFacing()
@@ -205,7 +205,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             .removeWalkEvents()
             .on(WalkEvents.WALK_START, this.playFacingAndWalk, this)
             .on(WalkEvents.WALK_SUBSTART, this.playFacingAndWalk, this)
-            .on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+            .on(WalkEvents.WALK_COMPLETE, this.walkCompleteListener, this);
     }
 
     setWalkEventsRotate()
@@ -214,7 +214,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             .removeWalkEvents()
             .on(WalkEvents.WALK_START, this.rotateThenWalk, this)
             .on(WalkEvents.WALK_SUBSTART, this.playFacingAndWalk, this)
-            .on(WalkEvents.WALK_COMPLETE, this.setIdle, this);
+            .on(WalkEvents.WALK_COMPLETE, this.walkCompleteListener, this);
 
             //just debugging
             // this
@@ -269,11 +269,40 @@ export default class Actor extends Phaser.GameObjects.Sprite
     turnAndStayStill(destVec)
     {
         this.walkAfterRotation = false;
+
         const {directionAngles} = RotationHelper;
-        // console.log("destVec:", destVec);
-        // console.log("directionAngles", directionAngles.has(destVec), directionAngles.get(destVec));
+
         this._calcRotation(directionAngles.has(destVec)? directionAngles.get(destVec): destVec);
     }
+
+    clearMission()
+    {
+        this.pendingFunc = null;
+
+        console.log("Mission cleared");
+        //this.setIdle();
+        return this;
+    }
+
+    assignMission(roomMethod)
+    {
+        this.pendingFunc = roomMethod;
+        return this;
+    }
+
+    walkCompleteListener()
+    {
+        this.setIdle();
+
+        if (this.pendingFunc)
+        {
+            this.pendingFunc.call(this.scene);
+        }
+
+        this.pendingFunc = null;
+    }
+
+
 
     // updStateZero()
     // {

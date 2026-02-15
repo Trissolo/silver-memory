@@ -455,7 +455,7 @@ export class Viewport extends Scene
 
         if (roomEmitter.listenerCount('complete') === 1)
         {
-            console.log("No pending 'colplete' events");
+            console.log("No pending 'complete' events");
         }
         else
         {
