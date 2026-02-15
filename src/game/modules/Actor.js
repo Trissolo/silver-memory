@@ -150,10 +150,10 @@ export default class Actor extends Phaser.GameObjects.Sprite
         if (Math.abs(gap) < 1) //.5707963267948966)
         {
             // console.log("☀️ There is no need to play the animation, but let's pretend it was done.\nwalkAfterRotation:", this.walkAfterRotation);
-            return this.manageStoppedRot();
-
+            
             // Changing frame just for fun...
-            //this.setFrame(`${this.costume}_walk_${finalAcronym}_0`);
+            this.setFrame(`${this.costume}_walk_${finalAcronym}_0`);
+            return this.manageStoppedRot();
         }
 
         // determine the direction of rotation

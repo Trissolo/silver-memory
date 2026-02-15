@@ -61,7 +61,9 @@ export default class WalkComponent
         {
             if (!dest.length)
             {
-                return false;
+                // console.assert(dest.length > 0, "Walk Component received an empty Vector2 array");
+
+                return false // this.walkFinished();
             }
 
             this.destinations.push(...dest);
@@ -88,6 +90,12 @@ export default class WalkComponent
             this.startCoords.copy(this.parent);
 
             this.endCoords.copy(dest);
+
+            if (this.startCoords.equals(this.endCoords) && !this.destinations.length)
+            {
+                console.log("ALready in position");
+                return this.walkFinished();
+            }
 
             this.maxDistAllowed = this.startCoords.distanceSq(this.endCoords);
 
@@ -142,9 +150,10 @@ export default class WalkComponent
 
                 if (this.destinations.length === 0)
                 {
-                    this._inProgress = false;
+                    //this._inProgress = false;
 
-                    this.parent.emit(WalkEvents.WALK_COMPLETE, this.parent);
+                    //this.parent.emit(WalkEvents.WALK_COMPLETE, this.parent);
+                    return this.walkFinished();
                 }
                 else
                 {
@@ -156,25 +165,31 @@ export default class WalkComponent
 
     }
 
-  destroy()
-  {   
-    this.aTargetExists = undefined;
-    this.parent = undefined;
-    this.destinations.length = 0;
-    this.destinations = undefined;
+    walkFinished()
+    {
+        this._inProgress = false;
 
-    this.startCoords = undefined;
-    this.endCoords = undefined;
-    this.velocity = undefined;
+        this.parent.emit(WalkEvents.WALK_COMPLETE, this.parent);
+    }
+    destroy()
+    {   
+        this.aTargetExists = undefined;
+        this.parent = undefined;
+        this.destinations.length = 0;
+        this.destinations = undefined;
 
-    this.maxDistAllowed = undefined;
-    this.speed = undefined;
-  }
+        this.startCoords = undefined;
+        this.endCoords = undefined;
+        this.velocity = undefined;
 
-  calcSpeed(numSpeed)
-  {
-      return Phaser.Math.GetSpeed(numSpeed, 1);
-  }
+        this.maxDistAllowed = undefined;
+        this.speed = undefined;
+    }
+
+    calcSpeed(numSpeed)
+    {
+        return Phaser.Math.GetSpeed(numSpeed, 1);
+    }
 
 
 //   setSpeed(n)
