@@ -184,17 +184,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         subdiv.set_center_widget(label)
         subdiv.reorder_child(label, 3)
         subdiv.show_all()
-
-        #main bar button: update layers
-        # self.get_mainbar_box().get_children()[0].connect("clicked", self.clicked_update_layer)
-        # self.get_mainbar_box().get_children()[1].connect("clicked", self.expensive_next)
-        # self.get_mainbar_box().get_children()[2].connect("clicked", self.expensive_next)
-        # #main bar button: generate JSON
-        # self.get_mainbar_box().get_children()[4].connect('clicked', self.brandnew_generate_json)
-        # self.get_mainbar_box().get_children()[5].connect("clicked", self.get_polygons)
-        # self.get_mainbar_box().get_children()[6].connect("clicked", self.show_rscript)
-        #button_remove_existing_parasite:
-        #self.get_content_area().get_children()[1].get_children()[0].connect('clicked', self.gui_delete_parasite)
     def get_mainbar_box(self):
         return self.get_content_area().get_children()[0]
     def get_left_liststore(self):
@@ -468,7 +457,14 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                 bp = path.stroke_get_points(curr_stroke).controlpoints
                 res.append(" ".join([str(int(x)) for pair in zip(bp[0::6], bp[1::6]) for x in pair]))
             polys[path.get_name()] = res[0] if len(res) == 1 else res
-        self.copy_text_to_clipboard(json.dumps(polys, indent = 1))
+
+        sorted_polys = type(self).put_polys_in_order(polys)
+        #print(json.dumps(list(sorted_polys.values()), indent=4))
+        poly_str = json.dumps(sorted_polys, indent=4)
+        poly_ary = f"\npolys_params: {json.dumps(list(sorted_polys.values()), indent=4)}"
+        #print(json.dumps(sorted_polys, indent=4), )
+        #all_merged_poly_params = f"{poly_str}\n{poly_ary}"
+        self.copy_text_to_clipboard(f"{poly_str}\n{poly_ary}")
         self.set_internal_message("🔹Paths copied to ClipBoard")
     def set_internal_message(self, message = "🟢 JSON copied to Clipboard"):
         self.get_mainbar_box().get_children()[3].set_text(message)

@@ -29,6 +29,27 @@ class CrossDisciplinary():
     @classmethod
     def add_button(cls):
         print("Adding button")
+    @staticmethod
+    def put_polys_in_order(source_dict):
+        res = {}
+        for key, val in source_dict.items():
+            first_char = key[0]
+            
+            if first_char not in res:
+                res[first_char] = []
+            
+            # If the key is exactly the single character (e.g., "a"), 
+            # insert it at the front. Otherwise, append to the end.
+            if key == first_char:
+                res[first_char].insert(0, val)
+            else:
+                res[first_char].append(val)
+    
+        # sorted_polys = put_in_order(obj)
+        # print(json.dumps(list(sorted_polys.values()), indent=4))
+        # print(json.dumps(sorted_polys, indent=4), f"\npoly_params: {json.dumps(list(sorted_polys.values()), indent=4)}")
+        return res
+    
 
 
 '''
