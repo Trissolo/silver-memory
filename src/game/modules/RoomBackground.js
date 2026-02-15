@@ -71,6 +71,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     console.log(`Clicked BG! World Coords: x: ${this.clickVector.x}, y: ${this.clickVector.y}`); //, Phaser.Math.RND);
 
     const {player} = this.scene;
+    player.setIdle();
     player.clearMission().walkTo([this.clickVector]);
     
 

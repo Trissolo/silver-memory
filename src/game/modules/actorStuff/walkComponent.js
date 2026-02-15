@@ -39,7 +39,7 @@ export default class WalkComponent
 
         this.destinations.length = 0;
 
-        this._inProgress = false;
+        //this._inProgress = false;
     }
 
     pause()
@@ -65,6 +65,17 @@ export default class WalkComponent
 
                 return false // this.walkFinished();
             }
+            else
+            {
+                this.endCoords.copy(dest[0]);
+                console.log("SONO UGUALI?", this.endCoords.equals(this.parent));
+                if (this.endCoords.equals(this.parent))
+                {
+                    return this.walkFinished();
+                }         
+            }
+            
+            
 
             this.destinations.push(...dest);
         }
@@ -91,11 +102,11 @@ export default class WalkComponent
 
             this.endCoords.copy(dest);
 
-            if (this.startCoords.equals(this.endCoords) && !this.destinations.length)
-            {
-                console.log("ALready in position");
-                return this.walkFinished();
-            }
+            // if (this.startCoords.equals(this.endCoords) && !this.destinations.length)
+            // {
+            //     console.log("ALready in position");
+            //     return this.walkFinished();
+            // }
 
             this.maxDistAllowed = this.startCoords.distanceSq(this.endCoords);
 
@@ -167,10 +178,11 @@ export default class WalkComponent
 
     walkFinished()
     {
-        this._inProgress = false;
+        this.stopAndClear();
 
         this.parent.emit(WalkEvents.WALK_COMPLETE, this.parent);
     }
+
     destroy()
     {   
         this.aTargetExists = undefined;
