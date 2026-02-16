@@ -460,10 +460,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
 
         sorted_polys = type(self).put_polys_in_order(polys)
         #print(json.dumps(list(sorted_polys.values()), indent=4))
-        poly_str = json.dumps(sorted_polys, indent=4)
-        poly_ary = f"\npolys_params: {json.dumps(list(sorted_polys.values()), indent=4)}"
-        #print(json.dumps(sorted_polys, indent=4), )
-        #all_merged_poly_params = f"{poly_str}\n{poly_ary}"
+        poly_str = json.dumps(sorted_polys, indent=None)
+        poly_ary = f'\n"polys_params": {json.dumps(list(sorted_polys.values()), indent=None)}'
         self.copy_text_to_clipboard(f"{poly_str}\n{poly_ary}")
         self.set_internal_message("🔹Paths copied to ClipBoard")
     def set_internal_message(self, message = "🟢 JSON copied to Clipboard"):
