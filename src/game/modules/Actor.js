@@ -6,6 +6,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
     costume;
     id;
     inventory;
+    polym;
+    vec = new Phaser.Math.Vector2();
     rotationAnim;
     pendingFunc = null;
     rotFrames = new Map();
@@ -34,7 +36,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         // this.setWalkEventsFacing();
         this.setWalkEventsRotate();
 
-        console.log("🍒", this.walkTo.toString());
+        // console.log("🍒", this.walkTo.toString());
 
         // this.timedEvent
 

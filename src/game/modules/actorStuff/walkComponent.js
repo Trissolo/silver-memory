@@ -21,8 +21,6 @@ export default class WalkComponent
 
     speed;
 
-    _inProgress = false;
-
     constructor(parent, speed = 60)
     {
         this.parent = parent;
@@ -38,8 +36,6 @@ export default class WalkComponent
         this.aTargetExists = false;
 
         this.destinations.length = 0;
-
-        //this._inProgress = false;
     }
 
     pause()
@@ -115,8 +111,6 @@ export default class WalkComponent
                 .subtract(this.startCoords)
                 .normalize();
             
-            // set this totally unused bool
-            this._inProgress = true;
             
             if (this.destinations.length === this.highestIndex)
             {
@@ -161,9 +155,6 @@ export default class WalkComponent
 
                 if (this.destinations.length === 0)
                 {
-                    //this._inProgress = false;
-
-                    //this.parent.emit(WalkEvents.WALK_COMPLETE, this.parent);
                     return this.walkFinished();
                 }
                 else

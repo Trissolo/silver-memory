@@ -1,7 +1,9 @@
+import { Viewport } from "../scenes/Viewport";
 export default class rs0
 {
     // wrench
-    static 0(thing){
+    static 0(thing)
+    {
         console.log(thing.frame.name);
         // const roomJson = this.getJson(this.roomId);
         // const tjson = roomJson.things[thing.state]
@@ -109,11 +111,11 @@ export default class rs0
                     run: () => player.turnAndStayStill("NE")
                 },
                 {
-                    at: 560,
+                    at: 800,
                     run: () => {console.log("SETTING INTERACT FRAME");player.setFrame(`${player.costume}_interactCenter_NE_0`)}
                 },
                 {
-                    at: 600,
+                    at: 900,
                     run: () => {
                         this.toggleBit(buttonSprite.rdata.suffix);
                         this.refreshSpriteFrame(buttonSprite);

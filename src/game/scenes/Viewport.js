@@ -14,6 +14,7 @@ export class Viewport extends Scene
     roomId;
     roomJson;
     thingsJson;
+    roomsData;
     thingsContainer;
     roomscript;
     bg;
@@ -48,6 +49,8 @@ export class Viewport extends Scene
 
     init(data)
     {
+        // Registry, not cache
+        this.roomsData = this.registry.get('roomData');
         //this.events.once('create', this.scene.get('Controller')._installScene, this.scene.get('Controller'))//, sce.scene.key));
         // this.events.once(Phaser.Scenes.Events.CREATE, () => console.log("🔮 Viewport CREATE (not READY) called"));
         console.log(`🍰 Running Vievport 'init'`)//, this);
@@ -116,11 +119,8 @@ export class Viewport extends Scene
     pressedZ(eve)
     {
         this.clear_room();
-        this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false); //+= 1;
-        if (this.debuCounter === 3)
-        {
-            this.debuCounter = 4;
-        }
+        this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false);
+        
         this.drawRoom(this.debuCounter); // & 1);
     }
 
@@ -213,8 +213,6 @@ export class Viewport extends Scene
                                 
             const tsprite = this.thingsGroup.get(thingData.x, thingData.y);
             
-            console.log("🫓 Super imp", "Active", tsprite.active, "Visible:", tsprite.visible, "State (ex .rid):", tsprite.state);
-            
             // set the frame, or, if needed, the texture
             const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
             //console.log(`AtlasKey: ${atlasKey}\nCurrent sprite texture: ${tsprite.texture.key}`)
@@ -287,8 +285,7 @@ export class Viewport extends Scene
         this.render_things();
         this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
 
-        this.bg.assignTexture(id);
-        console.log(this.bg.show().name);
+        this.bg.assignTexture(id).show();
 
         this.handleActors();
 
@@ -319,17 +316,11 @@ export class Viewport extends Scene
 
     conditionIsSatisfied(ary)
     {
-        console.log(`'conditionIsSatisfied' param length: ${ary.length}`);
         return VarManager.newHandleAny(ary[0] & 3, ary[0] >>> 2) === ary[1];
     }
 
     setVariable(vcoords, newValue)
     {
-        // if (Array.isArray(ary))
-        // {
-        //    ary = ary[0];
-        // }
-        console.log("'setVariable' Param is array?", Array.isArray(vcoords));
         // console.log(`Writing the value: ${newValue} to var identified with kind: ${ary&3}, idx: ${ary>>>2}`);
         VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, newValue);
     }
@@ -352,10 +343,10 @@ export class Viewport extends Scene
     // end varsvars
 
     // unused
-    getRoomJson(roomId)
-    {
-        return roomId === undefined? this.roomJson : this.cache.json.get(`room${roomId}`)
-    }
+    // getRoomJson(roomId)
+    // {
+        
+    // }
 
     // unused
     getThingsJson(roomId)
@@ -366,7 +357,8 @@ export class Viewport extends Scene
     getJson(roomId)
     {
         // console.log(`Getting JSON for room: ${roomId}`);
-        return this.cache.json.get(`room${roomId}`);
+        // return roomId === undefined? this.roomJson : this.roomsData.get(roomId);
+        return this.roomsData.get(roomId);
     }
 
     // used

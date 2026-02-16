@@ -62,6 +62,8 @@ export default class RoomBackground extends Phaser.GameObjects.Image
       this.scene.cameras.main.setScroll(0, 0);
     }
 
+    return this;
+
   }
 
   clickOnBg(pointer, screenX, screenY, {stopPropagation})
