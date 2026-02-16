@@ -2,6 +2,16 @@ import { Scene } from 'phaser';
 
 export class Preloader extends Scene
 {
+    // 53 character for the loading bar
+    maxLength = 53;
+
+    // Precalculated room amount
+    roomAmount = 5;
+
+    tempTasks = [];
+
+    roomDataMap;
+
     tempx = 2;
     tempy = 0;
     constructor ()
@@ -12,24 +22,24 @@ export class Preloader extends Scene
     init ()
     {
         console.log("🥚 PRELOADER SCENE");
-        // this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlas0`, this.preliminary, this);
-        this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this);
-        this.anims.on(Phaser.Animations.Events.ADD_ANIMATION, this.testAnim, this);
-        // this.load.once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-ref_font`, this.makeRetroFont, this)
 
-        this.maxLength = 53;
-        //this.percent = 0;
+        // show progress bar
         this.bar = this.add.bitmapText(22, 80, 'bootm', `\n${"a".repeat(this.maxLength)}`);
-        this.redrawBar();
-        this.load.on('progress', this.redrawBar, this);
-        
-    }
 
-    redrawBar(val)
-    {
-        // console.log(val);
-        // const val = 0.75
-        this.bar.setText(`${Math.floor(val*100)}%\n${"a".repeat(Math.floor(this.maxLength * val))}`.padEnd(this.maxLength, "b"));
+        this.redrawBar();
+
+        // Some event
+        this.load
+            .once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this)
+            .once(Phaser.Loader.Events.COMPLETE, this.listenerAllLoaded, this)
+            .on(Phaser.Loader.Events.PROGRESS, this.redrawBar, this)
+            .on(Phaser.Loader.Events.FILE_COMPLETE, this.listenerOnFileComplete, this);
+        
+        this.anims.on(Phaser.Animations.Events.ADD_ANIMATION, this.testAnim, this); 
+        
+        // 'global RoomData'
+        this.roomDataMap = this.registry.get('roomData');
+        console.log("RoomData", this.roomDataMap, this.roomDataMap.size)
     }
 
     preload ()
@@ -37,45 +47,88 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        // this.load.atlas('atlasbase', 'atlasbase.png', 'atlasbase.json');
         this.load.atlas('atlasbase', 'atlasbase_tp.png', 'atlasbase_tp.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
         this.load.atlas('atlas1', 'atlas1.png', 'atlas1.json');
     
-        const maxRooms = 5;
-
-        for (let i = 0; i < maxRooms; i++)
+        for (let i = 0; i < this.roomAmount; i++)
         {
-            if (i == 3)
-            {
-                continue
-            }
-            this.load.json(`room${i}`, `jsons/room${i}.json`)
+            this.load.json(`room${i}`, `jsons/room${i}.json`);
         }
         
     }
 
     create()
     {
-        this.load.off('progress', this.redrawBar, this);
+        this.load.off(Phaser.Loader.Events.PROGRESS, this.redrawBar, this);
+
         this.bar.destroy();
 
-        this.input.keyboard.once('keydown-Z', ()=> {
-            this.anims.off(Phaser.Animations.Events.ADD_ANIMATION);
-            this.scene.start('Controller');
-        });
-        //this.scene.start('Controller');
+        // this.anims.off(Phaser.Loader.Events.ADD_ANIMATION, this.testAnim, this, false);
+
+        // temporary stuff
+        console.log("Registry:", this.registry, "Cache is Registry?", this.registry === this.cache);
+
+        this.input.keyboard.once('keydown-Z', this.allTasksDone, this);
+    }
+
+    checkTasks()
+    {
+
+    }
+
+    allTasksDone()
+    {
+        this.anims.off(Phaser.Animations.Events.ADD_ANIMATION);
+
+        //console.log("Cache:", this.cache.json.getKeys(), this.cache.json);
+        // do not use the Cache:
+        console.log("Reset???", this.cache.json?.reset);
+        for (const key of this.cache.json.getKeys())
+        {
+            console.log(`Removing: ${key}: ${this.cache.json.remove(key)}`);
+        }
+        console.log("Registry:", this.roomDataMap);
+
+        this.scene.start('Controller');
+    }
+
+    listenerAllLoaded(loader, totalComplete, totalFailed)
+    {
+        console.log(`Loaded: ${totalComplete} files. Failed: ${totalFailed}`);
+    }
+
+    listenerOnFileComplete(key, type, data)
+    {
+        if (type === "json" && key.startsWith("room"))
+        {
+            console.log(`🟣 Room .json: ${key}`, data, "Is correct?", Object.hasOwn(data, "id"));
+
+            this.roomDataMap.set(data.id, data);
+        }
+        else
+        {
+            console.log(`File Complete: ${key}, type: ${type}`);
+        }
+    }
+
+    redrawBar(val)
+    {
+        this.bar.setText(`${Math.floor(val*100)}%\n${"a".repeat(Math.floor(this.maxLength * val))}`.padEnd(this.maxLength, "b"));
     }
 
     onatlasbase()
     {
-        
-        console.log("atlasbase Loaded!");
+        // console.log("atlasbase Loaded!");
+
         this.makeRetroFont();
+
         this.generateAnimations();
 
         const t =  this.textures.get('atlasbase');
-        t.add(`pixel${String.fromCharCode(65)}`, 0, 56, 118, 1, 1);
+
+        //hardcoded coords: x:24, y: 5
+        t.add(`pixel${String.fromCharCode(65)}`, 0, 24, 5, 1, 1);
         // this.add.bitmapText(50, 50, 'font0', "ESFT£");
     }
 
@@ -112,7 +165,7 @@ export class Preloader extends Scene
 
         // console.dir("DOUBT:", fontFrame,`cutX: ${cutX}, cutY: ${cutY}`);
 
-        console.log("...Making retro font...");
+        // console.log("...Making retro font...");
         const mainfont_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÈÌÒÙàèìòù 0123456789,.:;"!?+-*/=^<>%()[]{}`_#';
         const config = {
             image: 'atlasbase',
@@ -130,7 +183,6 @@ export class Preloader extends Scene
         const newfont = this.cache.bitmapFont.get('font0');
 
         newfont.data.chars[39] = newfont.data.chars[96];
-        //console.log(newfont.data.chars, typeof newfont.data.chars)
     }
 
     generateAnimations()

@@ -1,95 +1,115 @@
 {
-  "frames": {
-    "bg4": {
-      "frame": {
-        "x": 0,
-        "y": 0,
-        "w": 251,
-        "h": 168
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 251,
-        "h": 168
-      },
-      "sourceSize": {
-        "w": 251,
-        "h": 168
-      }
-    },
-    "platform": {
-      "frame": {
-        "x": 251,
-        "y": 0,
-        "w": 70,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 70,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 70,
-        "h": 31
-      }
-    },
-    "panela": {
-      "frame": {
-        "x": 321,
-        "y": 0,
-        "w": 68,
-        "h": 15
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 68,
-        "h": 15
-      },
-      "sourceSize": {
-        "w": 68,
-        "h": 15
-      }
-    },
-    "panelb": {
-      "frame": {
-        "x": 321,
-        "y": 0,
-        "w": 68,
-        "h": 15
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 68,
-        "h": 15
-      },
-      "sourceSize": {
-        "w": 68,
-        "h": 15
-      }
-    }
-  },
-  "meta": {
-    "app": "http://free-tex-packer.com",
-    "version": "0.6.7",
-    "image": "atlas1.png",
-    "format": "RGBA8888",
-    "size": {
-      "w": 389,
-      "h": 168
-    },
-    "scale": 1
-  }
+	"frames": {
+		"bg3.png": {
+			"frame": {
+				"x": 1,
+				"y": 1,
+				"w": 198,
+				"h": 185
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 198,
+				"h": 185
+			},
+			"sourceSize": {
+				"w": 198,
+				"h": 185
+			}
+		},
+		"bg4.png": {
+			"frame": {
+				"x": 201,
+				"y": 1,
+				"w": 251,
+				"h": 168
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 251,
+				"h": 168
+			},
+			"sourceSize": {
+				"w": 251,
+				"h": 168
+			}
+		},
+		"panela.png": {
+			"frame": {
+				"x": 454,
+				"y": 1,
+				"w": 68,
+				"h": 15
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 68,
+				"h": 15
+			},
+			"sourceSize": {
+				"w": 68,
+				"h": 15
+			}
+		},
+		"panelb.png": {
+			"frame": {
+				"x": 524,
+				"y": 1,
+				"w": 68,
+				"h": 15
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 68,
+				"h": 15
+			},
+			"sourceSize": {
+				"w": 68,
+				"h": 15
+			}
+		},
+		"platform.png": {
+			"frame": {
+				"x": 594,
+				"y": 1,
+				"w": 70,
+				"h": 31
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 70,
+				"h": 31
+			},
+			"sourceSize": {
+				"w": 70,
+				"h": 31
+			}
+		}
+	},
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "spritesheet.png",
+		"format": "RGBA8888",
+		"size": {
+			"w": 665,
+			"h": 187
+		},
+		"scale": "1"
+	}
 }
