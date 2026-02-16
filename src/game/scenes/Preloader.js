@@ -1,15 +1,17 @@
 import { Scene } from 'phaser';
+import PMStroll from '../modules/actorStuff/pmStroll/PMStroll.mjs';
 
 export class Preloader extends Scene
 {
     // 53 character for the loading bar
     maxLength = 53;
 
-    // Precalculated room amount
+    // Precalculated room amount:
     roomAmount = 5;
 
     tempTasks = [];
 
+    //shared Map with room data:
     roomDataMap;
 
     tempx = 2;
@@ -23,7 +25,7 @@ export class Preloader extends Scene
     {
         console.log("🥚 PRELOADER SCENE");
 
-        // show progress bar
+        // the progress bar
         this.bar = this.add.bitmapText(22, 80, 'bootm', `\n${"a".repeat(this.maxLength)}`);
 
         this.redrawBar();
@@ -32,19 +34,19 @@ export class Preloader extends Scene
         this.load
             .once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this)
             .once(Phaser.Loader.Events.COMPLETE, this.listenerAllLoaded, this)
-            .on(Phaser.Loader.Events.PROGRESS, this.redrawBar, this)
-            .on(Phaser.Loader.Events.FILE_COMPLETE, this.listenerOnFileComplete, this);
+            .on(Phaser.Loader.Events.PROGRESS, this.redrawBar, this);
+            // .on(Phaser.Loader.Events.FILE_COMPLETE, this.listenerOnFileComplete, this);
         
         this.anims.on(Phaser.Animations.Events.ADD_ANIMATION, this.testAnim, this); 
         
         // 'global RoomData'
         this.roomDataMap = this.registry.get('roomData');
-        console.log("RoomData", this.roomDataMap, this.roomDataMap.size)
+        // console.log("RoomData", this.roomDataMap, this.roomDataMap.size)
     }
 
     preload ()
     {
-        //  Load the assets for the game - Replace with your own assets
+        // Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
         this.load.atlas('atlasbase', 'atlasbase_tp.png', 'atlasbase_tp.json');
@@ -53,10 +55,51 @@ export class Preloader extends Scene
     
         for (let i = 0; i < this.roomAmount; i++)
         {
-            this.load.json(`room${i}`, `jsons/room${i}.json`);
+            const roomJsonKey = `room${i}`
+            this.load
+                .json(roomJsonKey, `jsons/room${i}.json`)
+                .once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}json-${roomJsonKey}`, this.singleJsonLoaded, this)
         }
         
     }
+
+    singleJsonLoaded(key, type, data)
+    {
+        console.log(`🟢 (singleJsonLoaded) Room .${type}: ${key}`, "Is correct?", Object.hasOwn(data, "id"));
+
+        // Store the data in the Map in Registry:
+        this.roomDataMap.set(data.id, data);
+
+        // Da this room has some VisibilityMaps?
+        if (data.polys_params && data.polys_params.length)
+        {
+            const {polys_params} = data;
+
+            // const {length: totalVisibilityMapPerRoom} = polys_params;
+
+            const visMaps = [];
+
+            // Build each Visibility Map!
+
+            for (const [idx, visibilityMapParam] of polys_params.entries())
+            {
+                // const {length: polygonsPerMap} = visibilityMapParam;
+
+                visMaps.push(PMStroll.addVisibilityMap(visibilityMapParam));
+
+                // console.log(`   🟣 Room [${data.id}] VisMap: ${idx+1}/${totalVisibilityMapPerRoom} contains ${polygonsPerMap} poly.`); //, visibilityMapParam);
+            }
+
+            // Add the VisMap directly on the roomData:
+            data.visMaps = visMaps;
+
+            // Remove the params:
+            delete data.polys_params;
+
+            // console.dir(data);
+        }
+        
+    } // end singleJsonLoaded
 
     create()
     {
@@ -83,11 +126,13 @@ export class Preloader extends Scene
 
         //console.log("Cache:", this.cache.json.getKeys(), this.cache.json);
         // do not use the Cache:
-        console.log("Reset???", this.cache.json?.reset);
         for (const key of this.cache.json.getKeys())
         {
-            console.log(`Removing: ${key}: ${this.cache.json.remove(key)}`);
+            console.log(`Removing: ${key}`);
+
+            this.cache.json.remove(key);
         }
+
         console.log("Registry:", this.roomDataMap);
 
         this.scene.start('Controller');
@@ -95,22 +140,13 @@ export class Preloader extends Scene
 
     listenerAllLoaded(loader, totalComplete, totalFailed)
     {
-        console.log(`Loaded: ${totalComplete} files. Failed: ${totalFailed}`);
+        console.log(`Loaded: ${totalComplete} files. ${totalFailed === 0}`);//? "All files loaded!": "Something wrong happens."}`);
     }
 
-    listenerOnFileComplete(key, type, data)
-    {
-        if (type === "json" && key.startsWith("room"))
-        {
-            console.log(`🟣 Room .json: ${key}`, data, "Is correct?", Object.hasOwn(data, "id"));
-
-            this.roomDataMap.set(data.id, data);
-        }
-        else
-        {
-            console.log(`File Complete: ${key}, type: ${type}`);
-        }
-    }
+    // listenerOnFileComplete(key, type, data)
+    // {
+    //     console.log(`File Complete: ${key}, type: ${type}`);
+    // }
 
     redrawBar(val)
     {
