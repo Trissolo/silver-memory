@@ -1,6 +1,6 @@
 {
 	"frames": {
-		"bg3.png": {
+		"bg3": {
 			"frame": {
 				"x": 1,
 				"y": 1,
@@ -20,7 +20,7 @@
 				"h": 185
 			}
 		},
-		"bg4.png": {
+		"bg4": {
 			"frame": {
 				"x": 201,
 				"y": 1,
@@ -40,7 +40,7 @@
 				"h": 168
 			}
 		},
-		"panela.png": {
+		"panela": {
 			"frame": {
 				"x": 454,
 				"y": 1,
@@ -60,7 +60,7 @@
 				"h": 15
 			}
 		},
-		"panelb.png": {
+		"panelb": {
 			"frame": {
 				"x": 524,
 				"y": 1,
@@ -80,7 +80,7 @@
 				"h": 15
 			}
 		},
-		"platform.png": {
+		"platform": {
 			"frame": {
 				"x": 594,
 				"y": 1,
@@ -104,7 +104,7 @@
 	"meta": {
 		"app": "http://www.codeandweb.com/texturepacker",
 		"version": "1.0",
-		"image": "spritesheet.png",
+		"image": "spritesheet",
 		"format": "RGBA8888",
 		"size": {
 			"w": 665,

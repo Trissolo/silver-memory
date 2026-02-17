@@ -31,10 +31,17 @@ export default class rs0
     // coso_dietro
     static 3(thing)
     {
-        console.log(thing.frame.name);
-        console.log(`Thing.y ${thing.y} - Robot: ${this.player.y}`)
-        thing.setDepth(thing.y);
-        this.player.setDepth(this.player.y);
+        // console.log(thing.frame.name);
+        // console.log(`Thing.y ${thing.y} - Robot: ${this.player.y}`)
+        // thing.setDepth(thing.y);
+        // this.player.setDepth(this.player.y);
+
+        const {scene} = thing;
+        const {worldX, worldY} = scene.input.activePointer;
+        console.log(`Before Thing y: ${thing.y}, Actor.y: ${thing.scene.player.y}`);
+        console.log(worldX, worldY)
+        scene.player.setPosition(worldX, worldY);
+        console.log(`After Thing y: ${thing.y}, Actor.y: ${thing.scene.player.y}`);
     }
 
     // AREA
@@ -52,7 +59,7 @@ export default class rs0
         console.log("This ROOMSCRIPT", "RoomId:", this.roomId);
 
         this.player.assignMission(this.getScript(this.roomId).pressButton);
-        this.player.walkTo([{x: 161, y: 68}]);
+        this.player.walkTo(161, 68);
     }
 
     // mensole
@@ -106,7 +113,7 @@ export default class rs0
                     run: this.userInteractionOff
                 },
                 {
-                    at: 300,
+                    at: 400,
                     // target: player,
                     run: () => player.turnAndStayStill("NE")
                 },
