@@ -1,13 +1,15 @@
 import RotationHelper from "./actorStuff/rotationHelper";
 import WalkEvents from "./actorStuff/walkEvents";
 import WalkComponent from "./actorStuff/walkComponent";
+import PMStroll from "./actorStuff/pmStroll/PMStroll.mjs";
+
 export default class Actor extends Phaser.GameObjects.Sprite
 {
     costume;
     id;
     inventory;
     polym;
-    vec = new Phaser.Math.Vector2();
+    comfyDest = new Phaser.Math.Vector2();
     rotationAnim;
     pendingFunc = null;
     rotFrames = new Map();
@@ -72,6 +74,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     setIdle()
     {
+        // Stop any animation played by the Sprite
         this.anims.stop();
 
         this.walk.stopAndClear();
@@ -230,14 +233,26 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.walk.aTargetExists = true;
     }
 
-    walkTo(path)
+    walkTo(destinationVector, y)
     {
-        if (!Array.isArray(path))
+        if (typeof y === 'number')
         {
-            path = [path];
+            this.comfyDest.set(destinationVector, y);
+        }
+        else
+        {
+            this.comfyDest.copy(destinationVector);
         }
 
-        this.walk.setPath(path);
+        // setIdle is called HERE in walkTo!
+        this.setIdle();
+
+        if (this.comfyDest.equals(this))
+        {
+            return this.walk.walkFinished();
+        }
+
+        this.walk.setPath(PMStroll.pathAStar(this, this.comfyDest, this.scene.getJson(this.scene.roomId).visMaps[0]));
     }
 
     debugWalk()
@@ -257,14 +272,15 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     playFacingAndWalk(actor, startVec, destVec)
     {
-        // this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(destVec))}`);
         this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(this.walk.endCoords))}`);
+
         this.startWalking();
     }
 
     rotateThenWalk(actor, startVec, destVec)
     {
         this.walkAfterRotation = true;
+
         this._calcRotation(destVec);
     }
 
@@ -282,13 +298,14 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.pendingFunc = null;
 
         console.log("Mission cleared");
-        //this.setIdle();
+
         return this;
     }
 
     assignMission(roomMethod)
     {
         this.pendingFunc = roomMethod;
+        
         return this;
     }
 

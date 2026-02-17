@@ -1,6 +1,7 @@
 import VarManager from '../modules/VarManager.js';
 import RoomScripts from '../roomscripts/roomscripts.js';
 import { NONE, Scene } from 'phaser';
+import PMStroll from '../modules/actorStuff/pmStroll/PMStroll.mjs';
 
 // specials
 import RoomBackground from '../modules/RoomBackground.js';
@@ -87,6 +88,8 @@ export class Viewport extends Scene
         // player
         this.player = new Actor(this, 0, 'robot');
 
+        this.pmstroll = PMStroll.useDebug(this);
+
         // shield
         this.shield = new Shield(this);
 
@@ -111,7 +114,10 @@ export class Viewport extends Scene
     pressedC()
     {
         console.clear();
-        this.player.turnAndStayStill("N")
+        //this.player.turnAndStayStill("N")
+        this.player.walkTo(this.player.x + 1, this.player.y);
+        //const {x} = this.player;
+        
         //this.player.setState(1);
         //this.bg.benchmarkRotation();
     }

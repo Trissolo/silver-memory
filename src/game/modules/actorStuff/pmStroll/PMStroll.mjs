@@ -1,5 +1,3 @@
-import Phaser from "phaser";
-
 // Phaser.Math.Vector2
 // Phaser.Math.Distance.BetweenPoints
 const {Vector2, Distance: {BetweenPoints: heuristic}} = Phaser.Math;
@@ -10,11 +8,11 @@ const {Vector2, Distance: {BetweenPoints: heuristic}} = Phaser.Math;
 // Phaser.Geom.Intersects.LineToLine;
 const {Polygon, Line, Line: {GetMidPoint}, Intersects: {LineToLine}} = Phaser.Geom;
 
-// generators
-//import {AnyAgainstAllOthers, EachPolygonSide, EachVectorAndAdjacents} from "./generators/index.mjs";
+// generators:
 import AnyAgainstAllOthers from "./generators/AnyAgainstAllOthers.mjs";
 import EachPolygonSide from "./generators/EachPolygonSide.mjs";
 import EachVectorAndAdjacents from "./generators/EachVectorAndAdjacents.mjs";
+
 
 // graph
 import GraphManager from "./GraphManager.mjs";
@@ -74,14 +72,6 @@ export default class PMStroll
             .checkAdjacent(visMap)
             .connectNodes(visMap);
 
-        // this.visibilityMaps.set(name, visMap);
-        // if (externalEmitter)
-        // {
-        //     console.log(externalEmitter.eventNames());
-        // }
-
-        // console.dir("new VisibilityMap", visMap);
-
         return visMap;
     }
 
@@ -96,8 +86,7 @@ export default class PMStroll
         {
             //iterate all vertices in each poly
             for(const [curr, succ, prec] of EachVectorAndAdjacents(points))
-            {
-            
+            {    
                 vertexA.copy(succ).subtract(curr);
 
                 vertexB.copy(curr).subtract(prec);
@@ -105,8 +94,7 @@ export default class PMStroll
                 if( (vertexB.cross(vertexA) < 0) === isFirstPoly )
                 {
                     GraphManager.addNode(curr, visibilityMap.graph);
-                }
-            
+                }   
             }
             
             // The fist polygon - the walkable one - has been checked. The remaining obstacle-polys need 'isFirstPoly' to be false

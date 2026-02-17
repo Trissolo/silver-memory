@@ -26,17 +26,17 @@ export default class PMDebug
         const {graphics} = this;
 
         //set color of walkable area
-        this.fillStyle(0x333333);
+        this.fillStyle(0x333377, 0.7);
 		
         for (const {points} of polygonalMap.polygons)//.values())
         {
             graphics.fillPoints(points, true, false);
 
             // set color for obstacles
-            this.fillStyle(0x777777);
+            this.fillStyle(0x777733, 0.6);
         }
 
-        this.fillStyle(0x575799);
+        this.fillStyle(0x575799, 0.5);
 			
         //show concave
         for (const vertex of polygonalMap.graph.keys())

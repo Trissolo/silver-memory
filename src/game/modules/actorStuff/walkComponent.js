@@ -25,12 +25,11 @@ export default class WalkComponent
     {
         this.parent = parent;
 
-        // this.defaultSpeed = this.calcSpeed(speed)
         this.speed = this.calcSpeed(speed) // speed * 0.001
 
     } // end constructor
 
-    // Idle status: no movement/destination/velocity setted. The sprite stay still/stops
+    // No movement/destination/velocity set. The sprite stay still/stops; any destination is cleared.
     stopAndClear()
     {
         this.aTargetExists = false;
@@ -50,35 +49,12 @@ export default class WalkComponent
     setPath(dest)
     {
         // First of all reset potential old data, and stop any movement.
-        this.stopAndClear();
-
-        // add destination(s) to destinations array
-        if (Array.isArray(dest))
+        if (!dest.length)
         {
-            if (!dest.length)
-            {
-                // console.assert(dest.length > 0, "Walk Component received an empty Vector2 array");
-
-                return false // this.walkFinished();
-            }
-            else
-            {
-                this.endCoords.copy(dest[0]);
-                console.log("SONO UGUALI?", this.endCoords.equals(this.parent));
-                if (this.endCoords.equals(this.parent))
-                {
-                    return this.walkFinished();
-                }         
-            }
-            
-            
-
-            this.destinations.push(...dest);
+            return false; // this.walkFinished();
         }
-        else
-        {
-            this.destinations.push(dest);
-        }
+                      
+        this.destinations.push(...dest);
 
         this.highestIndex = this.destinations.length - 1;
 
@@ -98,19 +74,12 @@ export default class WalkComponent
 
             this.endCoords.copy(dest);
 
-            // if (this.startCoords.equals(this.endCoords) && !this.destinations.length)
-            // {
-            //     console.log("ALready in position");
-            //     return this.walkFinished();
-            // }
-
             this.maxDistAllowed = this.startCoords.distanceSq(this.endCoords);
 
             this.velocity
                 .copy(this.endCoords)
                 .subtract(this.startCoords)
                 .normalize();
-            
             
             if (this.destinations.length === this.highestIndex)
             {
@@ -150,8 +119,11 @@ export default class WalkComponent
             // our target as been reached!
             {
                 this.aTargetExists = false;
-                this.parent.x = this.endCoords.x;
-                this.parent.y = this.endCoords.y;
+
+                this.parent.copyPosition(this.endCoords);
+
+                // this.parent.x = this.endCoords.x;
+                // this.parent.y = this.endCoords.y;
 
                 if (this.destinations.length === 0)
                 {
@@ -161,7 +133,6 @@ export default class WalkComponent
                 {
                     this.grabTarget();
                 }
-
             }
         }
 
