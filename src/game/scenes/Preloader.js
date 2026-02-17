@@ -263,7 +263,7 @@ export class Preloader extends Scene
             anims.create({
                         key: `${costume}_rotate`,
                         defaultTextureKey: 'atlasbase',
-                        frames: cardinalsPoints.map(  el => ({ frame: `${costume}_walk_${el}_${isRobot?0:3}` })  ),
+                        frames: cardinalsPoints.map(  el => ({ frame: `${costume}_walk_${el}_0` })  ),
                         skipMissedFrames: false,
                         repeat: -1,
                         frameRate: 10

@@ -114,8 +114,8 @@ export class Viewport extends Scene
     pressedC()
     {
         console.clear();
-        //this.player.turnAndStayStill("N")
-        this.player.walkTo(this.player.x + 1, this.player.y);
+        this.player.turnAndStayStill("N");
+        //this.player.walkTo(this.player.x + 1, this.player.y);
         //const {x} = this.player;
         
         //this.player.setState(1);

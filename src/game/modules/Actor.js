@@ -13,7 +13,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     rotationAnim;
     pendingFunc = null;
     rotFrames = new Map();
-    rotateBeforeWalk = false;
+    rotateBeforeWalkEnabled = false;
     walkAfterRotation = false;
 
 
@@ -30,7 +30,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         
         this.costume = costume;
 
-        this.enableRotation();
+        // this.enableRotation();
 
         this.walk = new WalkComponent(this);
 
@@ -112,7 +112,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.on(Phaser.Animations.Events.ANIMATION_STOP, this.manageStoppedRot, this);
 
         // A 'switch' that indicates whether pre-walk rotation is active
-        this.rotateBeforeWalk = true;
+        this.rotateBeforeWalkEnabled = true;
     }
 
     disableRotation()
@@ -120,7 +120,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.rotFrames.clear();
         this.rotationAnim = null;
         this.off(Phaser.Animations.Events.ANIMATION_STOP);
-        this.rotateBeforeWalk = false;
+        this.rotateBeforeWalkEnabled = false;
     }
 
     relativeAngle(extVec)
@@ -157,8 +157,13 @@ export default class Actor extends Phaser.GameObjects.Sprite
             // console.log("☀️ There is no need to play the animation, but let's pretend it was done.\nwalkAfterRotation:", this.walkAfterRotation);
             
             // Changing frame just for fun...
-            this.setFrame(`${this.costume}_walk_${finalAcronym}_0`);
-            return this.manageStoppedRot();
+            //this.setFrame(`${this.costume}_walk_${finalAcronym}_0`);
+            if (this.walkAfterRotation)
+            {
+                this.play(`${this.costume}_walk_${finalAcronym}`);
+            }
+
+            return this.manageStoppedRot(null, null, this, null, finalAcronym);
         }
 
         // determine the direction of rotation
@@ -171,17 +176,24 @@ export default class Actor extends Phaser.GameObjects.Sprite
         (gap >= 0) ? this.play({key: this.rotationAnim.key, startFrame: fromFrame})
                 : this.playReverse({key: this.rotationAnim.key, startFrame: fromFrame})
         
+        this.adjustFirstWalk = true;
         // 'stopOnFrame' must be called *after* the animation has started playing!
         this.stopOnFrame(realFrame);
+
+        if (this.walkAfterRotation)
+        {
+            this.chain(`${this.costume}_walk_${finalAcronym}`);
+        }
     }
 
     manageStoppedRot(animation, frame, gameObject, frameKey)
     {
-        if (this.rotateBeforeWalk && this.walkAfterRotation)
+        if (this.rotateBeforeWalkEnabled && this.walkAfterRotation)
         {
             this.walkAfterRotation = false;
 
-            this.playFacingAndWalk(null, null, this.walk.endCoords);
+            //this.playFacingAndWalk(null, null, this.walk.endCoords);
+            this.startWalking();
         }
     }
 
@@ -219,7 +231,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
             .removeWalkEvents()
             .on(WalkEvents.WALK_START, this.rotateThenWalk, this)
             .on(WalkEvents.WALK_SUBSTART, this.playFacingAndWalk, this)
-            .on(WalkEvents.WALK_COMPLETE, this.walkCompleteListener, this);
+            .on(WalkEvents.WALK_COMPLETE, this.walkCompleteListener, this)
+            .enableRotation();
 
             //just debugging
             // this
@@ -272,9 +285,20 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     playFacingAndWalk(actor, startVec, destVec)
     {
-        this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(this.walk.endCoords))}`);
+        //this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(this.walk.endCoords))}`);
+
+        //console.log("DEBUG CONTROL:", this.adjustFirstWalk, this.anims.currentAnim);
+
+        this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(this.walk.endCoords))}`);   //, frameRate: 10, });
+
+        //this.adjustFirstWalk = false;
 
         this.startWalking();
+        // if (this.costume === "guy")
+        // {
+        //     console.log("Is guy", this.anims.currentAnim);
+        //     this.anims.currentAnim.nextFrame(this.anims);
+        // }
     }
 
     rotateThenWalk(actor, startVec, destVec)
