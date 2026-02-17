@@ -85,7 +85,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
             player.setPosition(this.clickVector.x, this.clickVector.y);
         }
 
-        this.debugPmStroll(this.clickVector);
+        // this.debugPmStroll(this.clickVector);
 
         player.walkTo(this.clickVector);
 

@@ -41,6 +41,7 @@ export class Viewport extends Scene
                 ],
             cameras:
             {
+                roundPixels: true,
                 backgroundColor: "#008777" //,
                 //y: 11, // 136,
                 //height: 64
@@ -64,6 +65,7 @@ export class Viewport extends Scene
     {
         // random preliminary stuff:
         this.cameras.main.setBackgroundColor(0x00ff00);
+        console.log(this.cameras.main, this.cameras.main.setRoundPixels(true));
         this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
 
         // 1) background image
@@ -86,7 +88,7 @@ export class Viewport extends Scene
         this.thingsContainer = new Map();
 
         // player
-        this.player = new Actor(this, 0, 'robot');
+        this.player = new Actor(this, 0, 'guy');
 
         this.pmstroll = PMStroll.useDebug(this);
 
@@ -478,7 +480,7 @@ export class Viewport extends Scene
     {
         const {player} = this;
 
-        player.setPosition(180, 76);
+        player.setPosition(180, 50);
 
         this.player
         .setPolygonalMapByIndex()

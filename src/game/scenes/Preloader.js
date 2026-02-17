@@ -16,9 +16,33 @@ export class Preloader extends Scene
 
     tempx = 2;
     tempy = 0;
+    // constructor ()
+    // {
+    //     super('Preloader');
+    // }
     constructor ()
     {
-        super('Preloader');
+        super(
+        {
+            key: 'Preloader',
+            active: false,
+            visible: false,
+            plugins: [
+                'Clock',  //this.time
+                //'DataManagerPlugin',  //this.data
+                'InputPlugin',  //this.input
+                'Loader',  //this.load
+                // 'TweenManager',  //this.tweens
+                // 'LightsPlugin'  //this.lights
+                ],
+            cameras:
+            {
+                roundPixels: true,
+                backgroundColor: "#334455" //,
+                //y: 11, // 136,
+                //height: 64
+            }
+        });
     }
 
     init ()
@@ -49,7 +73,7 @@ export class Preloader extends Scene
         // Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        this.load.atlas('atlasbase', 'atlasbase_tp.png', 'atlasbase_tp.json');
+        this.load.atlas('atlasbase', 'atlasbase_padding1.png', 'atlasbase_padding1.json');
         this.load.atlas('atlas0', 'atlas0.png', 'atlas0.json');
         this.load.atlas('atlas1', 'atlas1.png', 'atlas1.json');
     
@@ -195,11 +219,11 @@ export class Preloader extends Scene
 
     makeRetroFont()
     {
-        const fontFrame = this.textures.get('atlasbase').get('monospaced_font_eng');
+        const fontFrame = this.textures.getFrame('atlasbase', 'monospaced_font_eng');//('atlasbase').get('monospaced_font_eng');
         
         const {cutX, cutY} = fontFrame;
 
-        // console.dir("DOUBT:", fontFrame,`cutX: ${cutX}, cutY: ${cutY}`);
+        console.dir("DOUBT:", fontFrame, `cutX: ${cutX}, cutY: ${cutY}`);
 
         // console.log("...Making retro font...");
         const mainfont_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÈÌÒÙàèìòù 0123456789,.:;"!?+-*/=^<>%()[]{}`_#';
@@ -208,9 +232,9 @@ export class Preloader extends Scene
             width: 4,
             height: 6,
             chars: mainfont_chars,
-            charsPerRow: 26,
-            'offset.x': cutX - 1,
-            'offset.y': cutY - 1  
+            charsPerRow: 26//,
+            //'offset.x': cutX + 0,
+            //'offset.y': cutY + 0  
         };
 
         this.cache.bitmapFont.add('font0', Phaser.GameObjects.RetroFont.Parse(this, config));

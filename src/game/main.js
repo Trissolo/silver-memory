@@ -29,7 +29,7 @@ const config = {
         //autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 256,
         height: 128,
-        zoom: 3
+        zoom: 4
     },
     disablePreFX: true,
     disablePostFX: true,
