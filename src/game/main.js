@@ -33,6 +33,10 @@ const config = {
     },
     disablePreFX: true,
     disablePostFX: true,
+    fps:
+    {
+      target: 30
+    },
     scene: [
         Boot,
         Controller,
