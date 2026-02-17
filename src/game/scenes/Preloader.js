@@ -225,8 +225,8 @@ export class Preloader extends Scene
     {
         const {anims} = this;
         const tempMap = new Map();
-        tempMap.set('robot', [0, 1, 2, 3]);
-        tempMap.set('guy', [0, 1, 2, 3]);
+        tempMap.set('robot', [1, 2, 3]);
+        tempMap.set('guy', [1, 2, 3, 0]);
         const cardinalsPoints = ["W", "NW", "N", "NE", "E", "SE", "S", "SW"];
 
         let isRobot = true
