@@ -477,23 +477,16 @@ export class Viewport extends Scene
     handleActors()
     {
         const {player} = this;
-        // player.setPosition(165, 125);
-        player.setPosition(180, 76);
-        const animName = `${this.player.costume}_rotate`;
-        this.player.show()
-        .setFrame(Phaser.Utils.Array.GetRandom([...this.player.rotFrames.values()]).textureFrame);
-        //.play(animName)
-        //.setFrame('robot_walk_NE_0')
-        this.varyingDepthSprites.add(this.player);
 
-        //console.log(this.anims.anims.entries)
-        // this.tweens.add({
-        //     targets: player,
-        //     y: 118,
-        //     yoyo: true,
-        //     duration: 3000,
-        //     repeat: -1
-        // });
+        player.setPosition(180, 76);
+
+        this.player
+        .setPolygonalMapByIndex()
+        .show()
+        .setFrame(Phaser.Utils.Array.GetRandom([...this.player.rotFrames.values()]).textureFrame);
+
+        // Deepth Sort!
+        this.varyingDepthSprites.add(this.player);
     }
 
     sortByHeight()

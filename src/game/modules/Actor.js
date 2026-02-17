@@ -8,7 +8,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     costume;
     id;
     inventory;
-    polym;
+    polygonalMap;
     comfyDest = new Phaser.Math.Vector2();
     rotationAnim;
     pendingFunc = null;
@@ -319,6 +319,13 @@ export default class Actor extends Phaser.GameObjects.Sprite
         }
 
         this.pendingFunc = null;
+    }
+
+    setPolygonalMapByIndex(visibilityMapIndex = 0, idx = this.scene.roomId)
+    {
+        this.polygonalMap = this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex];
+
+        return this;
     }
 
 
