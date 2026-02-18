@@ -21,6 +21,12 @@ export default class WalkComponent
 
     speed;
 
+    debuVel = "";
+
+    debuLegal = null;
+
+    quellaDecente = new Phaser.Math.Vector2();;
+
     constructor(parent, speed = 60)
     {
         this.parent = parent;
@@ -59,6 +65,12 @@ export default class WalkComponent
         this.highestIndex = this.destinations.length - 1;
 
         this.grabTarget();
+
+        // Debug  da rimuovere
+        this.debuLegal = null;
+        //this.quellaDecente.reset();
+        console.log("Resetting because starting"); //, this.quellaDecente);
+        // Debug  da rimuovere end
 
     }
 
@@ -115,6 +127,29 @@ export default class WalkComponent
 
             this.parent.y += this.velocity.y * vel;
 
+            // Debug da rimuovere
+            const nowIsLegal = this.parent.inAllowedPosition();
+            // if (nowIsLegal)
+            // {
+            //     this.quellaDecente.copy(this.parent);
+            // }
+
+            if (this.debuLegal !== nowIsLegal)
+            {
+                console.log(nowIsLegal);
+                this.debuLegal = nowIsLegal;
+            }
+
+            // const controlloVel = JSON.stringify(this.velocity);
+            // if (controlloVel !== this.debuVel)
+            // {
+            //     console.log(controlloVel);
+            //     this.debuVel = controlloVel;
+            // }
+
+            //console.log(this.velocity, this.parent.inAllowedPosition())
+            // Debug da rimuovere End
+
             if (this.startCoords.distanceSq(this.parent) >= this.maxDistAllowed)
             // our target as been reached!
             {
@@ -122,8 +157,9 @@ export default class WalkComponent
 
                 this.parent.copyPosition(this.endCoords);
 
-                // this.parent.x = this.endCoords.x;
-                // this.parent.y = this.endCoords.y;
+                // Debug da rimuovere
+                this.quellaDecente.copy(this.endCoords);
+                // Debug da rimuovere End
 
                 if (this.destinations.length === 0)
                 {
@@ -163,6 +199,28 @@ export default class WalkComponent
     calcSpeed(numSpeed)
     {
         return Phaser.Math.GetSpeed(numSpeed, 1);
+    }
+
+    vaiARitroso()
+    {
+        const internalVector = new Phaser.Math.Vector2(this.parent.x, this.parent.y);
+        const lastUsedVelocity = this.velocity.clone();
+        for (let i = 0; i < 30; i++)
+        {
+            if (this.parent.inAllowedPosition(internalVector))
+            {
+                console.log(`Found Decent pos andando a rotroso! ${i}`);
+
+                this.parent.setPositionfromVector(internalVector);
+
+                return;
+            }
+
+            internalVector.subtract(lastUsedVelocity);
+        }
+
+        console.log("MEEEERDA! Nulla! :(", this.quellaDecente);
+        this.parent.setPositionfromVector(this.quellaDecente);
     }
 
 

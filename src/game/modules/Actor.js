@@ -84,6 +84,22 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.walk.stopAndClear();
 
+        if (this.inAllowedPosition())
+        {
+            return this;
+        }
+
+        // if (!this.walk.quellaDecente.equals(Phaser.Math.Vector2.ZERO))
+        // {
+        //     console.log("Setting quella decente");
+        //     this.setPositionfromVector(this.walk.quellaDecente);
+        // }
+        // else
+        // {
+            console.log("Andando a ritroso...")
+            this.walk.vaiARitroso();
+        // }
+
         //PMStroll.snapIfRequired(this);
 
         // if (!PMStroll.permittedPosition(this, this.polygonalMap))
@@ -387,9 +403,15 @@ export default class Actor extends Phaser.GameObjects.Sprite
         return false
     }
 
-    inAllowedPosition()
+    inAllowedPosition(vector = this)
     {
-        return PMStroll.permittedPosition(this, this.polygonalMap);
+        return PMStroll.permittedPosition(vector, this.polygonalMap);
+    }
+
+    setPositionfromVector(vector)
+    {
+        this.x = vector.x;
+        this.y = vector.y;
     }
 
     // updStateZero()

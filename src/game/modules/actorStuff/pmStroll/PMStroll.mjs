@@ -219,54 +219,54 @@ export default class PMStroll
             graphKeys.push(newVertex);
         }
 
-        // 4 mental check :/
-        const tempRect = new Phaser.Geom.Rectangle(start.x - 12, start.y - 12, 24, 24);
-        const tempEdge = new Phaser.Geom.Line();
-        console.log("START in CLonedGr", clonedGraph.has(start));
-        // console.log("start", start, "Rect:", tempRect);
-        // console.log("start", start.x, start.y, "Rect:", tempRect.x, tempRect.y);
-        for (const poly of visibilityMap.polygons)
-        {
-            for (const [varA, varB] of EachPolygonSide(poly.points))
-            {
-                tempEdge.setFromObjects(varA, varB);
+        // // 4 mental check :/
+        // const tempRect = new Phaser.Geom.Rectangle(start.x - 12, start.y - 12, 24, 24);
+        // const tempEdge = new Phaser.Geom.Line();
+        // console.log("START in CLonedGr", clonedGraph.has(start));
+        // // console.log("start", start, "Rect:", tempRect);
+        // // console.log("start", start.x, start.y, "Rect:", tempRect.x, tempRect.y);
+        // for (const poly of visibilityMap.polygons)
+        // {
+        //     for (const [varA, varB] of EachPolygonSide(poly.points))
+        //     {
+        //         tempEdge.setFromObjects(varA, varB);
 
-                // console.log(tempEdge, Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect));
+        //         // console.log(tempEdge, Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect));
                 
-                if (Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect))
-                {
+        //         if (Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect))
+        //         {
                         
-                        console.log("Intersect found!!!!!!!!!!!!!!!!!!!!!!!!!", varA, varB);
-                        if ( !clonedGraph.has(start) )
-                        {
-                            GraphManager.addNode(start, clonedGraph)
-                        }
+        //                 console.log("Intersect found!!!!!!!!!!!!!!!!!!!!!!!!!", varA, varB);
+        //                 if ( !clonedGraph.has(start) )
+        //                 {
+        //                     GraphManager.addNode(start, clonedGraph)
+        //                 }
                         
-                        if (!clonedGraph.has(varA))
-                        {
-                            GraphManager.addNode(varA, clonedGraph);
-                        }
+        //                 if (!clonedGraph.has(varA))
+        //                 {
+        //                     GraphManager.addNode(varA, clonedGraph);
+        //                 }
 
-                        if (!clonedGraph.has(varB))
-                        {
-                            GraphManager.addNode(varB, clonedGraph);
-                        }
-                        GraphManager.addEdge(start, varA, heuristic(start, varA), clonedGraph);
-                        GraphManager.addEdge(start, varB, heuristic(start, varB), clonedGraph);
-                        console.log("HAS", clonedGraph.has(start), clonedGraph.has(varA), clonedGraph.has(varB));
-                }
-                    //graphKeys.push(varA);
-                    //GraphManager.addEdge(varA, start, heuristic(varA, start), clonedGraph);
-                    //GraphManager.addEdge(varB, start, heuristic(varB, start), clonedGraph);
-                    //graphKeys.push(varB);
-            }
-                // else
-                // {
-                //     console.log("None found");
-                // }
+        //                 if (!clonedGraph.has(varB))
+        //                 {
+        //                     GraphManager.addNode(varB, clonedGraph);
+        //                 }
+        //                 GraphManager.addEdge(start, varA, heuristic(start, varA), clonedGraph);
+        //                 GraphManager.addEdge(start, varB, heuristic(start, varB), clonedGraph);
+        //                 console.log("HAS", clonedGraph.has(start), clonedGraph.has(varA), clonedGraph.has(varB));
+        //         }
+        //             //graphKeys.push(varA);
+        //             //GraphManager.addEdge(varA, start, heuristic(varA, start), clonedGraph);
+        //             //GraphManager.addEdge(varB, start, heuristic(varB, start), clonedGraph);
+        //             //graphKeys.push(varB);
+        //     }
+        //         // else
+        //         // {
+        //         //     console.log("None found");
+        //         // }
         
             
-        }
+        // }
 
         return clonedGraph;
     }
