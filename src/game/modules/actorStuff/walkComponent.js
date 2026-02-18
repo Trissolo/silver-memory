@@ -42,16 +42,16 @@ export default class WalkComponent
         this.aTargetExists = false;
     }
 
-    /*
-    * @method WalkComponent#setPath
-    * @param {point-like object[]} dest - single point-like object, or an Array of point-like objects 
-    */
+    // /** 
+    // * @method WalkComponent.setPath
+    // * @param {Phaser.Types.Math.Vector2Like[]} dest -An Array of point-like objects 
+    // */
     setPath(dest)
     {
         // First of all reset potential old data, and stop any movement.
         if (!dest.length)
         {
-            return false; // this.walkFinished();
+            return false;
         }
                       
         this.destinations.push(...dest);

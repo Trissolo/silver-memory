@@ -13,6 +13,8 @@ import AnyAgainstAllOthers from "./generators/AnyAgainstAllOthers.mjs";
 import EachPolygonSide from "./generators/EachPolygonSide.mjs";
 import EachVectorAndAdjacents from "./generators/EachVectorAndAdjacents.mjs";
 
+import SnappedCoord from "./generators/snappedCoord.mjs";
+
 
 // graph
 import GraphManager from "./GraphManager.mjs";
@@ -259,6 +261,42 @@ export default class PMStroll
         }
 
         return true;
+    }
+
+
+    /**
+     * 
+     * @param {Phaser.Types.Math.Vector2Like} actor 
+     * @param {*} polygonMap 
+     * @param {Phaser.Geom.Polygon} walkable 
+     */
+    static snapIfRequired(actor, polygonMap = actor.polygonalMap, walkable = polygonMap.polygons[0])
+    {
+        //const walkable = polygonMap.polygons[0];
+        if (walkable.contains(actor.x, actor.y))
+        {
+            return true;
+        }
+
+        const {x: currX, y: currY} = actor;
+
+        for (const x of SnappedCoord(currX))
+        {
+            for (const y of SnappedCoord(currY))
+            {
+                if (walkable.contains(x, y))
+                {
+                    actor.x = x;
+                    actor.y = y;
+                    console.log("🐠 danger averted");
+                    return actor;
+                }
+            }
+        }
+
+        console.error("🦈 Shit happened! Player outside the polygon Map.");
+
+        return false;
     }
 
 }

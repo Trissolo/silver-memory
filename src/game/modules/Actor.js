@@ -40,7 +40,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.setWalkEventsRotate();
 
         // console.log("🍒", this.walkTo.toString());
-        this.on('panic', this.panic, this);
+        // this.on('panic', this.panic, this);
 
         // this.timedEvent
 
@@ -84,10 +84,12 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.walk.stopAndClear();
 
-        if (!PMStroll.permittedPosition(this, this.polygonalMap))
-        {
-            this.emit("panic", this.polygonalMap, this.walk.startCoords, this.walk.endCoords);
-        }
+        PMStroll.snapIfRequired(this);
+
+        // if (!PMStroll.permittedPosition(this, this.polygonalMap))
+        // {
+        //     this.emit("panic", this.polygonalMap, this.walk.startCoords, this.walk.endCoords);
+        // }
 
         return this;
     }
