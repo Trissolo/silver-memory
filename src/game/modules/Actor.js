@@ -15,6 +15,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     rotFrames = new Map();
     rotateBeforeWalkEnabled = false;
     walkAfterRotation = false;
+    timedEvent;
 
 
     constructor(scene, id, costume)
@@ -39,6 +40,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.setWalkEventsRotate();
 
         // console.log("🍒", this.walkTo.toString());
+        this.on('panic', this.panic, this);
 
         // this.timedEvent
 
@@ -49,7 +51,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     preUpdate(time, delta)
     {
-        super.preUpdate(time, delta);
+        
 
         if (this.walk.aTargetExists)
         {
@@ -57,6 +59,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         }
 
         // this[this.state]();
+        super.preUpdate(time, delta);
 
     }
     destroy()
@@ -67,9 +70,11 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.rotationAnim = this.rotFrames = undefined;
 
-        super.destroy();
-
         RotationHelper.destroy();
+
+        this.walk.destroy();
+
+        super.destroy();
     }
 
     setIdle()
@@ -78,6 +83,11 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.anims.stop();
 
         this.walk.stopAndClear();
+
+        if (!PMStroll.permittedPosition(this, this.polygonalMap))
+        {
+            this.emit("panic", this.polygonalMap, this.walk.startCoords, this.walk.endCoords);
+        }
 
         return this;
     }
@@ -149,7 +159,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         // Distance
         const gap = Phaser.Math.Angle.GetShortestDistance(startAngle, finalAngle);
-        // console.log("☀️ GAP!", gap, startAcronym, finalAcronym, finalAngle === startAngle);
 
         // Skip if too close
         if (Math.abs(gap) < 1) //.5707963267948966)
@@ -163,7 +172,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
                 this.play(`${this.costume}_walk_${finalAcronym}`);
             }
 
-            return this.manageStoppedRot(null, null, this, null, finalAcronym);
+            return this.manageStoppedRot();
         }
 
         // determine the direction of rotation
@@ -177,6 +186,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
                 : this.playReverse({key: this.rotationAnim.key, startFrame: fromFrame})
         
         this.adjustFirstWalk = true;
+
         // 'stopOnFrame' must be called *after* the animation has started playing!
         this.stopOnFrame(realFrame);
 
@@ -192,7 +202,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
         {
             this.walkAfterRotation = false;
 
-            //this.playFacingAndWalk(null, null, this.walk.endCoords);
             this.startWalking();
         }
     }
@@ -272,33 +281,22 @@ export default class Actor extends Phaser.GameObjects.Sprite
     {
         const {walk} = this;
 
-        console.log(`🌡️Debug Walk`); //${walk.aTargetExists}`);
+        console.log(`🌡️Debug Walk`);
 
         console.log(`Dest. vecs remaining: ${walk.destinations.length}`);
 
         console.log(`highestIndex: ${walk.highestIndex}`);
 
-        console.log(`startCoords:`, walk.startCoords); // ${walk.startCoords}`);
+        console.log(`startCoords:`, walk.startCoords);
 
-        console.log(`☁️ endCoords:`, walk.endCoords); // ${walk.endCoords}`);
+        console.log(`☁️ endCoords:`, walk.endCoords);
     }
 
     playFacingAndWalk(actor, startVec, destVec)
     {
-        //this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(this.walk.endCoords))}`);
-
-        //console.log("DEBUG CONTROL:", this.adjustFirstWalk, this.anims.currentAnim);
-
         this.play(`${this.costume}_walk_${this.getAcronym(this.relativeAngle(this.walk.endCoords))}`);   //, frameRate: 10, });
 
-        //this.adjustFirstWalk = false;
-
         this.startWalking();
-        // if (this.costume === "guy")
-        // {
-        //     console.log("Is guy", this.anims.currentAnim);
-        //     this.anims.currentAnim.nextFrame(this.anims);
-        // }
     }
 
     rotateThenWalk(actor, startVec, destVec)
@@ -345,14 +343,48 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.pendingFunc = null;
     }
 
-    setPolygonalMapByIndex(visibilityMapIndex = 0, idx = this.scene.roomId)
+    setPolygonalMapByIndex(visibilityMapIndex = 0, idx)
     {
-        this.polygonalMap = this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex];
+        this.polygonalMap = idx === undefined? this.scene.roomJson.visMaps[visibilityMapIndex] : this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex];
 
         return this;
     }
 
+    panic(pomap, stvec, endvec)
+    {
+        console.clear();
+        console.log("✈️ Panic!");
+        const poly = pomap.polygons[0];
+        if (Phaser.Geom.Polygon.Contains(poly, this.x, this.y))
+        {
+            console.log("NO Problem! 😅");
+            return true;
+        }
 
+        const {x, y} = this;
+
+        // stvec.setFromObject(this);
+
+        // console.log(stvec);
+
+        for (const potX of [Math.floor(x), Math.ceil(x)])
+        {
+            for (const potY of [Math.floor(y), Math.ceil(y)])
+            {
+                if (Phaser.Geom.Polygon.Contains(poly, potX, potY))
+                {
+                    this.setPosition(potX, potY);
+                    console.log("🫡👌 FIXED!")
+                    return true;
+                }
+                // endvec.setFromObject(potX, potY);
+                // // console.log("Map", PMStroll.permittedPosition(endvec, pomap), `{ x: ${potX}, y: ${potY}}`);
+                // console.log("Polygon", Phaser.Geom.Polygon.Contains(poly, potX, potY), `{ x: ${potX}, y: ${potY}}`);
+            }
+        }
+        console.log("😈 Cannot fix :(", x, y, poly);
+        return false
+    }
 
     // updStateZero()
     // {
