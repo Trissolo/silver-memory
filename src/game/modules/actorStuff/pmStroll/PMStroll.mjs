@@ -273,22 +273,27 @@ export default class PMStroll
     static snapIfRequired(actor, polygonMap = actor.polygonalMap, walkable = polygonMap.polygons[0])
     {
         //const walkable = polygonMap.polygons[0];
-        if (walkable.contains(actor.x, actor.y))
+        // PMStroll.permittedPosition(this.clickVector, player.polygonalMap)
+        //if (walkable.contains(actor.x, actor.y))
+        if (this.permittedPosition(actor, polygonMap))
         {
             return true;
         }
 
         const {x: currX, y: currY} = actor;
+        const quickVec = new Phaser.Math.Vector2();
 
         for (const x of SnappedCoord(currX))
         {
             for (const y of SnappedCoord(currY))
             {
-                if (walkable.contains(x, y))
+                quickVec.set(x, y);
+
+                if (this.permittedPosition(quickVec, polygonMap))
                 {
+                    console.log("🐠 danger averted", quickVec, quickVec.x - actor.x, quickVec.y - actor.y);
                     actor.x = x;
                     actor.y = y;
-                    console.log("🐠 danger averted");
                     return actor;
                 }
             }
