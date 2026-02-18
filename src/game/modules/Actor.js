@@ -93,8 +93,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
         // }
         // else
         // {
-            console.log("The position was wrong :(\nAndando a ritroso. Calling '.walk.vaiARitroso'.")
-            this.walk.vaiARitroso();
+            //console.log("The position was wrong :(\nAndando a ritroso. Calling '.walk.vaiARitroso'.")
+            //this.walk.vaiARitroso();
         // }
 
         //PMStroll.snapIfRequired(this);
@@ -288,7 +288,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             return this.walk.walkFinished();
         }
 
-        this.walk.setPath(PMStroll.pathAStar(this, this.comfyDest, this.polygonalMap));
+        this.walk.setPath(PMStroll.calculatePath(this, this.comfyDest, this.polygonalMap));
     }
 
     debugWalk()
@@ -409,6 +409,11 @@ export default class Actor extends Phaser.GameObjects.Sprite
     {
         this.x = vector.x;
         this.y = vector.y;
+    }
+
+    setStandingFrame()
+    {
+        this.setFrame(`${this.costume}_walk_${this.frame.name.split("_")[2]}_0`);
     }
 
     // updStateZero()

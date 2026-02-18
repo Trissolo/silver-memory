@@ -89,8 +89,9 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         if (pointer.middleButtonDown())
         {
             player.setPosition(this.clickVector.x, this.clickVector.y);
-            
-            
+            //console.log(player.scene.pmstroll.prepareGraphWithTrick(player, this.clickVector, player.polygonalMap));
+            //const boooo = player.scene.pmstroll.getClosestInVismap(player, player.polygonalMap);
+            //console.log(boooo);
             return;
         }
         
@@ -117,7 +118,8 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     debugPmStroll(dest)
     {
         const vismap = this.scene.player.polygonalMap;
-        const testAStarPath = PMStroll.pathAStar(this.scene.player, dest, vismap);
+
+        const testAStarPath = PMStroll.calculatePath(this.scene.player, dest, vismap);
 
         console.log(testAStarPath);
 

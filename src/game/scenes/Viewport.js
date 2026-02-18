@@ -193,7 +193,7 @@ export class Viewport extends Scene
 
         this.bg.hide() //setVisible(false);
 
-        this.player.hide();
+        this.player.hide().walk.stopAndClear();
 
         this.disable_group_things();
     }
@@ -494,7 +494,7 @@ export class Viewport extends Scene
         {
             elem.setDepth(elem.y);
         }
-        
+
         //this.children.depthSort();
     }
 

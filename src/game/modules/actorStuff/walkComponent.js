@@ -56,18 +56,15 @@ export default class WalkComponent
 
         // First of all reset potential old data, and stop any movement.
         this.stopAndClear();
-                      
+
+        // Populate the queue
         this.destinations.push(...dest);
 
+        // the index to determine the status of the walk cycle
         this.highestIndex = this.destinations.length - 1;
 
+        // the first destination
         this.grabTarget();
-
-        // Debug  da rimuovere
-        // this.debuLegal = null;
-        // this.quellaDecente.reset();
-        // console.log("Resetting because starting"); //, this.quellaDecente);
-        // Debug  da rimuovere end
 
     }
 
@@ -103,6 +100,7 @@ export default class WalkComponent
         
         else
         {
+            // no destination, but this point will never be reached
             this.parent.emit(WalkEvents.WALK_STAY_IDLE, this.parent);
 
             this.stopAndClear();
@@ -140,28 +138,14 @@ export default class WalkComponent
                 this.debuLegal = nowIsLegal;
             }
 
-            // const controlloVel = JSON.stringify(this.velocity);
-            // if (controlloVel !== this.debuVel)
-            // {
-            //     console.log(controlloVel);
-            //     this.debuVel = controlloVel;
-            // }
 
-            //console.log(this.velocity, this.parent.inAllowedPosition())
-            // Debug da rimuovere End
-
-
-
+            // have we reached the goal?
             if (this.startCoords.distanceSq(this.parent) >= this.maxDistAllowed)
-            // our target as been reached!
             {
+                // Yes! Here we are!
                 this.aTargetExists = false;
 
                 this.parent.copyPosition(this.endCoords);
-
-                // Debug da rimuovere
-                // this.quellaDecente.copy(this.endCoords);
-                // Debug da rimuovere End
 
                 if (this.destinations.length === 0)
                 {
@@ -169,6 +153,7 @@ export default class WalkComponent
                 }
                 else
                 {
+                    // not yet. Let's grab the next target...
                     this.grabTarget();
                 }
             }
@@ -207,11 +192,11 @@ export default class WalkComponent
     {
         const internalVector = new Phaser.Math.Vector2(this.parent.x, this.parent.y);
         const lastUsedVelocity = this.velocity.clone();
-        for (let i = 0; i < 30; i++)
+        for (let i = 30; i--; /* --- */)
         {
             if (this.parent.inAllowedPosition(internalVector))
             {
-                console.log(`Found Decent pos andando a rotroso! ${i}`);
+                console.log(`Found Decent position going backwards! ${i}`);
 
                 this.parent.setPositionfromVector(internalVector);
 
@@ -221,8 +206,8 @@ export default class WalkComponent
             internalVector.subtract(lastUsedVelocity);
         }
 
-        console.log("MEEEERDA! Nulla! :(", this.quellaDecente);
-        this.parent.setPositionfromVector(this.quellaDecente);
+        console.log("MEEEERDA! Nulla! :(");
+        // this.parent.setPositionfromVector(this.quellaDecente);
     }
 
 
