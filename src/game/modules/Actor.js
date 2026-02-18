@@ -84,7 +84,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.walk.stopAndClear();
 
-        PMStroll.snapIfRequired(this);
+        //PMStroll.snapIfRequired(this);
 
         // if (!PMStroll.permittedPosition(this, this.polygonalMap))
         // {
@@ -385,6 +385,11 @@ export default class Actor extends Phaser.GameObjects.Sprite
         }
         console.log("😈 Cannot fix :(", x, y, poly);
         return false
+    }
+
+    inAllowedPosition()
+    {
+        return PMStroll.permittedPosition(this, this.polygonalMap);
     }
 
     // updStateZero()
