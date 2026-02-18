@@ -171,7 +171,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             //this.setFrame(`${this.costume}_walk_${finalAcronym}_0`);
             if (this.walkAfterRotation)
             {
-                this.play(`${this.costume}_walk_${finalAcronym}`);
+                this.play(`${this.costume}_walk_${finalAcronym}`, true);
             }
 
             return this.manageStoppedRot();
@@ -184,12 +184,11 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         const fromFrame = this.rotFrames.get(startAcronym).index - 1;
 
-        (gap >= 0) ? this.play({key: this.rotationAnim.key, startFrame: fromFrame})
-                : this.playReverse({key: this.rotationAnim.key, startFrame: fromFrame})
+        (gap >= 0) ? this.play({key: this.rotationAnim.key, startFrame: fromFrame}, true)
+                : this.playReverse({key: this.rotationAnim.key, startFrame: fromFrame}, true)
         
-        this.adjustFirstWalk = true;
 
-        // 'stopOnFrame' must be called *after* the animation has started playing!
+        // Note that 'stopOnFrame' must be called *after* the animation has started playing!
         this.stopOnFrame(realFrame);
 
         if (this.walkAfterRotation)
