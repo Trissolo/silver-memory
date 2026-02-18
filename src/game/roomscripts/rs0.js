@@ -113,7 +113,7 @@ export default class rs0
                     run: this.userInteractionOff
                 },
                 {
-                    at: 400,
+                    at: 500,
                     // target: player,
                     run: () => player.turnAndStayStill("NE")
                 },

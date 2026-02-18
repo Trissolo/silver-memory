@@ -499,4 +499,13 @@ export class Viewport extends Scene
         }
         //this.children.depthSort();
     }
+
+    // update(time, delta)
+    // {
+    //     if (this.player.walk.aTargetExists)
+    //     {
+    //         console.log("Walking...");
+    //         this.pmstroll.debug.lineFromVecs(this.player.walk.startCoords, this.player.walk.endCoords, 0xffffff);
+    //     }
+    // }
 }
