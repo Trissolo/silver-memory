@@ -223,7 +223,7 @@ export class Preloader extends Scene
         
         const {cutX, cutY} = fontFrame;
 
-        console.dir("DOUBT:", fontFrame, `cutX: ${cutX}, cutY: ${cutY}`);
+        // console.dir("DOUBT:", fontFrame, `cutX: ${cutX}, cutY: ${cutY}`);
 
         // console.log("...Making retro font...");
         const mainfont_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÈÌÒÙàèìòù 0123456789,.:;"!?+-*/=^<>%()[]{}`_#';
