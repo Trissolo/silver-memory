@@ -307,9 +307,10 @@ export class Viewport extends Scene
     onThingDown(a,b)
     {
         const scene = this.scene;
-        console.log(`Clicked thing`,this.frame.name);
-        scene.roomscript[this.state].call(scene, this);
 
+        console.log(`Clicked thing`,this.frame.name);
+
+        scene.roomscript[this.state].call(scene, this);
     }
 
     // varsvars
@@ -317,7 +318,8 @@ export class Viewport extends Scene
     {
         if (Array.isArray(vcoords))
         {
-            console.warn(`'getVarValue' received an array, then attempted to consider the value at position [0]`, ary)
+            console.warn(`'getVarValue' received an array, then attempted to consider the value at position [0]`, ary);
+
             vcoords = vcoords[0];
         }
         return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2);
@@ -350,12 +352,6 @@ export class Viewport extends Scene
     }
 
     // end varsvars
-
-    // unused
-    // getRoomJson(roomId)
-    // {
-        
-    // }
 
     // unused
     getThingsJson(roomId)
@@ -498,6 +494,7 @@ export class Viewport extends Scene
         {
             elem.setDepth(elem.y);
         }
+        
         //this.children.depthSort();
     }
 

@@ -21,17 +21,11 @@ export default class WalkComponent
 
     speed;
 
-    debuVel = "";
-
-    debuLegal = null;
-
-    quellaDecente = new Phaser.Math.Vector2();;
-
     constructor(parent, speed = 60)
     {
         this.parent = parent;
 
-        this.speed = this.calcSpeed(speed) // speed * 0.001
+        this.speed = this.calcSpeed(speed);
 
     } // end constructor
 
@@ -54,11 +48,14 @@ export default class WalkComponent
     // */
     setPath(dest)
     {
-        // First of all reset potential old data, and stop any movement.
+        // if no destination, nothing happens
         if (!dest.length)
         {
             return false;
         }
+
+        // First of all reset potential old data, and stop any movement.
+        this.stopAndClear();
                       
         this.destinations.push(...dest);
 
@@ -67,9 +64,9 @@ export default class WalkComponent
         this.grabTarget();
 
         // Debug  da rimuovere
-        this.debuLegal = null;
-        //this.quellaDecente.reset();
-        console.log("Resetting because starting"); //, this.quellaDecente);
+        // this.debuLegal = null;
+        // this.quellaDecente.reset();
+        // console.log("Resetting because starting"); //, this.quellaDecente);
         // Debug  da rimuovere end
 
     }
@@ -127,7 +124,10 @@ export default class WalkComponent
 
             this.parent.y += this.velocity.y * vel;
 
+
+
             // Debug da rimuovere
+            // just some info
             const nowIsLegal = this.parent.inAllowedPosition();
             // if (nowIsLegal)
             // {
@@ -150,6 +150,8 @@ export default class WalkComponent
             //console.log(this.velocity, this.parent.inAllowedPosition())
             // Debug da rimuovere End
 
+
+
             if (this.startCoords.distanceSq(this.parent) >= this.maxDistAllowed)
             // our target as been reached!
             {
@@ -158,7 +160,7 @@ export default class WalkComponent
                 this.parent.copyPosition(this.endCoords);
 
                 // Debug da rimuovere
-                this.quellaDecente.copy(this.endCoords);
+                // this.quellaDecente.copy(this.endCoords);
                 // Debug da rimuovere End
 
                 if (this.destinations.length === 0)

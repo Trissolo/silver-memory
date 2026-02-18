@@ -43,6 +43,8 @@ export default class PMDebug
         {
             graphics.fillPoint(vertex.x, vertex.y, 3);
         }
+
+        return this;
     }
 
     lineFromVecs(vecA, vecB, color = 0xf4f499)

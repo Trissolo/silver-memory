@@ -75,27 +75,29 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         console.log(`Clicked BG! World Coords: x: ${this.clickVector.x}, y: ${this.clickVector.y}`); //, Phaser.Math.RND);
 
-        // setIdle and clearMission are ok!
-        const {player} = this.scene;
-        // player.setIdle();
-        player.clearMission(); //.walkTo([this.clickVector]);
+        // This method MUST clear any potential action. Then it must set the player walk (checking the correctness of the coordinates first).
 
+        const {player} = this.scene;
+
+        // CLEAR POTENTIAL ACTIONS!
+        player.clearMission();
+
+        // player.setIdle();
+
+
+        // development stuff:
         if (pointer.middleButtonDown())
         {
             player.setPosition(this.clickVector.x, this.clickVector.y);
+            
+            
+            return;
         }
-
+        
+        
         this.debugPmStroll(this.clickVector);
 
         player.walkTo(this.clickVector);
-
-        // hmmmm
-        //this.debugPmStroll(this.clickVector);
-
-
-
-
-        // console.log(`Screen coords: ${screenX}, ${screenY}, original WorldCoords:`, pointer.worldX, pointer.worldY);
 
         // test Rotation:
         // this.scene.player.turnAndStayStill(this.clickVector);
@@ -110,17 +112,19 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         // this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(41,20)]);
         // rotation test
         // this.benchmarkRotation();
-
     }
 
     debugPmStroll(dest)
     {
-        const vismap = this.scene.roomJson.visMaps[0];
+        const vismap = this.scene.player.polygonalMap;
         const testAStarPath = PMStroll.pathAStar(this.scene.player, dest, vismap);
 
         console.log(testAStarPath);
-        this.scene.pmstroll.debug.clear().showPolygons(vismap);
-        this.scene.pmstroll.debug.showPath(testAStarPath, this.scene.player, 0x9aba67);
+
+        this.scene.pmstroll.debug
+            .clear()
+            .showPolygons(vismap)
+            .showPath(testAStarPath, this.scene.player, 0x9aba67);
 
     }
 

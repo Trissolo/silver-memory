@@ -31,16 +31,13 @@ export default class Actor extends Phaser.GameObjects.Sprite
         
         this.costume = costume;
 
-        // this.enableRotation();
-
         this.walk = new WalkComponent(this);
 
         // this.setWalkEventsJustWalk();
         // this.setWalkEventsFacing();
         this.setWalkEventsRotate();
 
-        // console.log("🍒", this.walkTo.toString());
-        // this.on('panic', this.panic, this);
+        // console.log("🍒");
 
         // this.timedEvent
 
@@ -96,7 +93,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         // }
         // else
         // {
-            console.log("Andando a ritroso...")
+            console.log("The position was wrong :(\nAndando a ritroso. Calling '.walk.vaiARitroso'.")
             this.walk.vaiARitroso();
         // }
 
@@ -291,7 +288,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             return this.walk.walkFinished();
         }
 
-        this.walk.setPath(PMStroll.pathAStar(this, this.comfyDest, this.scene.getJson(this.scene.roomId).visMaps[0]));
+        this.walk.setPath(PMStroll.pathAStar(this, this.comfyDest, this.polygonalMap));
     }
 
     debugWalk()
@@ -367,45 +364,45 @@ export default class Actor extends Phaser.GameObjects.Sprite
         return this;
     }
 
-    panic(pomap, stvec, endvec)
+    // panic(pomap, stvec, endvec)
+    // {
+    //     console.clear();
+    //     console.log("✈️ Panic!");
+    //     const poly = pomap.polygons[0];
+    //     if (Phaser.Geom.Polygon.Contains(poly, this.x, this.y))
+    //     {
+    //         console.log("NO Problem! 😅");
+    //         return true;
+    //     }
+
+    //     const {x, y} = this;
+
+    //     // stvec.setFromObject(this);
+
+    //     // console.log(stvec);
+
+    //     for (const potX of [Math.floor(x), Math.ceil(x)])
+    //     {
+    //         for (const potY of [Math.floor(y), Math.ceil(y)])
+    //         {
+    //             if (Phaser.Geom.Polygon.Contains(poly, potX, potY))
+    //             {
+    //                 this.setPosition(potX, potY);
+    //                 console.log("🫡👌 FIXED!")
+    //                 return true;
+    //             }
+    //             // endvec.setFromObject(potX, potY);
+    //             // // console.log("Map", PMStroll.permittedPosition(endvec, pomap), `{ x: ${potX}, y: ${potY}}`);
+    //             // console.log("Polygon", Phaser.Geom.Polygon.Contains(poly, potX, potY), `{ x: ${potX}, y: ${potY}}`);
+    //         }
+    //     }
+    //     console.log("😈 Cannot fix :(", x, y, poly);
+    //     return false
+    // }
+
+    inAllowedPosition(src = this)
     {
-        console.clear();
-        console.log("✈️ Panic!");
-        const poly = pomap.polygons[0];
-        if (Phaser.Geom.Polygon.Contains(poly, this.x, this.y))
-        {
-            console.log("NO Problem! 😅");
-            return true;
-        }
-
-        const {x, y} = this;
-
-        // stvec.setFromObject(this);
-
-        // console.log(stvec);
-
-        for (const potX of [Math.floor(x), Math.ceil(x)])
-        {
-            for (const potY of [Math.floor(y), Math.ceil(y)])
-            {
-                if (Phaser.Geom.Polygon.Contains(poly, potX, potY))
-                {
-                    this.setPosition(potX, potY);
-                    console.log("🫡👌 FIXED!")
-                    return true;
-                }
-                // endvec.setFromObject(potX, potY);
-                // // console.log("Map", PMStroll.permittedPosition(endvec, pomap), `{ x: ${potX}, y: ${potY}}`);
-                // console.log("Polygon", Phaser.Geom.Polygon.Contains(poly, potX, potY), `{ x: ${potX}, y: ${potY}}`);
-            }
-        }
-        console.log("😈 Cannot fix :(", x, y, poly);
-        return false
-    }
-
-    inAllowedPosition(vector = this)
-    {
-        return PMStroll.permittedPosition(vector, this.polygonalMap);
+        return PMStroll.permittedPosition(src, this.polygonalMap);
     }
 
     setPositionfromVector(vector)
