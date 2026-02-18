@@ -18,7 +18,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         .setName("Room background")
         .setVisible(false)
         .addToDisplayList()
-        .setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', hitAreaCallback: Phaser.Geom.Rectangle.Contains, hitArea: new Phaser.Geom.Rectangle(0, 0, 1, 2)}
+        .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Phaser.Geom.Rectangle.Contains, hitArea: new Phaser.Geom.Rectangle(0, 0, 1, 2)}
         )
         .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
 
@@ -85,7 +85,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
             player.setPosition(this.clickVector.x, this.clickVector.y);
         }
 
-        // this.debugPmStroll(this.clickVector);
+        this.debugPmStroll(this.clickVector);
 
         player.walkTo(this.clickVector);
 
