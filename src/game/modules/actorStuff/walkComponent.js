@@ -126,17 +126,17 @@ export default class WalkComponent
 
             // Debug da rimuovere
             // just some info
-            const nowIsLegal = this.parent.inAllowedPosition();
+            //          const nowIsLegal = this.parent.inAllowedPosition();
             // if (nowIsLegal)
             // {
             //     this.quellaDecente.copy(this.parent);
             // }
 
-            if (this.debuLegal !== nowIsLegal)
-            {
-                console.log(nowIsLegal);
-                this.debuLegal = nowIsLegal;
-            }
+            // if (this.debuLegal !== nowIsLegal)
+            // {
+                //     console.log(nowIsLegal);
+                //     this.debuLegal = nowIsLegal;
+            // }
 
 
             // have we reached the goal?
@@ -188,27 +188,27 @@ export default class WalkComponent
         return Phaser.Math.GetSpeed(numSpeed, 1);
     }
 
-    vaiARitroso()
-    {
-        const internalVector = new Phaser.Math.Vector2(this.parent.x, this.parent.y);
-        const lastUsedVelocity = this.velocity.clone();
-        for (let i = 30; i--; /* --- */)
-        {
-            if (this.parent.inAllowedPosition(internalVector))
-            {
-                console.log(`Found Decent position going backwards! ${i}`);
+    // vaiARitroso()
+    // {
+    //     const internalVector = new Phaser.Math.Vector2(this.parent.x, this.parent.y);
+    //     const lastUsedVelocity = this.velocity.clone();
+    //     for (let i = 30; i--; /* --- */)
+    //     {
+    //         if (this.parent.inAllowedPosition(internalVector))
+    //         {
+    //             console.log(`Found Decent position going backwards! ${i}`);
 
-                this.parent.setPositionfromVector(internalVector);
+    //             this.parent.setPositionfromVector(internalVector);
 
-                return;
-            }
+    //             return;
+    //         }
 
-            internalVector.subtract(lastUsedVelocity);
-        }
+    //         internalVector.subtract(lastUsedVelocity);
+    //     }
 
-        console.log("MEEEERDA! Nulla! :(");
-        // this.parent.setPositionfromVector(this.quellaDecente);
-    }
+    //     console.log("MEEEERDA! Nulla! :(");
+    //     // this.parent.setPositionfromVector(this.quellaDecente);
+    // }
 
 
 //   setSpeed(n)
