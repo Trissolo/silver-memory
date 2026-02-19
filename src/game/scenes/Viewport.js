@@ -65,7 +65,7 @@ export class Viewport extends Scene
     {
         // random preliminary stuff:
         this.cameras.main.setBackgroundColor(0x00ff00);
-        console.log(this.cameras.main, this.cameras.main.setRoundPixels(true));
+        // console.log(this.cameras.main, this.cameras.main.setRoundPixels(true));
         this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
 
         // 1) background image
@@ -137,7 +137,7 @@ export class Viewport extends Scene
     {
         //this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
         //this.scene.switch('Controller');
-        this.player.testRot();
+        //this.player.testRot();
         /*
         console.log("roomId is:", this.roomId);
         VarManager._debug();

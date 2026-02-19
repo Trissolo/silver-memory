@@ -119,14 +119,17 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     {
         const vismap = this.scene.player.polygonalMap;
 
-        const testAStarPath = PMStroll.calculatePath(this.scene.player, dest, vismap);
+        // const testAStarPath = PMStroll.calculatePathWithTrick(this.scene.player, dest, vismap);
 
-        console.log(testAStarPath);
+        // console.log(testAStarPath);
+
+        const nearest = PMStroll.getClosestInVismap(this.scene.player, vismap);
 
         this.scene.pmstroll.debug
             .clear()
             .showPolygons(vismap)
-            .showPath(testAStarPath, this.scene.player, 0x9aba67);
+            .lineFromVecs(nearest.wantedA, nearest.wantedB, 0xffff34);
+            // .showPath(testAStarPath, this.scene.player, 0x9aba67);
 
     }
 

@@ -70,20 +70,39 @@ export default class PMStroll
 
         //bui
 
-        this.grabConcave(visMap)
+        this.grabConcave(visMap, false)
             .checkAdjacent(visMap)
             .connectNodes(visMap);
 
         return visMap;
     }
 
-    static grabConcave(visibilityMap)
+    static grabConcave(visibilityMap, grabAnyInstead = true)
     {
         const {vertexA, vertexB} = this;
         
         let isFirstPoly = true;
+
+        if (grabAnyInstead)
+        {
+            // console.log("Grabbing ANY vertex");
+
+            for (const {points} of visibilityMap.polygons)
+            {
+                for (const vertex of points)
+                {
+                    GraphManager.addNode(vertex, visibilityMap.graph);
+                }
+                
+                isFirstPoly = false;
+            }
+
+            return this;
+        }
+
+        // console.log("Grabbing ONLY Concave");
         
-        //iterate all walkable poly
+        // iterate all walkable poly
         for (const {points} of visibilityMap.polygons)
         {
             //iterate all vertices in each poly
@@ -304,7 +323,7 @@ export default class PMStroll
 
     } // end pathAStar
 
-    static calculatePath(start, end, visibilityMap)
+    static calculatePathWithTrick(start, end, visibilityMap)
     {
         // disposable clones of the two new vertices, although I'm not sure garbage collection will benefit from them
         start = {x: start.x, y: start.y};
@@ -315,7 +334,7 @@ export default class PMStroll
 
         return new AStar(start, end, clonedGraph, heuristic).search();
 
-    } // end calculatePath
+    } // end calculatePathWithTrick
 
     static permittedPosition(point2Like, {polygons})
     {
@@ -423,15 +442,15 @@ export default class PMStroll
 
     static getClosestInVismap(point, visibilityMap)
     {
+        console.log("getClosestInVismap", visibilityMap.polygons.length, visibilityMap.polygons);
         let closestPt = new Phaser.Math.Vector2(0, 0);
-        let minDistance = Infinity;
-        //const points = polygon.points;
-        const resLine = new Phaser.Geom.Line();
+        let minDistance = Number.MAX_SAFE_INTEGER;
         let wantedA = null;
         let wantedB = null;
 
         for (const polygon of visibilityMap.polygons)
         {
+            console.log("AREA", polygon.points);
             for (const [p1, p2] of EachPolygonSide(polygon.points))
             {
                 // Find the closest point on this specific segment
@@ -442,32 +461,31 @@ export default class PMStroll
                     minDistance = dist;
                     closestPt.x = tempPt.x;
                     closestPt.y = tempPt.y;
-                    resLine.setFromObjects(p1, p2);
                     wantedA = p1;
                     wantedB = p2;
                     
 
                 }
             }
+        }
 
             // Applying Math.floor/ceil as requested for that "snappy" low-precision feel
             return {
                 x: Math.floor(closestPt.x),
                 y: Math.floor(closestPt.y),
-                line: resLine,
                 wantedA,
                 wantedB
             };
-        }
+        
     }
 
     static prepareGraphWithTrick(start, end, visibilityMap)
     {
         const {wantedA, wantedB} = this.getClosestInVismap(start, visibilityMap);
 
-        console.log("A SIDE EXISTS:", wantedA, wantedB);
+        //console.log("A SIDE EXISTS:", wantedA, wantedB);
 
-        console.dir(visibilityMap.polygons);
+        //console.dir(visibilityMap.polygons);
 
         // 1) clone the base Graph:
         const clonedGraph = GraphManager.cloneGraph(visibilityMap.graph);
@@ -475,22 +493,38 @@ export default class PMStroll
         // 2) get the vertices to be checked against the new one
         const graphKeys = [...clonedGraph.keys()];
 
-        console.log("INDEXOF A", graphKeys.indexOf(wantedA));
-        console.log("INDEXOF B", graphKeys.indexOf(wantedA));
+        // 2B) ....
+
+        console.log("INDEXOF A", graphKeys.indexOf(wantedA) > -1, clonedGraph.has(wantedA)); //,graph.has(wantedA));
+        console.log("INDEXOF B", graphKeys.indexOf(wantedB) > -1, clonedGraph.has(wantedB)); // , visibilityMap.graph.has(wantedB));
 
         const gagset = new Set([wantedA, wantedB])
 
+        const toAdd = [start, end];
+
+        // for (const elem of gagset)
+        // if (!visibilityMap.graph.has(elem))
+        // {
+        //     toAdd.push(elem);
+        // }
+
+        // console.log("TO ADD LENGTH", toAdd.length);
+        
         // 3) create edge if needed
-        for (const newVertex of [start, end])
+        for (const newVertex of toAdd)
         {
+            console.log("ToAdd NewVert", newVertex === wantedA || newVertex === wantedB);
+            console.assert(newVertex !== wantedA, "Era WantedA");
+            console.assert(newVertex !== wantedB, "Era WantedB");
             GraphManager.addNode(newVertex, clonedGraph);
 
             for (const existingVertex of graphKeys)
             {
                 //console.log("EXists:", gagset.has(existingVertex));
                 /// GAGG!
-                if (newVertex === start && (gagset.has(existingVertex) || newVertex.x === existingVertex.x && newVertex.y === existingVertex.y))
+                if (newVertex === start && gagset.has(existingVertex))
                 {
+                    // console.log("ToAdd NewVert", newVertex === wantedA || existingVertex === wantedB);
                     GraphManager.addEdge(newVertex, existingVertex, heuristic(newVertex, existingVertex), clonedGraph);
                     continue;
                 }

@@ -81,10 +81,12 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.walk.stopAndClear();
 
-        if (this.inAllowedPosition())
-        {
-            return this;
-        }
+        this.setStandingFrame();
+
+        // if (this.inAllowedPosition())
+        // {
+        //     return this;
+        // }
 
         // if (!this.walk.quellaDecente.equals(Phaser.Math.Vector2.ZERO))
         // {
@@ -288,7 +290,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             return this.walk.walkFinished();
         }
 
-        this.walk.setPath(PMStroll.calculatePath(this, this.comfyDest, this.polygonalMap));
+        this.walk.setPath(PMStroll.calculatePathWithTrick(this, this.comfyDest, this.polygonalMap));
     }
 
     debugWalk()

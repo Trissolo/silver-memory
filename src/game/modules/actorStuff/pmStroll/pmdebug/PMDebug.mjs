@@ -50,7 +50,7 @@ export default class PMDebug
     lineFromVecs(vecA, vecB, color = 0xf4f499)
     {
         // this.setLineColor(color);
-        this.graphics.lineStyle(1, color, 0.2);
+        this.graphics.lineStyle(1, color, 1);
 
         if (vecB)
         {
