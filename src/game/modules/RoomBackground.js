@@ -52,10 +52,46 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         //set hitArea:
         const {width, height} = this.frame;
+
         this.input.hitArea.setSize(width, height);
 
-        // experimental set Scroll (will change when the Player will exist)
-        // console.log("Setting camera Scroll coords based on background size", "(Current camera scrollX):", this.scene.cameras.main.scrollX);
+        // if the Player is visible, the Camera must follow him
+        // console.log("Camera follow", this.scene.player.visible);
+        // if (!this.scene.player.visible)
+        // {
+        //     // experimental set Scroll (will change when the Player will exist)
+        //     // console.log("Setting camera Scroll coords based on background size", "(Current camera scrollX):", this.scene.cameras.main.scrollX);
+        //     if (width < this.game_basesize_width)
+        //     {
+        //         this.scene.cameras.main.setScroll( (width - this.game_basesize_width) >> 1, 0 );
+        //     }
+        //     else
+        //     {
+        //         this.scene.cameras.main.setScroll(0, 0);
+        //     }
+        // }
+
+        return this;
+
+    }
+
+    setCameraBounds(param = true)
+    {
+        const {main} = this.scene.cameras;
+
+        let adjust = 5;
+
+        main.setBounds(0, 0, this.input.hitArea.width, this.input.hitArea.height);//adjust, adjust, this.game_basesize_width - adjust, this.game_basesize_height - adjust);
+
+        adjust = 80;
+        main.setDeadzone(this.game_basesize_width - adjust, this.game_basesize_height - adjust);
+
+        if (param)
+        {
+            return this;
+        }
+
+        // hmmm
         if (width < this.game_basesize_width)
         {
             this.scene.cameras.main.setScroll( (width - this.game_basesize_width) >> 1, 0 );
@@ -63,10 +99,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         else
         {
             this.scene.cameras.main.setScroll(0, 0);
-        }
-
-        return this;
-
+        } 
     }
 
     clickOnBg(pointer, screenX, screenY, {stopPropagation})

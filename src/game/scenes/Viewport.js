@@ -195,6 +195,8 @@ export class Viewport extends Scene
 
         this.player.hide().walk.stopAndClear();
 
+        this.cameras.main.stopFollow();
+
         this.disable_group_things();
     }
 
@@ -483,6 +485,11 @@ export class Viewport extends Scene
         .setPolygonalMapByIndex()
         .show()
         .setFrame(Phaser.Utils.Array.GetRandom([...this.player.rotFrames.values()]).textureFrame);
+
+        // camera follow
+        
+        this.bg.setCameraBounds();
+        this.cameras.main.startFollow(this.player, true);
 
         // Deepth Sort!
         this.varyingDepthSprites.add(this.player);

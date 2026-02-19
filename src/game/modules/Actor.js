@@ -83,29 +83,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
         this.setStandingFrame();
 
-        // if (this.inAllowedPosition())
-        // {
-        //     return this;
-        // }
-
-        // if (!this.walk.quellaDecente.equals(Phaser.Math.Vector2.ZERO))
-        // {
-        //     console.log("Setting quella decente");
-        //     this.setPositionfromVector(this.walk.quellaDecente);
-        // }
-        // else
-        // {
-            //console.log("The position was wrong :(\nAndando a ritroso. Calling '.walk.vaiARitroso'.")
-            //this.walk.vaiARitroso();
-        // }
-
-        //PMStroll.snapIfRequired(this);
-
-        // if (!PMStroll.permittedPosition(this, this.polygonalMap))
-        // {
-        //     this.emit("panic", this.polygonalMap, this.walk.startCoords, this.walk.endCoords);
-        // }
-
         return this;
     }
 
@@ -282,7 +259,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
             this.comfyDest.copy(destinationVector);
         }
 
-        // setIdle is called HERE in walkTo!
+        // setIdle is called HERE, in walkTo!
         this.setIdle();
 
         if (this.comfyDest.equals(this))
@@ -297,7 +274,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     {
         const {walk} = this;
 
-        console.log(`🌡️Debug Walk`);
+        console.log(`🌡️ Debug Walk`);
 
         console.log(`Dest. vecs remaining: ${walk.destinations.length}`);
 
