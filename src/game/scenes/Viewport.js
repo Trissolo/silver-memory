@@ -479,7 +479,8 @@ export class Viewport extends Scene
     {
         const {player} = this;
 
-        player.setPosition(180, 50);
+        // Place at the center of the room texture
+        player.setPosition(this.bg.input.hitArea.width >> 1, this.bg.input.hitArea.height >> 1);
 
         this.player
         .setPolygonalMapByIndex()
@@ -488,7 +489,7 @@ export class Viewport extends Scene
 
         // camera follow
         
-        this.bg.setCameraBounds();
+        //this.bg.setCameraBounds();
         this.cameras.main.startFollow(this.player, true);
 
         // Deepth Sort!
