@@ -390,9 +390,9 @@ export default class Actor extends Phaser.GameObjects.Sprite
         this.y = vector.y;
     }
 
-    setStandingFrame()
+    setStandingFrame(acronimDir = this.frame.name.split("_")[2])
     {
-        this.setFrame(`${this.costume}_walk_${this.frame.name.split("_")[2]}_0`);
+        this.setFrame(`${this.costume}_walk_${acronimDir}_0`);
     }
 
     // updStateZero()

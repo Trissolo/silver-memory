@@ -119,10 +119,14 @@ export default class rs0
                 },
                 {
                     at: 800,
+                    run: () => {console.log("SETTING STANDING FRAME");player.setStandingFrame("NE")}
+                },
+                {
+                    at: 950,
                     run: () => {console.log("SETTING INTERACT FRAME");player.setFrame(`${player.costume}_interactCenter_NE_0`)}
                 },
                 {
-                    at: 900,
+                    at: 1100,
                     run: () => {
                         this.toggleBit(buttonSprite.rdata.suffix);
                         this.refreshSpriteFrame(buttonSprite);
@@ -131,7 +135,7 @@ export default class rs0
                 },
                 {
                     at: 1500,
-                    run: () => {console.log("SETTING IDLE FRAME"); player.setFrame(`${player.costume}_walk_NE_0`)}
+                    run: () => {console.log("SETTING IDLE FRAME"); player.setStandingFrame('NE')}
                 }
         ], /*raiseshield =*/ true, /*immediatePlay =*/ true);  //, onceComplete, scope)
     

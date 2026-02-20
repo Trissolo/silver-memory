@@ -57,12 +57,22 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         // test!
         const {main: cam} = this.scene.cameras;
+
         cam.removeBounds();
+
         const potentialScrollAdjust = cam.getScroll(width >> 1, height >> 1);
+
+        const clampedScrollX = Math.min(0, potentialScrollAdjust.x);
+
+        const clampedScrollY = Math.min(0, potentialScrollAdjust.y);
+        
         console.log("POTENTIAL potentialScrollAdjust", potentialScrollAdjust);
 
-        cam.setBounds(Math.min(0, potentialScrollAdjust.x), Math.min(0, potentialScrollAdjust.y), Math.max(width, cam.width), Math.max(height, cam.height));
-        cam.setScroll(Math.min(0, potentialScrollAdjust.x), Math.min(0, potentialScrollAdjust.y))
+
+        cam.setBounds(clampedScrollX, clampedScrollY, Math.max(width, cam.width), Math.max(height, cam.height));
+
+        cam.setScroll(clampedScrollX, clampedScrollY);
+        
 
         console.log("Bounds riCorretti", cam.getBounds());
 
