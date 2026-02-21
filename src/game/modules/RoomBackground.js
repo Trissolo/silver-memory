@@ -123,11 +123,16 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         } 
     }
 
+
     clickOnBg(pointer, screenX, screenY, {stopPropagation})
     {
         this.floorVecUtility(this.clickVector.setTo(pointer.worldX, pointer.worldY));
 
-        console.log(`Clicked BG! World Coords: x: ${this.clickVector.x}, y: ${this.clickVector.y}`); //, Phaser.Math.RND);
+        if (pointer.rightButtonDown())
+        {
+            console.log(`Clicked BG! World Coords: x: ${this.clickVector.x}, y: ${this.clickVector.y}`);
+        }
+
 
         // This method MUST clear any potential action. Then it must set the player walk (checking the correctness of the coordinates first).
 

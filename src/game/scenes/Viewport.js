@@ -242,16 +242,16 @@ export class Viewport extends Scene
             //tsprite.setVisible(true)
             
             // if it's a new member, let's associate the listener for user interaction
-            if (!tsprite.listenerCount(Phaser.Input.Events.POINTER_DOWN))
+            if (!tsprite.listenerCount(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN))
             {
-                tsprite.on(Phaser.Input.Events.POINTER_DOWN, this.onThingDown);
+                tsprite.on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.onThingDown);
             }
             else
             {
                 console.log("Thing already has input listeners");
             }
             
-            // console.log("eventNames()", tsprite.eventNames(), "pointerdown amount:", tsprite.listenerCount('pointerdown'));
+            console.log("eventNames()", tsprite.eventNames(), "pointerdown amount:", tsprite.listenerCount('pointerdown'));
 
             // deepthsorted?
             if (thingData.kind === 4)
@@ -272,7 +272,6 @@ export class Viewport extends Scene
             }
             else
             {
-                //tsprite.on('pointerdown', this.onThingDown)//RoomScripts[thingData_roomId][idx], this);
                 tsprite.setInteractive();
             }
             
@@ -306,13 +305,13 @@ export class Viewport extends Scene
     }
 
     //the scope is the GameObject
-    onThingDown(a,b)
+    onThingDown(pointer) //, localX, localY, event)
     {
         const scene = this.scene;
 
-        console.log(`Clicked thing`,this.frame.name);
+        console.log(`Clicked thing`,this.frame.name, "pointer:", pointer);
 
-        scene.roomscript[this.state].call(scene, this);
+        scene.roomscript[this.state].call(scene, this, pointer);
     }
 
     // varsvars

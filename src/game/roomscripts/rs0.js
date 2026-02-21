@@ -19,8 +19,8 @@ export default class rs0
         console.log(thing.frame.name);
         const roomJson = this.getJson(0);
         const tjson = roomJson.things[thing.state]
-        console.dir(tjson);
-        console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.getVarValue(tjson.suffix)}`)
+        // console.dir(tjson);
+        // console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.getVarValue(tjson.suffix)}`)
         this.toggleBit(tjson.suffix);
         thing.setFrame(`${tjson.frame}${this.getVarValue(tjson.suffix)}`);
     }
@@ -69,12 +69,17 @@ export default class rs0
     }
 
     // striscia
-    static 9(thing){console.log(thing.frame.name);}
+    static 9(thing, pointer)
+    {
+        console.log(thing.frame.name);
+        this.player.walkTo(pointer.worldX, pointer.worldY);
+    }
 
     // porta
     static 10(thing)
     {
         console.log(thing.frame.name);
+        console.dir('RData', this.roomJson);
         //const roomJson = this.getJson(0);
         //const tjson = roomJson.things[thing.state];
         //const {suffix: vcoords_for_suffix} = tjson;
