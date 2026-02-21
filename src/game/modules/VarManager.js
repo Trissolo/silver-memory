@@ -196,10 +196,11 @@ class VarManager
     {
         for (const elem of this.varContainers.values())
         {
-            console.log("Vars per element:", elem.varsPerElement)
+            console.log("%c Vars per element: ", "background-color: gray;", elem.varsPerElement)
             for (const value of elem.typedArray)
             {
-                console.log(value);
+                console.log(`Dec: ${value}, Hex: ${value.toString(16)}`);
+                // console.log(Number.parseInt(value.toString(16), 16));
             }
         }
     }

@@ -55,7 +55,7 @@ export class Viewport extends Scene
         this.roomsData = this.registry.get('roomData');
         //this.events.once('create', this.scene.get('Controller')._installScene, this.scene.get('Controller'))//, sce.scene.key));
         // this.events.once(Phaser.Scenes.Events.CREATE, () => console.log("🔮 Viewport CREATE (not READY) called"));
-        console.log(`🍰 Running Vievport 'init'`)//, this);
+        console.log(`🍰 Running Viewport 'init'`)//, this);
         // console.log("Vars", VarManager)
         this.debuCounter = 0;
         this.events.once('destroy', this.onDestroy, this);
@@ -128,21 +128,23 @@ export class Viewport extends Scene
     pressedZ(eve)
     {
         this.clear_room();
+
         this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false);
         
-        this.drawRoom(this.debuCounter); // & 1);
+        this.drawRoom(this.debuCounter);
     }
 
     pressedX(eve)
     {
-        //this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
-        //this.scene.switch('Controller');
-        //this.player.testRot();
+        VarManager._debug();
+        //console.dir(this.thingsGroup.children);
+        //this.player.setPosition(-40, 64);
+        // this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
+        // this.scene.switch('Controller');
+        // this.cameras.main.shake(650, 0.01);
         /*
         console.log("roomId is:", this.roomId);
-        VarManager._debug();
         this.shield.active? this.shield.lower(): this.shield.raise();
-        this.cameras.main.shake(650, 0.01);
         console.log("TEST_this.getVarValue");
         console.log(`${this.getVarValue()} <---`)
         */
@@ -488,7 +490,6 @@ export class Viewport extends Scene
 
         // camera follow
         
-        //this.bg.setCameraBounds();
         this.cameras.main.startFollow(this.player, true);
 
         // Deepth Sort!

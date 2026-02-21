@@ -10,20 +10,20 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
     constructor(scene)
     {
-    super(scene, 0, 0, 'atlasbase', 'pixelA');
+        super(scene, 0, 0, 'atlasbase', 'pixelA');
 
-    this
-        .setDepth(-5)
-        .setOrigin(0)
-        .setName("Room background")
-        .setVisible(false)
-        .addToDisplayList()
-        .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Phaser.Geom.Rectangle.Contains, hitArea: new Phaser.Geom.Rectangle(0, 0, 1, 2)}
-        )
-        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
+        this
+            .setDepth(-5)
+            .setOrigin(0)
+            .setName("Room background")
+            .setVisible(false)
+            .addToDisplayList()
+            .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Phaser.Geom.Rectangle.Contains, hitArea: new Phaser.Geom.Rectangle(0, 0, 1, 2)}
+            )
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
 
-        this.game_basesize_width = this.scene.scale.baseSize.width;
-        this.game_basesize_height = this.scene.scale.baseSize.height;
+            this.game_basesize_width = this.scene.scale.baseSize.width;
+            this.game_basesize_height = this.scene.scale.baseSize.height;
     }
 
     hide()
@@ -76,88 +76,43 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         console.log("Bounds riCorretti", cam.getBounds());
 
-        // if the Player is visible, the Camera must follow him
-        // console.log("Camera follow", this.scene.player.visible);
-        // if (!this.scene.player.visible)
-        // {
-        //     // experimental set Scroll (will change when the Player will exist)
-        //     // console.log("Setting camera Scroll coords based on background size", "(Current camera scrollX):", this.scene.cameras.main.scrollX);
-        //     if (width < this.game_basesize_width)
-        //     {
-        //         this.scene.cameras.main.setScroll( (width - this.game_basesize_width) >> 1, 0 );
-        //     }
-        //     else
-        //     {
-        //         this.scene.cameras.main.setScroll(0, 0);
-        //     }
-        // }
-
         return this;
 
     }
 
-    setCameraBounds(param = true)
-    {
-        const {main} = this.scene.cameras;
-
-        let adjust = 5;
-
-        main.setBounds(0, 0, this.input.hitArea.width, this.input.hitArea.height);//adjust, adjust, this.game_basesize_width - adjust, this.game_basesize_height - adjust);
-
-        adjust = 80;
-        main.setDeadzone(this.game_basesize_width - adjust, this.game_basesize_height - adjust);
-
-        if (param)
-        {
-            return this;
-        }
-
-        // hmmm
-        if (width < this.game_basesize_width)
-        {
-            this.scene.cameras.main.setScroll( (width - this.game_basesize_width) >> 1, 0 );
-        }
-        else
-        {
-            this.scene.cameras.main.setScroll(0, 0);
-        } 
-    }
-
-
     clickOnBg(pointer, screenX, screenY, {stopPropagation})
     {
+        // A) assign World coords to thie Vector
         this.floorVecUtility(this.clickVector.setTo(pointer.worldX, pointer.worldY));
 
+        // A2) Info
         if (pointer.rightButtonDown())
         {
             console.log(`Clicked BG! World Coords: x: ${this.clickVector.x}, y: ${this.clickVector.y}`);
+            
+            return;
         }
 
-
-        // This method MUST clear any potential action. Then it must set the player walk (checking the correctness of the coordinates first).
-
+        
         const {player} = this.scene;
-
-        // CLEAR POTENTIAL ACTIONS!
+        
+        // // This method MUST clear any potential action. Then it must set the player walk (checking the correctness of the coordinates first).
+        // B) CLEAR POTENTIAL ACTIONS!
         player.clearMission();
 
-        // player.setIdle();
 
-
-        // development stuff:
+        // B2) development stuff:
         if (pointer.middleButtonDown())
         {
             player.setPosition(this.clickVector.x, this.clickVector.y);
-            //console.log(player.scene.pmstroll.prepareGraphWithTrick(player, this.clickVector, player.polygonalMap));
-            //const boooo = player.scene.pmstroll.getClosestInVismap(player, player.polygonalMap);
-            //console.log(boooo);
+            
             return;
-        }
-        
-        
-        this.debugPmStroll(this.clickVector);
+        }   
 
+        // C) walk
         player.walkTo(this.clickVector);
+
+        this.debugPmStroll(this.clickVector);
 
         // test Rotation:
         // this.scene.player.turnAndStayStill(this.clickVector);
@@ -178,18 +133,13 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     {
         const vismap = this.scene.player.polygonalMap;
 
-        // const testAStarPath = PMStroll.calculatePathWithTrick(this.scene.player, dest, vismap);
-
-        // console.log(testAStarPath);
-
+        // Get and stroke in yellow the nearest Side in the polygonalMap
         const nearest = PMStroll.getClosestInVismap(this.scene.player, vismap);
 
         this.scene.pmstroll.debug
             .clear()
             .showPolygons(vismap)
             .lineFromVecs(nearest.wantedA, nearest.wantedB, 0xffff34);
-            // .showPath(testAStarPath, this.scene.player, 0x9aba67);
-
     }
 
     destroy()

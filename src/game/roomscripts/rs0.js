@@ -97,11 +97,14 @@ export default class rs0
         console.log("Changed to:", this.getVarValue(vcoords_for_suffix));
         //refresh frame
         thing.setFrame(`${thing.rdata.frame}${this.getVarValue(vcoords_for_suffix)}`);
-
     }
 
+    /**
+     * @this {Viewport}
+     * @param {Phaser.GameObjects.Sprite} thing 
+     */
     // vasca
-    static 11(thing){console.log(thing.frame.name);}
+    static 11(thing){console.log(thing.frame.name, this.roomId);}
 
     // tubo
     static 12(thing){console.log(thing.frame.name);}
