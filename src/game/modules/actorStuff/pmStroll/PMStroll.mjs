@@ -1,7 +1,8 @@
 // Phaser.Math.Vector2
+// Phaser.Math.Clamp
 // Phaser.Math.Distance.BetweenPoints
 
-const {Vector2, Distance: {BetweenPoints: heuristic}} = Phaser.Math;
+const {Vector2, Clamp, Distance: {BetweenPoints: heuristic}} = Phaser.Math;
 
 // Phaser.Geom.Polygon;
 // Phaser.Geom.Line;
@@ -72,62 +73,55 @@ export default class PMStroll
 
         //bui
 
-        this.grabConcave(visMap, false)
+        this.grabVertices(visMap)
             .checkAdjacent(visMap)
             .connectNodes(visMap);
 
         return visMap;
     }
 
-    static grabConcave(visibilityMap, grabAnyInstead = true)
+    static grabVertices(visibilityMap, onlyConcave = false)
     {
         const {vertexA, vertexB} = this;
-        
-        let isFirstPoly = true;
 
-        if (grabAnyInstead)
+        if (onlyConcave)
         {
-            // console.log("Grabbing ANY vertex");
-
+            let isFirstPoly = true;
+        
+            // iterate all walkable poly
             for (const {points} of visibilityMap.polygons)
             {
-                for (const vertex of points)
-                {
-                    GraphManager.addNode(vertex, visibilityMap.graph);
+                //iterate all vertices in each poly
+                for(const [curr, succ, prec] of EachVectorAndAdjacents(points))
+                {    
+                    vertexA.copy(succ).subtract(curr);
+
+                    vertexB.copy(curr).subtract(prec);
+        
+                    if( (vertexB.cross(vertexA) < 0) === isFirstPoly )
+                    {
+                        GraphManager.addNode(curr, visibilityMap.graph);
+                    }   
                 }
                 
+                // The fist polygon - the walkable one - has been checked. The remaining obstacle-polys need 'isFirstPoly' to be false
                 isFirstPoly = false;
             }
 
             return this;
         }
 
-        // console.log("Grabbing ONLY Concave");
-        
-        // iterate all walkable poly
         for (const {points} of visibilityMap.polygons)
         {
-            //iterate all vertices in each poly
-            for(const [curr, succ, prec] of EachVectorAndAdjacents(points))
-            {    
-                vertexA.copy(succ).subtract(curr);
-
-                vertexB.copy(curr).subtract(prec);
-     
-                if( (vertexB.cross(vertexA) < 0) === isFirstPoly )
-                {
-                    GraphManager.addNode(curr, visibilityMap.graph);
-                }   
-            }
-            
-            // The fist polygon - the walkable one - has been checked. The remaining obstacle-polys need 'isFirstPoly' to be false
-            isFirstPoly = false;
-        
+            for (const vertex of points)
+            {
+                GraphManager.addNode(vertex, visibilityMap.graph);
+            }   
         }
 
         return this;
         
-    } // end grabConcave
+    } // end grabVertices
 
     static checkAdjacent(visibilityMap)
     {
@@ -230,13 +224,6 @@ export default class PMStroll
 
             for (const existingVertex of graphKeys)
             {
-                /// GAGG!
-                // if (newVertex === start)
-                // {
-                //     GraphManager.addEdge(newVertex, existingVertex, heuristic(newVertex, existingVertex), clonedGraph);
-                //     continue;
-                // }
-                /// end GAGG
                 if (this.quickInLineOfSight(newVertex, existingVertex, visibilityMap))
                 {
                     GraphManager.addEdge(newVertex, existingVertex, heuristic(newVertex, existingVertex), clonedGraph);
@@ -246,55 +233,6 @@ export default class PMStroll
             // From now, the 'newVertex' belongs in the graph, so add it to be checked against the next vertex
             graphKeys.push(newVertex);
         }
-
-        // // 4 mental check :/
-        // const tempRect = new Phaser.Geom.Rectangle(start.x - 12, start.y - 12, 24, 24);
-        // const tempEdge = new Phaser.Geom.Line();
-        // console.log("START in CLonedGr", clonedGraph.has(start));
-        // // console.log("start", start, "Rect:", tempRect);
-        // // console.log("start", start.x, start.y, "Rect:", tempRect.x, tempRect.y);
-        // for (const poly of visibilityMap.polygons)
-        // {
-        //     for (const [varA, varB] of EachPolygonSide(poly.points))
-        //     {
-        //         tempEdge.setFromObjects(varA, varB);
-
-        //         // console.log(tempEdge, Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect));
-                
-        //         if (Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect))
-        //         {
-                        
-        //                 console.log("Intersect found!!!!!!!!!!!!!!!!!!!!!!!!!", varA, varB);
-        //                 if ( !clonedGraph.has(start) )
-        //                 {
-        //                     GraphManager.addNode(start, clonedGraph)
-        //                 }
-                        
-        //                 if (!clonedGraph.has(varA))
-        //                 {
-        //                     GraphManager.addNode(varA, clonedGraph);
-        //                 }
-
-        //                 if (!clonedGraph.has(varB))
-        //                 {
-        //                     GraphManager.addNode(varB, clonedGraph);
-        //                 }
-        //                 GraphManager.addEdge(start, varA, heuristic(start, varA), clonedGraph);
-        //                 GraphManager.addEdge(start, varB, heuristic(start, varB), clonedGraph);
-        //                 console.log("HAS", clonedGraph.has(start), clonedGraph.has(varA), clonedGraph.has(varB));
-        //         }
-        //             //graphKeys.push(varA);
-        //             //GraphManager.addEdge(varA, start, heuristic(varA, start), clonedGraph);
-        //             //GraphManager.addEdge(varB, start, heuristic(varB, start), clonedGraph);
-        //             //graphKeys.push(varB);
-        //     }
-        //         // else
-        //         // {
-        //         //     console.log("None found");
-        //         // }
-        
-            
-        // }
 
         return clonedGraph;
     }
@@ -338,6 +276,7 @@ export default class PMStroll
 
     } // end calculatePathWithTrick
 
+
     static permittedPosition(point2Like, {polygons})
     {
         for (let i = 0, poly, isFirst = false; i < polygons.length; i++)
@@ -354,17 +293,8 @@ export default class PMStroll
     }
 
 
-    /**
-     * 
-     * @param {Phaser.Types.Math.Vector2Like} actor 
-     * @param {*} polygonMap 
-     * @param {Phaser.Geom.Polygon} walkable 
-     */
     static snapIfRequired(actor, polygonMap = actor.polygonalMap, walkable = polygonMap.polygons[0])
     {
-        //const walkable = polygonMap.polygons[0];
-        // PMStroll.permittedPosition(this.clickVector, player.polygonalMap)
-        //if (walkable.contains(actor.x, actor.y))
         if (this.permittedPosition(actor, polygonMap))
         {
             return true;
@@ -394,39 +324,10 @@ export default class PMStroll
         return false;
     }
 
-    // getClosestPointOnPolygon(point, polygon)
-    // {
-    //     let closestPt = new Phaser.Math.Vector2(0, 0);
-    //     let minDistance = Infinity;
-    //     const points = polygon.points;
-
-    //     for (let i = 0; i < points.length; i++) {
-    //         // Get the current segment (start and end points)
-    //         let p1 = points[i];
-    //         let p2 = points[(i + 1) % points.length]; // Loops back to the start
-
-    //         // Find the closest point on this specific segment
-    //         let tempPt = this.getClosestPointOnSegment(point.x, point.y, p1.x, p1.y, p2.x, p2.y);
-    //         let dist = Phaser.Math.Distance.Between(point.x, point.y, tempPt.x, tempPt.y);
-
-    //         if (dist < minDistance) {
-    //             minDistance = dist;
-    //             closestPt.x = tempPt.x;
-    //             closestPt.y = tempPt.y;
-    //         }
-    //     }
-
-    //     // Applying Math.floor/ceil as requested for that "snappy" low-precision feel
-    //     return {
-    //         x: Math.floor(closestPt.x),
-    //         y: Math.floor(closestPt.y)
-    //     };
-    // }
-
     static getClosestPointOnSegment({x: px, y: py}, {x: x1, y: y1}, {x:x2, y: y2})
     {
-        let dx = x2 - x1;
-        let dy = y2 - y1;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
 
         if (dx === 0 && dy === 0) return { x: x1, y: y1 };
 
@@ -434,7 +335,7 @@ export default class PMStroll
         let t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
 
         // Clamp t to ensure the point is on the segment (0 to 1)
-        t = Phaser.Math.Clamp(t, 0, 1); //Math.max(0, Math.min(1, t));
+        t = Clamp(t, 0, 1); //Math.max(0, Math.min(1, t));
 
         return {
             x: x1 + t * dx,
@@ -445,7 +346,7 @@ export default class PMStroll
     static getClosestInVismap(point, visibilityMap)
     {
         // console.log("getClosestInVismap", visibilityMap.polygons.length, visibilityMap.polygons);
-        let closestPt = new Phaser.Math.Vector2(0, 0);
+        const closestPt = new Phaser.Math.Vector2(0, 0);
         let minDistance = Number.MAX_SAFE_INTEGER;
         let wantedA = null;
         let wantedB = null;
@@ -472,8 +373,6 @@ export default class PMStroll
 
             // Applying Math.floor/ceil as requested for that "snappy" low-precision feel
             return {
-                //x, //: Math.floor(closestPt.x),
-                //y, //: Math.floor(closestPt.y),
                 closestPt,
                 wantedA,
                 wantedB
@@ -489,29 +388,15 @@ export default class PMStroll
         // 2) get the vertices to be checked against the new one
         const graphKeys = [...clonedGraph.keys()];
 
-        // 2B) the trick (I think that works better with 'grabAnyInstead = true' in 'grabConcave' method)...
+        // 2B) *the trick*: the nearest polygon side is 'invisible': it does not block the rays, which therefore pass through it  (This trick works better with 'grabOnlyConcave = false' in 'grabVertices' method)...
 
         const {wantedA, wantedB} = this.getClosestInVismap(start, visibilityMap);
 
         const containerClosestSideVertices = new Set([wantedA, wantedB]);
 
-        // console.log("INDEXOF A", graphKeys.indexOf(wantedA) > -1, clonedGraph.has(wantedA)); //,graph.has(wantedA));
-        // console.log("INDEXOF B", graphKeys.indexOf(wantedB) > -1, clonedGraph.has(wantedB)); // , visibilityMap.graph.has(wantedB));
-
-        // const toAdd = [start, end];
-
-        // for (const elem of containerClosestSideVertices)
-        // if (!visibilityMap.graph.has(elem))
-        // {
-        //     toAdd.push(elem);
-        // }
-
         // 3) create edge if needed
-        for (const newVertex of [start, end]) // toAdd)
+        for (const newVertex of [start, end])
         {
-            // console.log("ToAdd NewVert", newVertex === wantedA || newVertex === wantedB);
-            // console.assert(newVertex !== wantedA, "Era WantedA");
-            // console.assert(newVertex !== wantedB, "Era WantedB");
             GraphManager.addNode(newVertex, clonedGraph);
 
             for (const existingVertex of graphKeys)
@@ -519,8 +404,8 @@ export default class PMStroll
                 /// GAGG!
                 if (newVertex === start && containerClosestSideVertices.has(existingVertex))
                 {
-                    // console.log("ToAdd NewVert", newVertex === wantedA || existingVertex === wantedB);
                     GraphManager.addEdge(newVertex, existingVertex, heuristic(newVertex, existingVertex), clonedGraph);
+
                     continue;
                 }
                 /// end GAGG
@@ -534,55 +419,6 @@ export default class PMStroll
             // From now, the 'newVertex' belongs in the graph, so add it to be checked against the next vertex
             graphKeys.push(newVertex);
         }
-
-        // // 4 mental check :/
-        // const tempRect = new Phaser.Geom.Rectangle(start.x - 12, start.y - 12, 24, 24);
-        // const tempEdge = new Phaser.Geom.Line();
-        // console.log("START in CLonedGr", clonedGraph.has(start));
-        // // console.log("start", start, "Rect:", tempRect);
-        // // console.log("start", start.x, start.y, "Rect:", tempRect.x, tempRect.y);
-        // for (const poly of visibilityMap.polygons)
-        // {
-        //     for (const [varA, varB] of EachPolygonSide(poly.points))
-        //     {
-        //         tempEdge.setFromObjects(varA, varB);
-
-        //         // console.log(tempEdge, Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect));
-                
-        //         if (Phaser.Geom.Intersects.LineToRectangle(tempEdge, tempRect))
-        //         {
-                        
-        //                 console.log("Intersect found!!!!!!!!!!!!!!!!!!!!!!!!!", varA, varB);
-        //                 if ( !clonedGraph.has(start) )
-        //                 {
-        //                     GraphManager.addNode(start, clonedGraph)
-        //                 }
-                        
-        //                 if (!clonedGraph.has(varA))
-        //                 {
-        //                     GraphManager.addNode(varA, clonedGraph);
-        //                 }
-
-        //                 if (!clonedGraph.has(varB))
-        //                 {
-        //                     GraphManager.addNode(varB, clonedGraph);
-        //                 }
-        //                 GraphManager.addEdge(start, varA, heuristic(start, varA), clonedGraph);
-        //                 GraphManager.addEdge(start, varB, heuristic(start, varB), clonedGraph);
-        //                 console.log("HAS", clonedGraph.has(start), clonedGraph.has(varA), clonedGraph.has(varB));
-        //         }
-        //             //graphKeys.push(varA);
-        //             //GraphManager.addEdge(varA, start, heuristic(varA, start), clonedGraph);
-        //             //GraphManager.addEdge(varB, start, heuristic(varB, start), clonedGraph);
-        //             //graphKeys.push(varB);
-        //     }
-        //         // else
-        //         // {
-        //         //     console.log("None found");
-        //         // }
-        
-            
-        // }
 
         return clonedGraph;
     }
