@@ -82,10 +82,13 @@ export default class WalkComponent
 
             this.maxDistAllowed = this.startCoords.distanceSq(this.endCoords);
 
-            this.velocity
-                .copy(this.endCoords)
-                .subtract(this.startCoords)
-                .normalize();
+            // this.velocity
+            //     .copy(this.endCoords)
+            //     .subtract(this.startCoords)
+            //     .normalize();
+            
+            // alternative way:
+            this.velocity.setToPolar(Phaser.Math.Angle.BetweenPoints(this.startCoords, this.endCoords), 1);
             
             if (this.destinations.length === this.highestIndex)
             {
