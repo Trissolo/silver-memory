@@ -82,8 +82,9 @@ export class Viewport extends Scene
         this.thingsGroup = this.add.group({createCallback: function (thing)
             {
                 thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
-                thing.setVisible(false);
-                thing.rdata = null;
+                .setVisible(false)
+                .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, thing.scene.onThingDown)
+                .rdata = null;
             }
         });
 
@@ -126,9 +127,9 @@ export class Viewport extends Scene
 
     pressedC()
     {
-        console.clear();
+        //console.clear();
         //this.player.turnAndStayStill("N");
-        console.log("Player legal", this.player.inAllowedPosition());
+        // console.log("Player legal", this.player.inAllowedPosition());
         //this.player.walkTo(this.player.x + 1, this.player.y);
         //const {x} = this.player;
         
@@ -225,71 +226,58 @@ export class Viewport extends Scene
     {
         const atlasKey = `atlas${Math.floor(this.roomId / 3)}`;
 
-        let tsprite;
+        let roomThing;
 
         for (const [idx, thingData] of this.roomJson.things.entries())
         {
             if (thingData.kind === 1)
             {
                 //continue;
-                tsprite = this.triggerZone.get();
-                tsprite.input.hitArea.setTo(...thingData.rect);
-                console.log("Rect hitArea:", tsprite.input.hitArea);
+                roomThing = this.triggerZone.get();
+                roomThing.input.hitArea.setTo(...thingData.rect);
+                console.log("Rect hitArea:", roomThing.input.hitArea);
             }
             else
             {
-                tsprite = this.thingsGroup.get(thingData.x, thingData.y);
-                // set the frame, or, if needed, the texture
+                roomThing = this.thingsGroup.get(thingData.x, thingData.y);
+                // set the frame, and, if needed, the texture
                 const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
-                tsprite.texture.key === atlasKey? tsprite.setFrame(assembledFrameName): tsprite.setTexture(atlasKey, assembledFrameName);
+                roomThing.texture.key === atlasKey? roomThing.setFrame(assembledFrameName): roomThing.setTexture(atlasKey, assembledFrameName);
             }
                                 
             
-            
-            
-            
-            // Room ID!
-            tsprite.setState(idx);
-            tsprite.rdata = thingData;
+            roomThing
+                .setDepth(thingData.kind)
+                .setActive(true)
+                .setState(idx) // Unique ID of the thing among all the things in the room
+                .rdata = thingData;
             
             // let's keep this thing in its container
-            this.thingsContainer.set(idx, tsprite);
+            this.thingsContainer.set(idx, roomThing);
             
-            tsprite.setDepth(thingData.kind);
-            tsprite.setActive(true);
-            
-            // if it's a new member, let's associate the listener for user interaction
-            if (!tsprite.listenerCount(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN))
-            {
-                tsprite.on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.onThingDown);
-            }
-            else
-            {
-                console.log("Thing already has input listeners");
-            }
-            
-            // console.log("eventNames()", tsprite.eventNames(), "pointerdown amount:", tsprite.listenerCount('pointerdown'));
+            // console.log("eventNames()", roomThing.eventNames(), "pointerdown amount:", roomThing.listenerCount('pointerdown'));
 
             // deepthsorted?
             if (thingData.kind === 4)
             {
-                tsprite.setOrigin(0.5, 1);
-                this.varyingDepthSprites.add(tsprite);
+                roomThing.setOrigin(0.5, 1);
+                this.varyingDepthSprites.add(roomThing);
             }
             else
             {
-                tsprite.setOrigin(0, 0);
+                roomThing.setOrigin(0, 0);
             }
             
             if (thingData.noInteraction)
             {
-                console.log("...but is input disabled");
-                tsprite.disableInteractive(false);
+                roomThing.disableInteractive(false);
+
+                // do we really have to continue?
                 continue;
             }
             else
             {
-                tsprite.setInteractive();
+                roomThing.setInteractive();
             }
             
             if (thingData.skipCond && this.conditionIsSatisfied(thingData.skipCond))
@@ -299,17 +287,8 @@ export class Viewport extends Scene
             }
             else
             {
-                tsprite.setVisible(true);
+                roomThing.setVisible(true);
             }
-
-            // if (thingData.kind === 1)
-            // {
-            //     tsprite.setInteractive();
-            //     console.log(tsprite, "Visible:", tsprite.visible);
-            //     const {hitArea} = tsprite.input
-            //     console.log("AGAIN hitAREA:", hitArea);
-            //     this.add.rectangle(hitArea.x, hitArea.y, hitArea.width, hitArea.height, 0xfafafa).setOrigin(0).setDepth(8e10)
-            // }
         }
     }
 
@@ -319,13 +298,16 @@ export class Viewport extends Scene
         this.set_fonsEtOrigo(id);
         
         this.render_things();
-        this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
+        //this.roomEmitter.emit(RoomEvents.THINGSREADY, this);
 
         this.bg.assignTexture(id).show();
 
         this.handleActors();
 
-        this.roomEmitter.emit(RoomEvents.READY, this);
+        // this.roomEmitter.emit(RoomEvents.READY, this);
+
+        // optional Room script
+        this.roomscript.onRoomReady?.call(this);
 
         this.input.enabled = true;
 
