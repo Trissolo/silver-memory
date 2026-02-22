@@ -8,6 +8,7 @@ import RoomBackground from '../modules/RoomBackground.js';
 import Shield from '../modules/Shield.js';
 import Actor from '../modules/Actor.js';
 import RoomEvents from './RoomEvents/genericRoomEvents.js'
+import TriggerZoneManager from '../modules/triggerZoneManager.mjs';
 
 export class Viewport extends Scene
 {
@@ -17,6 +18,7 @@ export class Viewport extends Scene
     thingsJson;
     roomsData;
     thingsContainer;
+    triggerZone;
     roomscript;
     bg;
     shield;
@@ -83,9 +85,12 @@ export class Viewport extends Scene
                 thing.setVisible(false);
                 thing.rdata = null;
             }
-        })
+        });
 
-        // 2b) container for 'things'
+        // 2b) Room's triggerzones
+        this.triggerZone = new TriggerZoneManager(this);
+
+        // 2c) container for 'things'
         this.thingsContainer = new Map();
 
         // player
@@ -133,7 +138,7 @@ export class Viewport extends Scene
 
     pressedZ(eve)
     {
-        this.clear_room();
+        //this.clear_room();
 
         this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false);
         
@@ -206,6 +211,7 @@ export class Viewport extends Scene
 
     set_fonsEtOrigo(roomId)
     {
+        this.clear_room();
         this.input.enabled = false;
         this.roomJson = this.getJson(roomId);
         this.roomscript = this.getScript(roomId); ////RoomScripts[roomId];
@@ -219,31 +225,38 @@ export class Viewport extends Scene
     {
         const atlasKey = `atlas${Math.floor(this.roomId / 3)}`;
 
+        let tsprite;
+
         for (const [idx, thingData] of this.roomJson.things.entries())
         {
             if (thingData.kind === 1)
             {
-                continue;
+                //continue;
+                tsprite = this.triggerZone.get();
+                tsprite.input.hitArea.setTo(...thingData.rect);
+                console.log("Rect hitArea:", tsprite.input.hitArea);
+            }
+            else
+            {
+                tsprite = this.thingsGroup.get(thingData.x, thingData.y);
+                // set the frame, or, if needed, the texture
+                const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
+                tsprite.texture.key === atlasKey? tsprite.setFrame(assembledFrameName): tsprite.setTexture(atlasKey, assembledFrameName);
             }
                                 
-            const tsprite = this.thingsGroup.get(thingData.x, thingData.y);
             
-            // set the frame, or, if needed, the texture
-            const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
-            //console.log(`AtlasKey: ${atlasKey}\nCurrent sprite texture: ${tsprite.texture.key}`)
-            tsprite.texture.key === atlasKey? tsprite.setFrame(assembledFrameName): tsprite.setTexture(atlasKey, assembledFrameName);
+            
+            
             
             // Room ID!
-            //tsprite.rid = idx;
             tsprite.setState(idx);
             tsprite.rdata = thingData;
             
             // let's keep this thing in its container
             this.thingsContainer.set(idx, tsprite);
             
-            tsprite.setDepth(thingData.kind);//.setActive(true).setVisible(true);
+            tsprite.setDepth(thingData.kind);
             tsprite.setActive(true);
-            //tsprite.setVisible(true)
             
             // if it's a new member, let's associate the listener for user interaction
             if (!tsprite.listenerCount(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN))
@@ -288,6 +301,15 @@ export class Viewport extends Scene
             {
                 tsprite.setVisible(true);
             }
+
+            // if (thingData.kind === 1)
+            // {
+            //     tsprite.setInteractive();
+            //     console.log(tsprite, "Visible:", tsprite.visible);
+            //     const {hitArea} = tsprite.input
+            //     console.log("AGAIN hitAREA:", hitArea);
+            //     this.add.rectangle(hitArea.x, hitArea.y, hitArea.width, hitArea.height, 0xfafafa).setOrigin(0).setDepth(8e10)
+            // }
         }
     }
 
@@ -304,8 +326,10 @@ export class Viewport extends Scene
         this.handleActors();
 
         this.roomEmitter.emit(RoomEvents.READY, this);
+
         this.input.enabled = true;
-        //console.log("pollRate", this.input.pollRate)
+
+        // this.roomscript[2]?.call(this, this.bg);
     }
 
     //the scope is the GameObject
@@ -313,7 +337,7 @@ export class Viewport extends Scene
     {
         const scene = this.scene;
 
-        console.log(`Clicked thing`,this.frame.name, "pointer:", pointer);
+        console.log(`Clicked thing`, this.type, /*this.frame.name,*/ "pointer:", pointer);
 
         scene.roomscript[this.state].call(scene, this, pointer);
     }

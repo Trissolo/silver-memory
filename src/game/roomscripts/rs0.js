@@ -45,13 +45,18 @@ export default class rs0
     }
 
     // AREA
-    static 4(thing){console.log(thing.frame.name);}
+    static 4(thing, p)
+    {
+        this.player.walkTo(p.worldX, p.worldY);
+        this.player.assignMission(()=>(this.drawRoom(1)));
+
+    }
 
     // AREA
-    static 5(thing){console.log(thing.frame.name);}
+    static 5(thing){console.log(thing.input.hitArea);}
 
     // crepa
-    static 6(thing){console.log(thing.frame.name);}
+    static 6(thing){console.log(thing.input.hitArea);}
 
     // button
     static 7(thing)
