@@ -516,7 +516,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
             image_prop_ary = self.qwerty_ary(self.image, room_prop)
             real_res[room_prop] = CrossDisciplinary.manage_array(image_prop_ary)
 
-        #iteration:
+        # 'Things' iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
             parasites = layer.get_parasite_list()
             #print(f"{layer.get_name()}")
@@ -529,6 +529,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                     continue
                 obj = {'kind': curr_kind}
                 things_array.append(obj)
+                # noInteraction
+                if possible_properties[4] in parasites:
+                    obj[possible_properties[4]] = 1
                 #hoverName
                 if possible_properties[1] in parasites:
                     obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
@@ -544,8 +547,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                 obj["frame"] = layer.get_name().rstrip("0123456789")
                 #suffix
                 if obj["frame"] != layer.get_name() and possible_properties[2] in parasites:
-                    suffix_coords = self.qwerty_ary(layer, possible_properties[2] )#self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
-                    # print(f"TEST merging {possible_properties[2]}: {suffix_coords} {CrossDisciplinary.manage_array(suffix_coords)}")
+                    suffix_coords = self.qwerty_ary(layer, possible_properties[2] )
                     obj[possible_properties[2]] = CrossDisciplinary.manage_array(suffix_coords)
                 type(self).manage_coords(layer, obj, curr_kind)
 
