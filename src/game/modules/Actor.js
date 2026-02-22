@@ -48,7 +48,6 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     preUpdate(time, delta)
     {
-        
 
         if (this.walk.aTargetExists)
         {
@@ -59,6 +58,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         super.preUpdate(time, delta);
 
     }
+    
     destroy()
     {
         this.disableRotation();
@@ -89,16 +89,16 @@ export default class Actor extends Phaser.GameObjects.Sprite
     hide()
     {
         return this
-        .setIdle()
-        .setActive(false)
-        .setVisible(false);
+            .setIdle()
+            .setActive(false)
+            .setVisible(false);
     }
 
     show()
     {
         return this
-        .setActive(true)
-        .setVisible(true);
+            .setActive(true)
+            .setVisible(true);
     }
 
     enableRotation()

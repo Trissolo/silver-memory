@@ -5,7 +5,6 @@ export default class PMDebug
 
     constructor(scene)
     {
-        this.scene = scene;
         this.graphics = scene.add.graphics(0, 0);
     }
 

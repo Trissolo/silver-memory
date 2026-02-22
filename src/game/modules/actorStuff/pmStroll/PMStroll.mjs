@@ -34,7 +34,7 @@ import PMDebug from "./pmdebug/PMDebug.mjs";
 export default class PMStroll
 {
     // optional:
-    // debug;
+    debug;
 
     // defaults:
     static epsilon = 0.03;

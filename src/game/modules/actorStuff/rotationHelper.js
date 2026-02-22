@@ -66,5 +66,7 @@ export default class RotationHelper
         this.snapTo = undefined;
 
         this.angleBetween = undefined;
+
+        this._isDestroyed = true;
     }
 }
