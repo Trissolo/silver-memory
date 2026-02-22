@@ -21,6 +21,7 @@ export class Viewport extends Scene
     bg;
     shield;
     player;
+    actors = [];
     varyingDepthSprites = new Set();
     Rnd = Phaser.Math.RND
 
@@ -88,7 +89,12 @@ export class Viewport extends Scene
         this.thingsContainer = new Map();
 
         // player
-        this.player = new Actor(this, 0, 'guy');
+        for (const [idx, costume] of ["robot", "guy"].entries())
+        {
+            this.actors.push(new Actor(this, idx, costume));
+        }
+            
+        this.player = this.actors[0];
 
         this.pmstroll = PMStroll.useDebug(this);
 
@@ -136,31 +142,27 @@ export class Viewport extends Scene
 
     pressedX(eve)
     {
-        VarManager._debug();
-        //console.dir(this.thingsGroup.children);
-        //this.player.setPosition(-40, 64);
-        // this.scene.get('Controller').text.setText(`${Math.random()} Moscagain`);
-        // this.scene.switch('Controller');
-        // this.cameras.main.shake(650, 0.01);
-        /*
-        console.log("roomId is:", this.roomId);
-        this.shield.active? this.shield.lower(): this.shield.raise();
-        console.log("TEST_this.getVarValue");
-        console.log(`${this.getVarValue()} <---`)
-        */
+        console.log("Pressed 'X'");
+
+        // VarManager._debug();
     }
 
     onDestroy()
     {
-        super.destroy();
+        console.log('Destroy called');
         this.thingsContainer.clear();
         this.roomEmitter = null;
         this.bg.destroy();
         this.bg = null;
         this.shield.destroy();
         this.shield = null;
+        this.thingsGroup.getChildren().forEach(el => el.destroy());
         this.thingsGroup.destroy();
         this.thingsGroup = null;
+        this.player = this.actors.forEach(elem => elem.destroy());
+        this.actors.length = 0;
+        PMStroll.debug.graphics.destroy();
+        PMStroll.debug = undefined;
     }
 
     getScript(roomId)
@@ -253,7 +255,7 @@ export class Viewport extends Scene
                 console.log("Thing already has input listeners");
             }
             
-            console.log("eventNames()", tsprite.eventNames(), "pointerdown amount:", tsprite.listenerCount('pointerdown'));
+            // console.log("eventNames()", tsprite.eventNames(), "pointerdown amount:", tsprite.listenerCount('pointerdown'));
 
             // deepthsorted?
             if (thingData.kind === 4)
