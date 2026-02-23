@@ -3,7 +3,7 @@ export default class rs2
     static onRoomReady()
     {
         // this.cameras.main.setBackgroundColor(0xff0000);
-        this.triggerZone.supervise(this.thingsContainer.get(7), this.player, true);
+        this.triggerZones.supervise(this.thingsContainer.get(7), this.player, true);
     }
     // button
     static 0(thing)
@@ -41,23 +41,29 @@ export default class rs2
     // AREA
     static 5(thing)
     {
+        console.log(arguments.length === 3? "Triggered callback":"Click on zone");
         console.log("TRigger 5");
         console.log(thing, pointer);
     }
 
     // muro
-    static 6(thing){console.log(thing.frame.name);}
+    static 6()
+    {
+        console.log("Muro", arguments.length);
+    }
 
     // AREA
     static 7(ta, actor, boolInside)
     {
-        this.cameras.main.setBackgroundColor(0x90fdfd);
+        console.log(arguments.length === 3? "Triggered callback":"Click on zone");
+            
+        this.cameras.main.setBackgroundColor(Phaser.Math.Between(255, 0xbababa));
 
-        console.log("Crossing the bridge in: AREA 7");
+        console.log("Crossing the bridge in: AREA 7", arguments.length);
 
-        console.log(typeof boolInside, boolInside);
+        //console.log(ta, actor, boolInside);
 
-        this.triggerZone.clearAll();
+        // this.triggerZone.clearAll();
     }
 
 }

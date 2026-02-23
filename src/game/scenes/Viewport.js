@@ -18,7 +18,7 @@ export class Viewport extends Scene
     thingsJson;
     roomsData;
     thingsContainer;
-    triggerZone;
+    triggerZones;
     roomscript;
     bg;
     shield;
@@ -89,7 +89,7 @@ export class Viewport extends Scene
         });
 
         // 2b) Room's triggerzones
-        this.triggerZone = new TriggerZoneManager(this);
+        this.triggerZones = new TriggerZoneManager(this);
 
         // 2c) container for 'things'
         this.thingsContainer = new Map();
@@ -139,8 +139,6 @@ export class Viewport extends Scene
 
     pressedZ(eve)
     {
-        //this.clear_room();
-
         this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false);
         
         this.drawRoom(this.debuCounter);
@@ -185,7 +183,6 @@ export class Viewport extends Scene
               .setVisible(false)
               .setState(null)
               .rdata = null;
-              //.rid = null
         }
 
         this.thingsContainer.clear();
@@ -198,6 +195,8 @@ export class Viewport extends Scene
         this.roomscript = null;
         this.thingsJson  = null;
         this.roomId = null;
+
+        this.triggerZones.clearAll();
 
         this.varyingDepthSprites.clear();
 
@@ -233,9 +232,9 @@ export class Viewport extends Scene
             if (thingData.kind === 1)
             {
                 //continue;
-                roomThing = this.triggerZone.get();
+                roomThing = this.triggerZones.get();
                 roomThing.input.hitArea.setTo(...thingData.rect);
-                console.log("Rect hitArea:", roomThing.input.hitArea);
+                // console.log("Rect hitArea:", roomThing.input.hitArea);
             }
             else
             {

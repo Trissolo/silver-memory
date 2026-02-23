@@ -34,13 +34,14 @@ export default class TriggerZoneManager
             .setSize(0, 0)
             .rdata = null;
             
-        console.log("Returning NEW TZone");
+        // console.log("Returning NEW TZone");
         return zone;
     }
 
     supervise(triggerArea, effectuators, startImmediately)
     {
-        console.log("supervise", triggerArea, effectuators)
+        // console.log("supervise", triggerArea, effectuators)
+
         if (!Array.isArray(effectuators))
         {
             effectuators = [effectuators];
@@ -71,28 +72,35 @@ export default class TriggerZoneManager
 
     check()
     {
-        console.log("Checking...", this.toBeChecked.size);
+        // console.log("Checking...", this.toBeChecked.size);
         if (this.toBeChecked.size === 0)
         {
             return;
         }
         for (const [triggerArea, actors] of this.toBeChecked.entries())
         {
-            console.log("hitArea:", triggerArea.input.hitArea);
+            // console.log("hitArea:", triggerArea.input.hitArea);
             for (const actor of actors)
             {
                 const inside = triggerArea.input.hitArea.contains(actor.x, actor.y);
-                console.log(inside, actor.x,actor.y)
+                // console.log(inside, actor.x,actor.y)
                 
                 if (!triggerArea.isOccupied && inside)
                 {
-                    this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, actor, true);
+                    console.log("Just entered");
+
+                    triggerArea.isOccupied = true;
+
+                    return this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, actor, true);
                 }
-                else
-                    if (triggerArea.isOccupied && !inside)
-                    {
-                        this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, actor, false);
-                    }
+                else if (triggerArea.isOccupied && !inside)
+                {
+                    console.log("Gone away");
+
+                    triggerArea.isOccupied = false;
+
+                    this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, actor, false);
+                }
             }
         }
     }
@@ -101,12 +109,16 @@ export default class TriggerZoneManager
     {
         this.timeEvent.paused = false;
 
+        // console.log("TZ ckeck started");
+
         return this;
     }
 
     stopChecking()
     {
         this.timeEvent.paused = true;
+
+        // console.log("TZ ckeck stopped");
         
         return this;
     }
@@ -116,6 +128,8 @@ export default class TriggerZoneManager
         this.stopChecking();
 
         this.toBeChecked.clear()
+
+        // console.log("TZ check *CLEARED ALL*");
 
         return this;
     }

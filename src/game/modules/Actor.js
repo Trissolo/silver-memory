@@ -20,7 +20,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     constructor(scene, id, costume)
     {
-        super(scene, 0, 0, 'atlasbase', 'pixelA');
+        super(scene, 0, 0, 'atlasbase', `${costume}_walk_SW_0`);
         this
         .setActive(false)
         .setVisible(false)

@@ -39,7 +39,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
     assignTexture(roomId)//frame, atlasKey)
     {
-        console.log(`Old BG key: ${this.texture.key}`);
+        // console.log(`Old BG key: ${this.texture.key}`);
         if (!Number.isInteger(roomId))
         {
             roomId = this.scene.roomId;
@@ -66,15 +66,14 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         const clampedScrollY = Math.min(0, potentialScrollAdjust.y);
         
-        console.log("POTENTIAL potentialScrollAdjust", potentialScrollAdjust);
+        // console.log("POTENTIAL potentialScrollAdjust", potentialScrollAdjust);
 
 
         cam.setBounds(clampedScrollX, clampedScrollY, Math.max(width, cam.width), Math.max(height, cam.height));
 
         cam.setScroll(clampedScrollX, clampedScrollY);
         
-
-        console.log("Bounds riCorretti", cam.getBounds());
+        // console.log("Bounds riCorretti", cam.getBounds());
 
         return this;
 
