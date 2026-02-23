@@ -39,7 +39,7 @@ export default class rs2
     }
 
     // AREA
-    static 5(thing)
+    static 5(thing, pointer)
     {
         console.log(arguments.length === 3? "Triggered callback":"Click on zone");
         console.log("TRigger 5");
@@ -59,7 +59,7 @@ export default class rs2
             
         this.cameras.main.setBackgroundColor(Phaser.Math.Between(255, 0xbababa));
 
-        console.log("Crossing the bridge in: AREA 7", arguments.length);
+        console.log(`${boolInside? "Crossing": "Leaving" } the bridge in: AREA 7`, arguments.length);
 
         //console.log(ta, actor, boolInside);
 

@@ -312,7 +312,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     {
         this.pendingFunc = null;
 
-        console.log("Mission cleared");
+        // console.log("Mission cleared");
 
         return this;
     }

@@ -318,7 +318,7 @@ export class Viewport extends Scene
     {
         const scene = this.scene;
 
-        console.log(`Clicked thing`, this.type, /*this.frame.name,*/ "pointer:", pointer);
+        console.log(`Clicked thing (${this.type})`);
 
         scene.roomscript[this.state].call(scene, this, pointer);
     }

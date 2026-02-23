@@ -3,7 +3,7 @@ export default class TriggerZoneManager
     
     scene;
     children = new Set();
-    toBeChecked = new Map();
+    scrutinizedOnes = new Map();
     timeEvent;
 
     constructor(scene)
@@ -18,7 +18,8 @@ export default class TriggerZoneManager
         {
             if (!zone.active)
             {
-                console.log("Returning existing TZone");
+                // console.log("Returning existing TZone");
+
                 return zone;
             }
         }
@@ -38,7 +39,7 @@ export default class TriggerZoneManager
         return zone;
     }
 
-    supervise(triggerArea, effectuators, startImmediately)
+    supervise(triggerArea, effectuators, startImmediately) //, callIfIn, callIfOutside)
     {
         // console.log("supervise", triggerArea, effectuators)
 
@@ -47,37 +48,52 @@ export default class TriggerZoneManager
             effectuators = [effectuators];
         }
 
-        let isOccupied = false;
+        // let someoneInside;
+        // let someoneOutside;
 
         for (const actor of effectuators)
         {
-            if (triggerArea.input.hitArea.contains(actor.x, actor.y))
-            {
-                isOccupied = true;
-                break;
-            }
+            this.scrutinizedOnes.set(triggerArea, effectuators);
+
+            // for now, let's assume no one is inside
+            triggerArea.isOccupied = false;
         }
+
+
+        //     if (triggerArea.input.hitArea.contains(actor.x, actor.y))
+        //     {
+        //         someoneInside = actor;
+        //     }
+        //     else
+        //     {
+        //         someoneOutside = actor;
+        //     }
+        // }
+
+        // if (someoneInside && callIfIn)
+        // {
+        //     this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, someoneInside, true);
+        // }
+
+        // if (someoneOutside && callIfOutside)
+        // {
+        //     this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, someoneOutside, false);
+        // }
+    
                 
-        triggerArea.isOccupied = isOccupied;
+        // triggerArea.isOccupied = false;
 
-        this.toBeChecked.set(triggerArea, effectuators);
-
-        if (startImmediately)
-        {
-            return this.startChecking();
-        }
-
-        return this;
+        return startImmediately? this.startChecking() : this;
     }
 
     check()
     {
-        // console.log("Checking...", this.toBeChecked.size);
-        if (this.toBeChecked.size === 0)
+        // console.log("Checking...", this.scrutinizedOnes.size);
+        if (this.scrutinizedOnes.size === 0)
         {
             return;
         }
-        for (const [triggerArea, actors] of this.toBeChecked.entries())
+        for (const [triggerArea, actors] of this.scrutinizedOnes.entries())
         {
             // console.log("hitArea:", triggerArea.input.hitArea);
             for (const actor of actors)
@@ -127,7 +143,7 @@ export default class TriggerZoneManager
     {
         this.stopChecking();
 
-        this.toBeChecked.clear()
+        this.scrutinizedOnes.clear()
 
         // console.log("TZ check *CLEARED ALL*");
 
