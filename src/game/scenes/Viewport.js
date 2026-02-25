@@ -7,8 +7,9 @@ import PMStroll from '../modules/actorStuff/pmStroll/PMStroll.mjs';
 import RoomBackground from '../modules/RoomBackground.js';
 import Shield from '../modules/Shield.js';
 import Actor from '../modules/Actor.js';
-import RoomEvents from './RoomEvents/genericRoomEvents.js'
+// import RoomEvents from './RoomEvents/genericRoomEvents.js'
 import TriggerZoneManager from '../modules/triggerZoneManager.mjs';
+import ThingNameLabelManager from '../modules/tlnManager.mjs';
 
 export class Viewport extends Scene
 {
@@ -26,6 +27,7 @@ export class Viewport extends Scene
     actors = [];
     varyingDepthSprites = new Set();
     Rnd = Phaser.Math.RND
+    labelManager;
 
     constructor ()
     {
@@ -84,7 +86,12 @@ export class Viewport extends Scene
                 thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
                 .setVisible(false)
                 .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, thing.scene.onThingDown)
+                .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, thing.scene.onThingOver)
+                .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, thing.scene.onThingOut)
                 .rdata = null;
+
+                thing.isThing = true;
+                thing.isTriggerArea = false;
             }
         });
 
@@ -93,6 +100,9 @@ export class Viewport extends Scene
 
         // 2c) container for 'things'
         this.thingsContainer = new Map();
+
+        // 2d) label
+        this.labelManager = new ThingNameLabelManager(this);
 
         // player
         for (const [idx, costume] of ["robot", "guy"].entries())
@@ -323,6 +333,25 @@ export class Viewport extends Scene
         scene.roomscript[this.state].call(scene, this, pointer);
     }
 
+    onThingOver(pointer)
+    {
+        console.log(`Over`);
+
+        this.scene._infoThing(this);
+
+        // if (this.rdata && this.rdata.hoverName)
+        // {   
+        //     const varIdx = this.rdata.hoverName; //this.scene.getVarValue(this.rdata.hoverName);
+
+        //     console.log(`hoverName idx ${varIdx}: ${this.scene.labelManager.hovernames[varIdx]}`);
+        // }
+    }
+
+    onThingOut(pointer)
+    {
+        console.log("Out");
+    }
+
     // varsvars
     getVarValue(vcoords)
     {
@@ -511,6 +540,13 @@ export class Viewport extends Scene
         }
 
         //this.children.depthSort();
+    }
+
+    _infoThing(thing)
+    {
+        const repoA = thing.isThing? '✔️ Is a thing': '❌ Not a thing';
+        const repoB = thing.isTriggerArea? "▭ is a TriggerArea": '';
+        console.log(`GameObject info:\n${repoA}\n${repoB}`);
     }
 
     // update(time, delta)

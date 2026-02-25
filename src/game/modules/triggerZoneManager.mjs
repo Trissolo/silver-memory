@@ -31,9 +31,14 @@ export default class TriggerZoneManager
             .setDepth(1)
             .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
             .addToDisplayList()
             .setSize(0, 0)
             .rdata = null;
+        
+        zone.isThing = true;
+        zone.isTriggerArea = true;
             
         // console.log("Returning NEW TZone");
         return zone;
