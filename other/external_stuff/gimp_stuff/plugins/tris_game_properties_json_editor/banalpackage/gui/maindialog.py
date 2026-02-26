@@ -395,57 +395,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         else:
             obj["x"] = x
             obj["y"] = y
-    def generate_json(self, button):
-        import json
-        #['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction']
-        #  0       1            2         3           4
-        possible_properties = [*self._json_properties_with_size.keys()]
-        #message:
-        #print(f"Defining json... {possible_properties}")
-        things_array = []
-        real_res = {'things': things_array}
-        #iteration:
-        for layer in (l for l in self.image.get_layers() if l.get_visible()):
-            parasites = layer.get_parasite_list()
-            #print(f"{layer.get_name()}")
-            if possible_properties[0] in parasites:
-                curr_kind = self.parasite_data_to_ary(layer.get_parasite(possible_properties[0]))[0]
-                if curr_kind == -5:
-                    real_res['bg'] = layer.get_name()
-                    continue
-                obj = {'kind': curr_kind}
-                things_array.append(obj)
-                #hoverName
-                if possible_properties[1] in parasites:
-                    obj[possible_properties[1]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[1]))[0]
-                #skipCond
-                if possible_properties[3] in parasites:
-                    compressed_skipcond= self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
-                    print(f"TEST {possible_properties[3]}: {compressed_skipcond} -> {CrossDisciplinary.manage_array(compressed_skipcond)}")
-                    obj[possible_properties[3]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[3]))
-                # Trigger area
-                if curr_kind == 1:
-                    type(self).manage_area(layer, obj)
-                    continue
-                obj["frame"] = layer.get_name().rstrip("0123456789")
-                #suffix
-                if obj["frame"] != layer.get_name() and possible_properties[2] in parasites:
-                    suffix_coords = self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
-                    print(f"TEST merging {possible_properties[2]}: {suffix_coords} {CrossDisciplinary.manage_array(suffix_coords)}")
-                    obj[possible_properties[2]] = self.parasite_data_to_ary(layer.get_parasite(possible_properties[2]))
-                type(self).manage_coords(layer, obj, curr_kind)
-
-            else:
-                #print("No kind")
-                continue
-        #real_res["basescript"] = self.assemble_basescript(things_array)
-        self.rscript = self.assemble_basescript(real_res)
-        print("json Done!")
-        self.copy_text_to_clipboard(json.dumps(real_res, indent = None))
-        self.set_internal_message()
-        #Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
-        #Gimp.message(final)#json.dumps(final, indent=None))#things_array, indent = None))
-        #Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
     def get_polygons(self, button):
         import json
         polys = {}
@@ -484,13 +433,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         sp = " "
         frame_prop = "frame"
         gen_start = f"{nl}{sp*4}static "
-
-
-
         for idx, elem in enumerate(real_res.get('things')):
-            comment = elem[frame_prop] if frame_prop in elem else "AREA"
-            res+= f"{sp*4}// {comment}{gen_start}{idx}(thing){{console.log(thing.frame.name);}}{nl*2}"
-
+            comment = elem[frame_prop] if frame_prop in elem else f"Area {elem['rect']}"
+            res+= f"{sp*4}// {comment}{gen_start}{idx}(thing){{console.log(thing);}}{nl*2}"
         return f"export default class rs{self.image.get_name()[4:-4]}{nl}{{{nl}{res}}}\n"
     def show_message(self, message = "Test\ntest"):
         Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX) # MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
@@ -515,7 +460,6 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         for room_prop in image_parasites:
             image_prop_ary = self.qwerty_ary(self.image, room_prop)
             real_res[room_prop] = CrossDisciplinary.manage_array(image_prop_ary)
-
         # 'Things' iteration:
         for layer in (l for l in self.image.get_layers() if l.get_visible()):
             parasites = layer.get_parasite_list()
