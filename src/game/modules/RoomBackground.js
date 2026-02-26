@@ -73,7 +73,10 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         cam.setScroll(clampedScrollX, clampedScrollY);
         
-        // console.log("Bounds riCorretti", cam.getBounds());
+        // console.dir("Bounds riCorretti", cam.getBounds());
+
+        // store this room bounds for labelNames
+        Phaser.Geom.Rectangle.CopyFrom(cam.getBounds(), this.scene.labelManager.camBounds);
 
         return this;
 

@@ -206,6 +206,8 @@ export class Viewport extends Scene
         this.thingsJson  = null;
         this.roomId = null;
 
+        this.labelManager.clear();
+
         this.triggerZones.clearAll();
 
         this.varyingDepthSprites.clear();
@@ -223,12 +225,12 @@ export class Viewport extends Scene
     {
         this.clear_room();
         this.input.enabled = false;
+        this.roomId = roomId;
         this.roomJson = this.getJson(roomId);
         this.roomscript = this.getScript(roomId); ////RoomScripts[roomId];
 
         // maybe too redundant
         this.thingsJson  = this.roomJson.things;
-        this.roomId = roomId;
     }
 
     render_things()
@@ -339,6 +341,13 @@ export class Viewport extends Scene
 
         this.scene._infoThing(this);
 
+        // obj.first?.second
+
+        if (this.rdata?.hoverName)
+        {
+            this.scene.labelManager.manageOveredThing(this);
+        }
+
         // if (this.rdata && this.rdata.hoverName)
         // {   
         //     const varIdx = this.rdata.hoverName; //this.scene.getVarValue(this.rdata.hoverName);
@@ -350,6 +359,7 @@ export class Viewport extends Scene
     onThingOut(pointer)
     {
         console.log("Out");
+        this.scene.labelManager.label.setVisible(false);
     }
 
     // varsvars
@@ -400,8 +410,9 @@ export class Viewport extends Scene
 
     getJson(roomId)
     {
-        // console.log(`Getting JSON for room: ${roomId}`);
+        console.log(`Getting JSON for room: ${roomId}. Default roomId ?? this.roomId`);
         // return roomId === undefined? this.roomJson : this.roomsData.get(roomId);
+        // return this.roomData.get(roomId ?? this.roomId):
         return this.roomsData.get(roomId);
     }
 
@@ -411,7 +422,7 @@ export class Viewport extends Scene
         if (!this.thingsContainer.has(rid))
         {
             console.warn(`Current room (${this.roomId}) does not contains any Thing with rid ${rid}`);
-            return false
+            return false;
         }
         return this.thingsContainer.get(rid);
     }
@@ -547,6 +558,7 @@ export class Viewport extends Scene
         const repoA = thing.isThing? '✔️ Is a thing': '❌ Not a thing';
         const repoB = thing.isTriggerArea? "▭ is a TriggerArea": '';
         console.log(`GameObject info:\n${repoA}\n${repoB}`);
+        console.log(thing.isThing? thing.rdata: "No rdata");
     }
 
     // update(time, delta)

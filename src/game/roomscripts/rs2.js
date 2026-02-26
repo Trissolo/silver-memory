@@ -43,7 +43,7 @@ export default class rs2
     {
         console.log(arguments.length === 3? "Triggered callback":"Click on zone");
         console.log("TRigger 5");
-        console.log(thing, pointer);
+        //console.log(thing, pointer);
     }
 
     // muro

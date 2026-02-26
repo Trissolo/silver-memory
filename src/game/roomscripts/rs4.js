@@ -30,5 +30,5 @@ export default class rs4
     static 2(thing){console.log(thing.frame.name);}
 
     // AREA
-    static 3(thing){console.log(thing.frame.name);}
+    static 3(thing){console.log(thing);}
 }
