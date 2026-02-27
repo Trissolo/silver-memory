@@ -47,8 +47,9 @@ export default class rs0
     // AREA
     static 4(thing, p)
     {
+        this.savegame._setActorLocation(this.player.id, 2, 288, 87, "NE", 0, true);
         this.player.walkTo(p.worldX, p.worldY);
-        this.player.assignMission(()=>(this.drawRoom(1)));
+        this.player.assignMission(()=>(this.drawRoom(2)));
 
     }
 

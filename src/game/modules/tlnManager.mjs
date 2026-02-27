@@ -23,7 +23,7 @@ export default class ThingNameLabelManager
         
         this.timeEvent = scene.time.addEvent({ paused: true, delay: 60, callback: this.updLabelPosition, callbackScope: this, loop: true });
 
-        this.labelTexture = scene.textures.addDynamicTexture('dynat', 200, 20);
+        this.labelTexture = scene.textures.addDynamicTexture('dynat', 80, 12);
 
         this.label = scene.add.image(0, 0, 'dynat').setOrigin(0).setVisible(false).setDepth(1e9);
     }
@@ -76,6 +76,8 @@ export default class ThingNameLabelManager
         const {border} = this;
 
         fakeRect.setSize(width + border + border, height + border + border);
+
+        console.log("Local:", width, height, "fakeRect", fakeRect)
 
         labelTexture
             .clear()

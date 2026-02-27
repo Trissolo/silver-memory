@@ -10,6 +10,7 @@ import Actor from '../modules/Actor.js';
 // import RoomEvents from './RoomEvents/genericRoomEvents.js'
 import TriggerZoneManager from '../modules/triggerZoneManager.mjs';
 import ThingNameLabelManager from '../modules/tlnManager.mjs';
+import SaveGame from '../modules/savegame.mjs';
 
 export class Viewport extends Scene
 {
@@ -120,6 +121,8 @@ export class Viewport extends Scene
         //test text
         //this.text = this.add.bitmapText(8, 8, "font0", "+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
 
+        this.savegame = new SaveGame(this);
+
         // Depth sorting
         this.events.on('prerender', this.sortByHeight, this);
 
@@ -139,9 +142,7 @@ export class Viewport extends Scene
     {
         //console.clear();
         //this.player.turnAndStayStill("N");
-        // console.log("Player legal", this.player.inAllowedPosition());
-        //this.player.walkTo(this.player.x + 1, this.player.y);
-        //const {x} = this.player;
+        // this.player.walk.setPath([{x: 122, y: 107}, {x: 140, y: 80}, {x: 98, y: 20}]);
         
         //this.player.setState(1);
         //this.bg.benchmarkRotation();
@@ -525,22 +526,46 @@ export class Viewport extends Scene
 
     handleActors()
     {
-        const {player} = this;
+        const {player, actors, savegame, roomId} = this;
+        let placement;
+        for (const actor of actors)
+        {
+            const {id} = actor;
+            placement = savegame.locations[id];
+            console.log("actorPlacement:", id, placement);
+            if (placement.room === roomId)
+            {
+                actor.setPosition(placement.x, placement.y)
+                .setStandingFrame(placement.facing)
+                .setPolygonalMapByIndex(placement.polygonalMap)
+                .show();
+
+                // // camera follow      
+                this.cameras.main.startFollow(this.player, true);
+
+                // Deepth Sort!
+                this.varyingDepthSprites.add(this.player);
+            }
+            else
+            {
+                actor.setVisible(false);
+            }
+        }
 
         // Place at the center of the room texture
-        player.setPosition(this.bg.input.hitArea.width >> 1, this.bg.input.hitArea.height >> 1);
+        //player.setPosition(this.bg.input.hitArea.width >> 1, this.bg.input.hitArea.height >> 1);
 
-        this.player
-        .setPolygonalMapByIndex()
-        .show()
-        .setFrame(Phaser.Utils.Array.GetRandom([...this.player.rotFrames.values()]).textureFrame);
+        // this.player
+        // .setPolygonalMapByIndex()
+        // .show()
+        // .setFrame(Phaser.Utils.Array.GetRandom([...this.player.rotFrames.values()]).textureFrame);
 
-        // camera follow
+        // // camera follow
         
-        this.cameras.main.startFollow(this.player, true);
+        // this.cameras.main.startFollow(this.player, true);
 
-        // Deepth Sort!
-        this.varyingDepthSprites.add(this.player);
+        // // Deepth Sort!
+        // this.varyingDepthSprites.add(this.player);
     }
 
     sortByHeight()
