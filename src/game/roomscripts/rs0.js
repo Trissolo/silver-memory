@@ -77,7 +77,7 @@ export default class rs0
     // striscia
     static 9(thing, pointer)
     {
-        console.log(thing.frame.name);
+        console.log(thing);
         this.player.walkTo(pointer.worldX, pointer.worldY);
     }
 

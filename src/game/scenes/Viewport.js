@@ -134,8 +134,8 @@ export class Viewport extends Scene
         this.input.keyboard.on('keydown-C', this.pressedC, this);
 
         // START
-        this.drawRoom(0);
-        ;
+        this.setCurrentPlayer(0, true)//drawRoom(0);
+        
     }
 
     pressedC()
@@ -150,9 +150,10 @@ export class Viewport extends Scene
 
     pressedZ(eve)
     {
-        this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false);
+        //this.debuCounter = this.nextIntInRange(this.debuCounter, 0, 4, false);
         
-        this.drawRoom(this.debuCounter);
+        //this.drawRoom(this.debuCounter);
+        this.changePlayer(this.player.id === 0? 1:0);
     }
 
     pressedX(eve)
@@ -532,7 +533,7 @@ export class Viewport extends Scene
         {
             const {id} = actor;
             placement = savegame.locations[id];
-            console.log("actorPlacement:", id, placement);
+            console.log("actorPlacement:", id, placement, "POLYMAP", placement.polygonalMap);
             if (placement.room === roomId)
             {
                 actor.setPosition(placement.x, placement.y)
@@ -584,6 +585,23 @@ export class Viewport extends Scene
         const repoB = thing.isTriggerArea? "▭ is a TriggerArea": '';
         console.log(`GameObject info:\n${repoA}\n${repoB}`);
         console.log(thing.isThing? thing.rdata: "No rdata");
+    }
+
+    setCurrentPlayer(id, gotoRoom = true)
+    {
+        this.savegame.setActor(id);
+
+        if (gotoRoom)
+        {
+            this.drawRoom(this.savegame.locations[id].room);
+        }
+    }
+
+    changePlayer(id, gotoRoom = true)
+    {
+        this.player.storeCurrentPlacement();
+
+        this.setCurrentPlayer(id, gotoRoom);
     }
 
     // update(time, delta)

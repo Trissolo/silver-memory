@@ -9,6 +9,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     id;
     inventory;
     polygonalMap;
+    polygonalMapIdx;
     comfyDest = new Phaser.Math.Vector2();
     rotationAnim;
     pendingFunc = null;
@@ -338,6 +339,10 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     setPolygonalMapByIndex(visibilityMapIndex = 0, idx)
     {
+        console.log("Current json", this.scene.roomJson);
+        this.polygonalMapIdx = visibilityMapIndex;
+        //console.log("setPolygonalMapByIndex)",  this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex]);
+        //console.log("SCENE.ROOM", this.scene.roomJson.visMaps[visibilityMapIndex]);
         this.polygonalMap = idx === undefined? this.scene.roomJson.visMaps[visibilityMapIndex] : this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex];
 
         return this;
@@ -393,6 +398,13 @@ export default class Actor extends Phaser.GameObjects.Sprite
     setStandingFrame(acronimDir = this.frame.name.split("_")[2])
     {
         this.setFrame(`${this.costume}_walk_${acronimDir}_0`);
+
+        return this;
+    }
+
+    storeCurrentPlacement()
+    {
+        this.scene.savegame._setActorLocation(this.id, this.scene.roomId);
 
         return this;
     }

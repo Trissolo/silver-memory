@@ -1,7 +1,7 @@
 export default class SaveGame
 {
     currentActor = 0;
-    _defaults = [{room: 0, x: 200, y: 68, facing: "SE", polygonalMap: 0, visible: true}, {room: 3, x: 135, y: 120, facing: "SE", polygonalMap: 0, visible: true}];
+    _defaults = [{room: 0, x: 200, y: 68, facing: "SE", polygonalMapIdx: 0, visible: true}, {room: 3, x: 135, y: 120, facing: "SE", polygonalMapIdx: 0, visible: true}];
     locations = [];
 
     constructor(scene)
@@ -14,7 +14,7 @@ export default class SaveGame
         }
     }
 
-    setActor(id, gotoRoom = true)
+    setActor(id) //, gotoRoom = true)
     {
         const {scene} = this;
 
@@ -23,21 +23,22 @@ export default class SaveGame
             return;
         }
 
-        this.currentActor = id;
+        this.scene.player = this.scene.actors[id];
 
         // return gotoRoom? scene.drawRoom() : scene;
     }
 
-    _setActorLocation(id, room, x, y, facing, polygonalMap, visible)
+    _setActorLocation(id, roomId, x, y, facing, polygonalMapIdx) //, visible)
     {
+        console.log("Saving polymap", polygonalMapIdx)
         const pendingPlacement = this.locations[id];
         const actor = this.scene.actors[id];
 
-        pendingPlacement.room = room;
-        pendingPlacement.x = x === undefined? actor.x : x;
-        pendingPlacement.y = y === undefined? actor.y : y;
-        pendingPlacement.facing = facing === undefined? actor.frame.name.split("_")[2]: facing;
-        pendingPlacement.polygonalMap = polygonalMap === undefined? actor.polygonalMap : polygonalMap;
-        pendingPlacement.visible = visible === undefined? actor.visible : visible;
+        pendingPlacement.room = roomId;
+        pendingPlacement.x = x ?? actor.x;
+        pendingPlacement.y = y ?? actor.y;
+        pendingPlacement.facing = facing ?? actor.frame.name.split("_")[2];
+        pendingPlacement.polygonalMapIdx = polygonalMapIdx ?? actor.polygonalMapIdx;
+        //pendingPlacement.visible = visible === undefined? actor.visible : visible;
     }
 }
