@@ -101,7 +101,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         #print(f"get_vexpand: {check.get_vexpand()}\nget_hexpand: {check.get_hexpand()}")
     def build_main_dictionary(self):
         #print("🎅TIPO:", self.get_content_area().get_children()[1].get_children()[0].get_name()) #[1].get_children()[0])
-        source_depths = {-6: 'Hoverable', -5: 'Background', 0: 'Ridiculously Faraway', 1: 'Trigger Area', 2: 'Covered', 3: 'Always Back', 4: 'Depth Sorted', 800: 'Foreground'}
+        source_depths = {-6: 'Hoverable', -5: 'Background', 0: 'Ridiculously Faraway', 1: 'Trigger Area', 2: 'Covered', 3: 'Always Back', 4: 'Depth Sorted', 5: 'Depth Sorted (centered)', 800: 'Foreground'}
         source_varcat = ["Bool", "Crumble", "Nibble", "Byte"]
         source_variables = self._populate_from_files()
         source_hnames = source_variables.pop()
@@ -392,6 +392,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         if kind == 4:
             obj["x"] = layer.get_width() // 2 + x
             obj["y"] = y + layer.get_height()
+        elif kind == 5:
+            obj["x"] = layer.get_width() // 2 + x
+            obj["y"] = layer.get_height() // 2 + y
         else:
             obj["x"] = x
             obj["y"] = y

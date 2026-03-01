@@ -1,7 +1,7 @@
 export default class SaveGame
 {
     currentActor = 0;
-    _defaults = [{room: 0, x: 200, y: 68, facing: "SE", polygonalMapIdx: 0, visible: true}, {room: 3, x: 135, y: 120, facing: "SE", polygonalMapIdx: 0, visible: true}];
+    _defaults = [{room: 0, x: 200, y: 68, facing: "SE", polygonalMapIdx: 0, visible: true}, {room: 4, x: 135, y: 120, facing: "SE", polygonalMapIdx: 0, visible: true}];
     locations = [];
 
     constructor(scene)

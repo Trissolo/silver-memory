@@ -61,7 +61,7 @@ export default class rs2
 
         console.log(`${boolInside? "Crossing": "Leaving" } the bridge in: AREA 7`, arguments.length);
 
-        //console.log(ta, actor, boolInside);
+        console.log(ta, actor, boolInside);
 
         // this.triggerZone.clearAll();
     }
