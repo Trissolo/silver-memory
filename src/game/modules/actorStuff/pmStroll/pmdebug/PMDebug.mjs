@@ -6,6 +6,8 @@ export default class PMDebug
     constructor(scene)
     {
         this.graphics = scene.add.graphics(0, 0);
+        
+        scene.cameras.cameras[1].ignore(this.graphics);
     }
 
     fillStyle(color = 0xffffff, alpha = 1)

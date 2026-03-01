@@ -45,13 +45,28 @@ export class Viewport extends Scene
                 'TweenManager',  //this.tweens
                 //'LightsPlugin'  //this.lights
                 ],
-            cameras:
-            {
-                roundPixels: true,
-                backgroundColor: "#008777" //,
-                //y: 11, // 136,
-                //height: 64
-            }
+            // cameras:
+            // {
+            //     roundPixels: true,
+            //     backgroundColor: "#008777" //,
+            //     //y: 11, // 136,
+            //     //height: 64
+            // }
+            cameras: [
+                {
+                    name: "main",
+                    height: 128,
+                    roundPixels: true,
+                    backgroundColor: '#ff0000'
+                },
+                {
+                    name: "sec",
+                    y: 128,
+                    height: 64,
+                    roundPixels: true,
+                    backgroundColor: '#670067'
+                }
+            ]
         });
     } //end constructor
 
@@ -70,9 +85,9 @@ export class Viewport extends Scene
     create ()
     {
         // random preliminary stuff:
-        this.cameras.main.setBackgroundColor(0x00ff00);
-        // console.log(this.cameras.main, this.cameras.main.setRoundPixels(true));
         this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
+
+        //this.cameras.main.setBackgroundColor(0x00ff00);
 
         // 1) background image
         this.bg = new RoomBackground(this);
@@ -93,6 +108,7 @@ export class Viewport extends Scene
 
                 thing.isThing = true;
                 thing.isTriggerArea = false;
+                thing.scene.cameras.cameras[1].ignore(thing);
             }
         });
 

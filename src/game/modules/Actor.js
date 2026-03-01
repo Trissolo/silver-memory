@@ -28,6 +28,8 @@ export default class Actor extends Phaser.GameObjects.Sprite
         .setOrigin(0.5, 1)
         .addToDisplayList();
 
+        scene.cameras.cameras[1].ignore(this);
+        
         this.id = id;
         
         this.costume = costume;

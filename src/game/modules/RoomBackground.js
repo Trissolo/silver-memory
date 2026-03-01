@@ -4,8 +4,6 @@ import PMStroll from "./actorStuff/pmStroll/PMStroll.mjs";
 export default class RoomBackground extends Phaser.GameObjects.Image
 {
     clickVector = new Phaser.Math.Vector2();
-    game_basesize_width;
-    game_basesize_height;
     floorVecUtility = Phaser.Geom.Point.Floor;
 
     constructor(scene)
@@ -21,9 +19,8 @@ export default class RoomBackground extends Phaser.GameObjects.Image
             .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Phaser.Geom.Rectangle.Contains, hitArea: new Phaser.Geom.Rectangle(0, 0, 1, 2)}
             )
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
-
-            this.game_basesize_width = this.scene.scale.baseSize.width;
-            this.game_basesize_height = this.scene.scale.baseSize.height;
+        
+        scene.cameras.cameras[1].ignore(this);
     }
 
     hide()
@@ -121,10 +118,6 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
         // Test Walk:
         // this.scene.player.walkTo([this.clickVector]);  //, new Phaser.Math.Vector2(126, 48), new Phaser.Math.Vector2(158, 66)]);
-
-        // quick test:
-        //const test_coords = new Phaser.Geom.Circle(this.game_basesize_width/2, this.game_basesize_height/2, 45).getPoints(9);
-        // this.scene.player.walkTo([this.clickVector, ...test_coords]);
 
         // this.scene.player.walkTo([this.clickVector, new Phaser.Math.Vector2(41,20)]);
         // rotation test

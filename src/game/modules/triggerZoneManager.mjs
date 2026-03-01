@@ -39,6 +39,8 @@ export default class TriggerZoneManager
         
         zone.isThing = true;
         zone.isTriggerArea = true;
+
+        zone.scene.cameras.cameras[1].ignore(zone);
             
         // console.log("Returning NEW TZone");
         return zone;
@@ -56,13 +58,13 @@ export default class TriggerZoneManager
         // let someoneInside;
         // let someoneOutside;
 
-        for (const actor of effectuators)
-        {
-            this.scrutinizedOnes.set(triggerArea, effectuators);
+        //for (const actor of effectuators)
+        //{
+            this.scrutinizedOnes.set(triggerArea, [...effectuators]);
 
             // for now, let's assume no one is inside
             triggerArea.isOccupied = false;
-        }
+        //}
 
 
         //     if (triggerArea.input.hitArea.contains(actor.x, actor.y))

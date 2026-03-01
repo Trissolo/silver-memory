@@ -28,7 +28,7 @@ const config = {
         mode: Phaser.Scale.NONE,
         //autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 256,
-        height: 128,
+        height: 192, // 128,
         zoom: 4
     },
     disablePreFX: true,
