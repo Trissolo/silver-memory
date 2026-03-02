@@ -175,13 +175,13 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
             button.set_halign(1)
             button.set_valign(1)
             if len(other):
-                button.__dict__[other[0]] = other[1]
+                setattr(button, other[0], other[1])
             subdiv.pack_start(button, False, False, 2)
 
         # label
         label = Gtk.Label.new("Layer name")
         subdiv.pack_start(label, True, True, 2)
-        subdiv.set_center_widget(label)
+        #subdiv.set_center_widget(label)
         subdiv.reorder_child(label, 3)
         subdiv.show_all()
     def get_mainbar_box(self):
