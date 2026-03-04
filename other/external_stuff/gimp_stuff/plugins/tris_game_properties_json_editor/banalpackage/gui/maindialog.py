@@ -31,10 +31,10 @@ from .multichooser import MultiChooser
 from .binarybox import BinaryBox
 
 class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
-    def __new__(cls):
-        print("Creating MainDialog")
-        gag = super(MainDialog, cls).__new__(cls)
-        return gag
+    # def __new__(cls):
+    #     print("Creating MainDialog")
+    #     gag = super(MainDialog, cls).__new__(cls)
+    #     return gag
     def __init__(self, *args):
         super().__init__(*args)
         self.set_title("Tris JSON generator")
@@ -519,8 +519,3 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
     def agnostic_get_parasite(self, prop, size):
         element = self.image if size == 8 else self.layer
         return element.get_parasite(prop) if self.agnostic_has_parasite(prop, size) else None
-
-             
-
-    
-    
