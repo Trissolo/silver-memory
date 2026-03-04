@@ -2,6 +2,13 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+# Grab Gtk and Gdk pro copy to clipboard method:
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
+
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
+
 class ImageStuff():
     def __init__(self, *, image, **kwargs):
         super().__init__(**kwargs)
@@ -65,6 +72,55 @@ class ImageStuff():
         if layer is None:
             layer = self.layer
         return layer.get_parasite_list()
+    @staticmethod
+    def merge_vcoords(kind, index):
+        if kind > 3:
+            raise ValueError(f"kind ({kind}) is too big!")
+        return (index << 2) | kind
+        
+    @staticmethod
+    def separate_vcoords(vcoord):
+        return [vcoord & 3, vcoord >> 2]
+        
+    def manage_array(self, ary):
+        l = len(ary)
+        if l == 0:
+            raise ValueError(f"Array is empty!")
+        if l == 1:
+            return ary[0]
+        vcoords = self.merge_vcoords(ary[0], ary[1])
+        if l == 2:
+            return vcoords
+        elif l == 3:
+            return [vcoords, ary[2]]
+        else:
+            raise ValueError(f"Array length ({l}) out of range!")
+    def summary_debug(self, to_clipboard = True):
+        layers = self.image.get_layers()
+        res = []
+        for l in layers:
+            paras = l.get_parasite_list()
+            if len(paras) > 0:
+                res.append(f"[x] Layer '{l.get_name()}':")
+                for elem in paras:
+                    name = elem
+                    ary = self.extract_array_from_parasite(elem, l)
+                    res.append(f"    + has prop '{elem}', with the array: {ary} -> {self.manage_array(ary)}")
+        if (to_clipboard):
+            self.output_string_to_clipboard("\n".join(res))
+        else:
+            print("\n".join(res))
+        return True
+    @staticmethod
+    def output_string_to_clipboard(text = "Nothing"):
+        # gi.require_version("Gtk", "3.0")
+        # from gi.repository import Gtk
+        # gi.require_version('Gdk', '3.0')
+        # from gi.repository import Gdk
+        tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        tempcl.set_text(text, -1)
+        return True
+
 
 
 '''
