@@ -200,8 +200,12 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
             self.refresh_summary()
     def on_active_row(self, liststore, row_idx, colu):
         liststore.get_selection().unselect_all()
-        #print("liststore is self.get_treeview()?", liststore is self.get_treeview())
         store = liststore.get_model()
+        if not store[row_idx][5]:
+            print("is hidden! Returnng...")
+            return
+        print(f"Model[0]: {store[row_idx][0]}, row_idx: {row_idx.get_indices()[0]}, {store[row_idx][5]}")
+        #print(f"Extended", {store[:]})
         first_cell_color = liststore.get_n_columns()
         other_cells_color = first_cell_color + 1
         self.refresh_summary(liststore)
@@ -223,10 +227,10 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
             self.get_stack().set_visible_child_name("fake")
 
     def aiut(self):
-        store = Gtk.ListStore.new([str]*5)
+        store = Gtk.ListStore.new([*([str] * 5), bool])
         predef = "---"
         for pname in self._json_properties_with_size.keys():
-            store.append([pname, predef, predef, "#000", "#888"])
+            store.append([pname, predef, predef, "#000", "#888", True])
             
         tw = Gtk.TreeView.new()
         tw.set_model(store) #(model=store)
@@ -238,7 +242,7 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         bg_others = bg_int + 1
 
         for idx, name in enumerate(col_names):
-            col = Gtk.TreeViewColumn(name, cell, text=idx, background=min(bg_int, bg_others))
+            col = Gtk.TreeViewColumn(name, cell, text=idx, background=min(bg_int, bg_others-1), visible=5)
             tw.append_column(col)
             bg_int += 1
         self.get_content_area().get_children()[2].pack_start(tw, False, False, 1)
@@ -279,6 +283,12 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
                 store[idx][2] = "---"
                 store[idx][color_prop_colu] = store[idx][other_color] = "#444"
                 #store[idx][other_color] = "#666"
+        if store[0][2] == "[-5]":
+            for anc_idx in range(1,5):
+                store[anc_idx][5] = False
+        else:
+            for anc_idx in range(1,5):
+                store[anc_idx][5] = True
         
         #prop, size, wid = self.clicked_update_layer()
         '''
