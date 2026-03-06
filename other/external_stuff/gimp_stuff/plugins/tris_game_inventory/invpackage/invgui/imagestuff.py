@@ -19,6 +19,8 @@ class ImageStuff():
     def update_layer(self):
         '''Set the currently selected layer as active layer'''
         self.layer = self.image.get_selected_layers()[0]
+        self.top_bar_write(self.layer.get_name())
+        return self
         #print(f"Set {self.layer.get_name()}")
     def select_adjacent_layer(self, addendum = 1):
         '''This method assumes that the argument 'button' is an Object with the property 'dir' set to 1 or -1.'''

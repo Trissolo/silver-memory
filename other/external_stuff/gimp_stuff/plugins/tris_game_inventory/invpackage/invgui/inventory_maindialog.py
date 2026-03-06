@@ -14,19 +14,34 @@ from .guibargenerator import GuiBarGenerator
 
 class InventoryDialog(GimpUi.Dialog, GuiBarGenerator, ImageStuff):
     def __init__(self, image, *args):
+        # First of all
         super().__init__(*args)
         
-        #0 the Dialog button:
+        #0 the Dialog chores:
+        self.set_title("Tris Inventory generator")
+        self.set_keep_above(True)
         self.add_buttons(Gtk.STOCK_OK, Gtk.ResponseType.OK)
         self.connect("destroy", self._on_destroy)
 
         #1 Set the Image and Current Layer:
         self.infuse_image(image)
-        #self.update_layer()
 
-        #2 Generate the Top Bar
-        self.generate_top()
-        #self.top_bar_write(f"Done! ({self.layer.get_name()})")
+        #2 the containers!
+        # results = [value for num in numbers if (value := slow(num)) > 0]
+        #top_bar, middle_bar = ary = [(p := Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)) for _ in range(3) if p.set_name(f'box_#{_}') is None]
+        top_bar, middle_bar = [p for name in ["Top Bar", "Middle Bar"] if (p := Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)) and p.set_name(name) == self.get_content_area().pack_start(p, False, True, 2)]
+
+        #3 Populate the Top Bar
+        self.generate_top(top_bar)
+
+        #4 Populate the Middle Bar
+        # ...
+
+        #5 the core widgets!
+        # ...
+
+        #6 Set the Layer!
+        self.update_layer()
 
     def _on_destroy(self, widget):
         self.remove_image_references()
