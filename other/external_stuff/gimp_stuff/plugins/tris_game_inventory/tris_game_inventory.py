@@ -49,12 +49,10 @@ from gi.repository import GObject
 class GameInventory(Gimp.PlugIn):
     # procedure(s) name in Procedure Browser. Note that this string value CANNOT have underscores, only hyphens/dashes
     def do_query_procedures(self):
-        return ["tris-game-properties-json-editor"]
-
+        return ["tris-game-inventory-editor"]
 
     def do_set_i18n(self, name):
         return False
-
 
     # The ImageProcedure (mostly hardcoded strings)
     def do_create_procedure(self, name):
@@ -88,17 +86,17 @@ class GameInventory(Gimp.PlugIn):
         print("** Json procedure complete! :D **")
         return prcdr.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
     
-    # # Two test methods
     # def set_working_directory(self):
     #     GLib.chdir(GLib.path_get_dirname(__file__))
     #     GLib.chdir("../..")
     #     return GLib.get_current_dir()
        
     def run(self, procedure, run_mode, image, drawables, config, run_data):
-        print("** Starting -from scratch!- Json procedure **")
-        # just for debug: not required for the plugin purpose
+        print("** Starting -Inventory procedure **")
         # MessageHandlerType.MESSAGE_BOX = 0, CONSOLE = 1, ERROR_CONSOLE = 2
         Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
+
+        print("Inv drawables and layers", drawables[0].get_name(), len(drawables), len(image.get_layers()))
 
         # quick bail
         if len(image.get_layers()) == 0 or image.get_xcf_file() is None:
@@ -107,36 +105,16 @@ class GameInventory(Gimp.PlugIn):
         
         # initialize Gtk!
         GimpUi.init(GLib.path_get_basename(__file__).removesuffix(".py"))
-
         
         print("*** Generate Game Inventory Plugin ***")
 
-        # from .invpackage.againcross import AgainCross
+        from invpackage import InventoryDialog
 
-        # q = AgainCross()
-        
-        # from banalpackage import MainDialog
-        # dialog = MainDialog()
-        # dialog.provide_image(image)
-        # dialog.run()
-        # dialog.destroy()
+        dialog = InventoryDialog(image=image)
+        dialog.run()
+        dialog.destroy()
 
         print("DESTROYED")
-        #print(GLib.path_get_dirname(__file__))
-        
-        '''
-        {
-            "kind": "ab",
-            "x": 90,
-            "y": 68,
-            "frame": "r2cabinetDoors",
-            "suffix": [0, 7],
-            "skipCond": "b_4_1",
-            "hoverName": 8,
-            "animation": "blink",
-            "no_interaction": True
-        }
-        '''
         
         # We have reached the end of the procedure: let's return "Success"
         return self.procedure_is_complete(procedure)  #procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())

@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-# Grab Gtk and Gdk pro copy to clipboard method:
+# Grab Gtk and Gdk for 'copy to clipboard' method:
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
@@ -10,8 +10,7 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 
 class ImageStuff():
-    def __init__(self, *, image, **kwargs):
-        super().__init__(**kwargs)
+    def infuse_image(self, image):
         self.image = image
         self.layer = None
     def remove_image_references(self):
@@ -20,18 +19,17 @@ class ImageStuff():
     def update_layer(self):
         '''Set the currently selected layer as active layer'''
         self.layer = self.image.get_selected_layers()[0]
-    def select_adjacent_layer(self, button):
+        #print(f"Set {self.layer.get_name()}")
+    def select_adjacent_layer(self, addendum = 1):
         '''This method assumes that the argument 'button' is an Object with the property 'dir' set to 1 or -1.'''
-        #print(f":( Expensive: {button.dir}")
         layers = self.image.get_layers()
         layers_length = len(layers)
         if not self.layer or layers_length < 2:
             print("No next layer. Skipping :(")
             return
-        next_idx = layers.index(self.layer) + button.dir
+        next_idx = layers.index(self.layer) + addendum
         self.image.set_selected_layers([layers[0] if next_idx == layers_length else layers[next_idx]])
-        # call 'update_layer' as temporary behavior:
-        self.update_layer()
+        return self
     def attach_array_to_current_layer(self, parasite_name, integers_array):
         '''Creates a parasite with the given name and attaches it to the current layer.
         If a parasite with the same name already exists, it will be eliminated before the process.'''
