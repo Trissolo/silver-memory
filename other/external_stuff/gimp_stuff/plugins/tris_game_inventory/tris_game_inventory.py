@@ -62,7 +62,7 @@ class GameInventory(Gimp.PlugIn):
 
         procedure.set_image_types("*")
 
-        procedure.set_menu_label("[Tris] ⛏️Tris Game Inventory generator")
+        procedure.set_menu_label("[Tris] ⛏️ Tris Game Inventory generator")
 
         procedure.add_menu_path("<Image>/Filters/[[Tris]]/")
 

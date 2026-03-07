@@ -10,9 +10,6 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 
 class ImageStuff():
-    def infuse_image(self, image):
-        self.image = image
-        self.layer = None
     def remove_image_references(self):
         self.image = None
         self.layer = None
@@ -21,7 +18,7 @@ class ImageStuff():
         self.layer = self.image.get_selected_layers()[0]
         self.top_bar_write(self.layer.get_name())
         return self
-        #print(f"Set {self.layer.get_name()}")
+    
     def select_adjacent_layer(self, addendum = 1):
         '''This method assumes that the argument 'button' is an Object with the property 'dir' set to 1 or -1.'''
         layers = self.image.get_layers()
@@ -32,6 +29,7 @@ class ImageStuff():
         next_idx = layers.index(self.layer) + addendum
         self.image.set_selected_layers([layers[0] if next_idx == layers_length else layers[next_idx]])
         return self
+    
     def attach_array_to_current_layer(self, parasite_name, integers_array):
         '''Creates a parasite with the given name and attaches it to the current layer.
         If a parasite with the same name already exists, it will be eliminated before the process.'''
@@ -45,7 +43,8 @@ class ImageStuff():
         dati_bytes = stringa_dati.encode('ascii')
         # Finally creates the parasite and attach it
         new_parasite = Gimp.Parasite.new(parasite_name, Gimp.PARASITE_PERSISTENT, dati_bytes)       
-        self.layer.attach_parasite(new_parasite)
+        return self.layer.attach_parasite(new_parasite)
+    
     def extract_array_from_parasite(self, parasite_name, layer = None):
         '''Returns the array contained in the parasite identified by the given name.
         Or an empty array if the parasite does not exist.'''
@@ -64,14 +63,21 @@ class ImageStuff():
             return integers_array
         except ValueError:
             return []
+        
     def detach_parasite_from_current_layer(self, parasite_name):
         '''If the current layer contains a parasite identified by the specified name, that parasite is deleted.'''
         if parasite_name in self.layer.get_parasite_list():
             self.layer.detach_parasite(parasite_name)
+        return
+    
+    def get_final_value(self, parasite_name, layer):
+        return self.manage_array(self.extract_array_from_parasite(parasite_name, layer))
+    
     def get_owned_parasites(self, layer = None):
         if layer is None:
             layer = self.layer
         return layer.get_parasite_list()
+    
     @staticmethod
     def merge_vcoords(kind, index):
         if kind > 3:
@@ -95,6 +101,7 @@ class ImageStuff():
             return [vcoords, ary[2]]
         else:
             raise ValueError(f"Array length ({l}) out of range!")
+        
     def summary_debug(self, to_clipboard = True):
         layers = self.image.get_layers()
         res = []
@@ -111,6 +118,7 @@ class ImageStuff():
         else:
             print("\n".join(res))
         return True
+    
     @staticmethod
     def output_string_to_clipboard(text = "Nothing"):
         # gi.require_version("Gtk", "3.0")
@@ -120,6 +128,78 @@ class ImageStuff():
         tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         tempcl.set_text(text, -1)
         return True
+    @staticmethod
+    def extract_id_for_json(image):
+        name = image.get_name()
+        pruned = name[4:-4]
+        return int(pruned) if pruned.isdigit() else name
+    
+    @staticmethod
+    def add_peculiar_properties(layer, obj, kind_value, remaining_props):
+        _succ, x, y = layer.get_offsets()
+        if kind_value == 1:
+            obj['rect'] = [x, y, layer.get_width(), layer.get_height()]
+            if 'suffix' in remaining_props:
+                print("Removing 'suffix'")
+                remaining_props.remove('suffix')
+            return
+        elif kind_value == 4:
+            obj["x"] = layer.get_width() // 2 + x
+            obj["y"] = y + layer.get_height()
+        elif kind_value == 5:
+            obj["x"] = layer.get_width() // 2 + x
+            obj["y"] = layer.get_height() // 2 + y
+        else:
+            obj["x"] = x
+            obj["y"] = y
+
+        obj["frame"] = layer.get_name().rstrip("0123456789")
+
+    def generate_json(self):
+        import json
+
+        #{ "kind": 1, "hoverName": 1, "suffix": 2, "skipCond": 3, "noInteraction": 1, "roomStatus": 8, "roomVariable": 8}
+        #kind, hoverName, suffix, skipCond, noInteraction, roomStatus, roomVariable
+
+        props = ['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction', 'roomStatus', 'roomVariable']
+
+        kind, *other, room_props, _ = props #['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction', 'roomStatus', 'roomVariable']
+
+        room_props = props[-2:]
+
+        things_array = []
+        room_res = {'things': things_array, 'id': self.extract_id_for_json(self.image)}
+
+        for layer in (l for l in self.image.get_layers() if l.get_visible()):
+            parasites = layer.get_parasite_list()
+            if kind in parasites:
+                kind_value = self.get_final_value(kind, layer)
+                if kind_value == -5:
+                    room_res['bg'] = layer.get_name()
+                    for rp in (potental_rp for potental_rp in room_props if potental_rp in parasites):
+                        room_res[rp] = self.get_final_value(rp, layer)
+                    continue
+
+                obj = {kind: kind_value}
+                things_array.append(obj)
+                parasites.remove(kind)
+                print(f"Props to add: {parasites}")
+                self.add_peculiar_properties(layer, obj, kind_value, parasites)
+                for prop in parasites:
+                    obj[prop] = self.get_final_value(prop, layer)
+                
+            else:
+                print(f"the Layer {layer.get_name()} has no 'Kind' assigned - '{len(parasites)}' in total")
+        
+        #print(json.dumps(room_res, indent = 0, sort_keys=True))
+        self.output_string_to_clipboard(json.dumps(room_res, indent=None, sort_keys=True))
+        return
+
+
+        # print(f"{props, len(props)}")
+        # print(f"{kind} - {room_props}, {other}")
+
+        
 
 
 

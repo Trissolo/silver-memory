@@ -20,39 +20,52 @@ class GuiBarGenerator():
     def top_bar_refresh_layer(self, button):
         self.update_layer()
 
-    def next_layer_from_button(self, button):
+    def top_bar_next_layer(self, button):
         self.select_adjacent_layer(button.dir).update_layer()
 
-    def generate_top(self, box = None):
+    def generate_top_bar(self):
         # container
-        if box is None:
-            box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
-            box.set_name("Top_Bar")
-            self.get_content_area().pack_start(box, False, False, 1)
-            print("Was none")
-        else:
-            print("box received", box.get_name())
+        box = self._gui_element_box(name="Top Bar")
+
         # params
         temp_tuple = (
             (GimpUi.ICON_VIEW_REFRESH, self.top_bar_refresh_layer),
-            (GimpUi.ICON_GO_PREVIOUS, self.next_layer_from_button, -1),
-            (GimpUi.ICON_GO_NEXT, self.next_layer_from_button, 1),
-            #(GimpUi.ICON_DOCUMENT_SAVE, self.top_bar_refresh_layer)
+            (GimpUi.ICON_GO_PREVIOUS, self.top_bar_next_layer, -1),
+            (GimpUi.ICON_GO_NEXT, self.top_bar_next_layer, 1),
+            (GimpUi.ICON_DOCUMENT_SAVE, self.placeholder_button_click)
         )
 
         for params in temp_tuple:
             b = self._gui_element_default_icon_button(*params)
-            box.pack_start(b , False, False, 2)
+            box.pack_start(b, False, False, 2)
      
         # add label
-        label = Gtk.Label.new("Layer name")
+        self._top_label = label = Gtk.Label.new("Layer name")
         box.pack_start(label, True, True, 2)
         #box.set_center_widget(label)
         box.reorder_child(label, 3)
-        self._top_label = label
+        
+        
         # Done! Show the Bar!
         box.show_all()
         return True
+    
+    def middle_bar_remove_parasite(self, button):
+        print("Removing...")
+        return #self.detach_parasite_from_current_layer()
+    
+    def generate_middle_bar(self):
+        box = self._gui_element_box(name="Middle Bar")
+
+        b = self._gui_element_default_icon_button(GimpUi.ICON_CLOSE, self.middle_bar_remove_parasite)
+        box.pack_start(b, False, False, 2)
+
+        self._middle_label = Gtk.Label.new("Generic Message")
+        box.pack_start(self._middle_label, True, True, 2)
+
+        box.show_all()
+        return
+        
     
     @staticmethod
     def _gui_element_default_icon_button(icon_name, click_callback, custom_attribute = None):
@@ -64,4 +77,12 @@ class GuiBarGenerator():
         if custom_attribute:
             button.dir = custom_attribute
         return button
-        
+    def _gui_element_box(self, isHorizontal=True, addToContentArea=True, name=None):
+        box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL if isHorizontal else Gtk.Orientation.VERTICAL, 2)
+        if name:
+            box.set_name(name)
+        if addToContentArea:
+            self.get_content_area().pack_start(box, False, False, 1)
+        return box
+    def placeholder_button_click(self, widget):
+        return print(f"Clicked {widget.get_name()}")
