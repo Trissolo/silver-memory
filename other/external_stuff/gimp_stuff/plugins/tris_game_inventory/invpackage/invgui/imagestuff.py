@@ -104,17 +104,26 @@ class ImageStuff():
         
     def summary_debug(self, to_clipboard = True):
         layers = self.image.get_layers()
+        empty = []
         res = []
+        #emojis = ['✅', '❎', '🔘', '☀️', '🔥', '🌊', '💩', '🪨', '🛑', '✨']
         for l in layers:
             paras = l.get_parasite_list()
+            layer_name = l.get_name()
             if len(paras) > 0:
-                res.append(f"[x] Layer '{l.get_name()}':")
+                res.append(f"\n* {layer_name}:")
+                if 'kind' in paras:
+                    res.append(f"    * KIND: {self.extract_array_from_parasite('kind', l)[0]}")
+                    paras.remove('kind')
+                else:
+                    res.append("    !!!! no KIND property")
                 for elem in paras:
-                    name = elem
                     ary = self.extract_array_from_parasite(elem, l)
-                    res.append(f"    + has prop '{elem}', with the array: {ary} -> {self.manage_array(ary)}")
+                    res.append(f"    - {elem}: {self.manage_array(ary)} {ary}")
+            else:
+                empty.append(layer_name)
         if (to_clipboard):
-            self.output_string_to_clipboard("\n".join(res))
+            self.output_string_to_clipboard(f"{'\n'.join(res)}\n\nEmpty:\n{'\n'.join(empty)}")
         else:
             print("\n".join(res))
         return True

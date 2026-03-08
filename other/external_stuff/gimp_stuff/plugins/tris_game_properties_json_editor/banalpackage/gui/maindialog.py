@@ -242,8 +242,9 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         bg_others = bg_int + 1
 
         for idx, name in enumerate(col_names):
-            col = Gtk.TreeViewColumn(name, cell, text=idx, background=min(bg_int, bg_others-1), visible=5)
+            col = Gtk.TreeViewColumn(name, cell, text=idx, background=min(bg_int, bg_others), visible=5)
             tw.append_column(col)
+            print(f"cell values: {min(bg_int, bg_others)}") # {bg_int=}, bg_others={bg_others}")
             bg_int += 1
         self.get_content_area().get_children()[2].pack_start(tw, False, False, 1)
         tw.show()

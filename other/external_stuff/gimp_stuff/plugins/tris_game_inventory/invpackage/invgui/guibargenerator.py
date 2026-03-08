@@ -9,7 +9,9 @@ from gi.repository import GimpUi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-class GuiBarGenerator():
+from .imagestuff import ImageStuff
+
+class GuiBarGenerator(ImageStuff):
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
 
