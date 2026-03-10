@@ -87,4 +87,8 @@ class GuiBarGenerator(ImageStuff):
             self.get_content_area().pack_start(box, False, False, 1)
         return box
     def placeholder_button_click(self, widget):
+        model = self.tw.get_model()
+        print("Model:", model)
+        model[self.curr_sel.row_idx][4] = self.tw.color_set 
+        print(self.curr_sel)
         return print(f"Clicked {widget.get_name()}")

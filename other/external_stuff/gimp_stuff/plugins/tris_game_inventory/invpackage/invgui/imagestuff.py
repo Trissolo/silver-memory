@@ -9,7 +9,9 @@ from gi.repository import Gtk
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 
-class ImageStuff():
+from ..misc.generic_utils import GenericUtils
+
+class ImageStuff(GenericUtils):
     def remove_image_references(self):
         self.image = None
         self.layer = None
@@ -17,6 +19,7 @@ class ImageStuff():
         '''Set the currently selected layer as active layer'''
         self.layer = self.image.get_selected_layers()[0]
         self.top_bar_write(self.layer.get_name())
+        self.tw_refresh_hard()
         return self
     
     def select_adjacent_layer(self, addendum = 1):
@@ -128,15 +131,7 @@ class ImageStuff():
             print("\n".join(res))
         return True
     
-    @staticmethod
-    def output_string_to_clipboard(text = "Nothing"):
-        # gi.require_version("Gtk", "3.0")
-        # from gi.repository import Gtk
-        # gi.require_version('Gdk', '3.0')
-        # from gi.repository import Gdk
-        tempcl = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        tempcl.set_text(text, -1)
-        return True
+    
     @staticmethod
     def extract_id_for_json(image):
         name = image.get_name()

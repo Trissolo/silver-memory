@@ -9,26 +9,28 @@ from gi.repository import GimpUi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-# dataclass
-from dataclasses import dataclass
 
-@dataclass
-class SelectionInfo:
-    prop: str | None
-    size: int | None
-    row_idx: int | None
-    wid: Gtk.Widget | None
-    def clear(self):
-        self.prop = None
-        self.size = None
-        self.row_idx = None
-        self.wid = None
-    def set_widget(self, widget):
-        self.wid = widget
-        return self
+# dataclass
+# from dataclasses import dataclass
+
+# @dataclass
+# class SelectionInfo:
+#     prop: str | None
+#     size: int | None
+#     row_idx: int | None
+#     wid: Gtk.Widget | None
+#     def clear(self):
+#         self.prop = None
+#         self.size = None
+#         self.row_idx = None
+#         self.wid = None
+#     def set_widget(self, widget):
+#         self.wid = widget
+#         return self
 
 # from .imagestuff import ImageStuff
 from .guibargenerator import GuiBarGenerator
+from ..misc.selectioninfo import SelectionInfo
 
 class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
     def __init__(self, image, *args):
@@ -66,9 +68,12 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
         for child in self.get_content_area().get_children():
             print(child.get_name())
 
-        #self.generate_json()
+        # Ready!
         self.build_tw()
+        self.update_layer()
+        self.tw_refresh_hard()
         #self.summary_debug()
+        #self.generate_json()
     
     def set_current_prop(self):
         #self.attach_array_to_current_layer()
@@ -101,9 +106,13 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
         }
         column_headers = ["Prop", "Readable", "Effective"]
 
-        column_amount = len(column_headers)
+        # attribute mapping
 
-        id_for_others = column_amount + 1
+        first_colum_color = len(column_headers)
+
+        other_colums_color = first_colum_color + 1
+
+        print(f"{first_colum_color=}, {other_colums_color=}")
 
         mytypes = [str] * len(column_headers)
 
@@ -131,13 +140,14 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
         cell = Gtk.CellRendererText.new()
 
         for idx, name in enumerate(column_headers):
-            col = Gtk.TreeViewColumn(name, cell, text=idx, background=3 if idx==0 else 4)
+            col = Gtk.TreeViewColumn(name, cell, text=idx, background=first_colum_color if idx==0 else other_colums_color)
             tw.append_column(col)
         
         tw.set_activate_on_single_click(True)
         tw.connect('row-activated', self.on_active_row)
         self.get_content_area().pack_start(tw, False, False, 1)
         tw.show_all()
+        self.tw = tw
 
     def on_active_row(self, liststore, row_idx, colu):
         print("On Active Row!")
@@ -151,6 +161,24 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
         self.curr_sel = self.row_infos[index_as_int]
         print(f"CurrSel: {self.curr_sel}")
         print(f"Analogies? {index_as_int=} -> {self.curr_sel.row_idx} -*- {model[row_idx][0]=} -> {self.curr_sel.prop} {model[row_idx][0]}")
+    
+    def tw_refresh_hard(self, tw=None, model=None):
+        if tw == None:
+            tw = self.tw
+            model = tw.get_model()
+        props = self.layer.get_parasite_list()
+        print(f"{props=}")
+        for row in model:
+            if row[0] in props:
+                row[3] = row[4] = tw.color_set
+                ary = self.extract_array_from_parasite(row[0])
+                row[1] = f"{ary}"
+            else:
+                for idx, value in enumerate([tw.text_empty, tw.text_empty, tw.color_empty, tw.color_empty], start=1):
+                   print(f"row[{idx}] = {value}")
+                   row[idx]=value
+
+        
 
 
 
