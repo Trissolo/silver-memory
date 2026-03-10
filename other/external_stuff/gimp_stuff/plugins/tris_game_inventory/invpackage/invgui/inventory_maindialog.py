@@ -9,38 +9,19 @@ from gi.repository import GimpUi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-
-# dataclass
-# from dataclasses import dataclass
-
-# @dataclass
-# class SelectionInfo:
-#     prop: str | None
-#     size: int | None
-#     row_idx: int | None
-#     wid: Gtk.Widget | None
-#     def clear(self):
-#         self.prop = None
-#         self.size = None
-#         self.row_idx = None
-#         self.wid = None
-#     def set_widget(self, widget):
-#         self.wid = widget
-#         return self
-
-# from .imagestuff import ImageStuff
-from .guibargenerator import GuiBarGenerator
+from .gui_bar_generator import GuiBarGenerator
 from ..misc.selectioninfo import SelectionInfo
 
-class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
-    def __init__(self, image, *args):
+class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
+    def __init__(self, image, crossroads, *args):
         # First of all
         super().__init__(title="Tris Inventory Generator", *args)
+
+        print(f"Crossroads: {type(crossroads)}")
         
         #0 the Dialog chores:
-        #self.set_title("Tris Inventory generator")
         self.set_keep_above(True)
-        self.add_buttons( "Done [close]", Gtk.ResponseType.OK)
+        # self.add_buttons( "Done [close]", Gtk.ResponseType.OK)
         self.connect("destroy", self._on_destroy)
         self.set_name("Inv. Dialog")
 
@@ -48,32 +29,30 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
         self.image = image
         self.layer = None
 
-        #2 the containers!
-        # results = [value for num in numbers if (value := slow(num)) > 0]
-        #top_bar, middle_bar = ary = [(p := Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)) for _ in range(3) if p.set_name(f'box_#{_}') is None]
-        #top_bar, middle_bar = [p for name in ["Top Bar", "Middle Bar"] if (p := Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)) and p.set_name(name) == self.get_content_area().pack_start(p, False, True, 2)]
-
-        #3 Populate the Top Bar
+        #2 Populate the Top Bar
         self.generate_top_bar()
 
-        #4 Populate the Middle Bar
+        #3 Populate the Middle Bar
         self.generate_middle_bar()
 
-        #5 the core widgets!
+        #4 the core widgets!
         # ...
 
-        #6 Set the Layer!
-        #self.update_layer()
+        #5 Set the Layer!
+
+        # self.update_layer()
         # test:
         for child in self.get_content_area().get_children():
             print(child.get_name())
 
-        # Ready!
+        #6 Ready!
         self.build_tw()
         self.update_layer()
-        self.tw_refresh_hard()
-        #self.summary_debug()
-        #self.generate_json()
+        self.grab_core_props_game()
+        # self.tw_refresh_hard()
+        # self.summary_debug()
+        # self.generate_json()
+        self.load_json_hovernames()
     
     def set_current_prop(self):
         #self.attach_array_to_current_layer()
@@ -105,6 +84,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
             "roomVariable": 2
         }
         column_headers = ["Prop", "Readable", "Effective"]
+
+        print(f"Debug locals so far: {locals()}")
 
         # attribute mapping
 
@@ -148,6 +129,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
         self.get_content_area().pack_start(tw, False, False, 1)
         tw.show_all()
         self.tw = tw
+        
 
     def on_active_row(self, liststore, row_idx, colu):
         print("On Active Row!")
@@ -167,7 +149,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
             tw = self.tw
             model = tw.get_model()
         props = self.layer.get_parasite_list()
-        print(f"{props=}")
+        #print(f"{props=}")
         for row in model:
             if row[0] in props:
                 row[3] = row[4] = tw.color_set
@@ -175,8 +157,26 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator): #, ImageStuff):
                 row[1] = f"{ary}"
             else:
                 for idx, value in enumerate([tw.text_empty, tw.text_empty, tw.color_empty, tw.color_empty], start=1):
-                   print(f"row[{idx}] = {value}")
+                   #print(f"row[{idx}] = {value}")
                    row[idx]=value
+        return True
+    def grab_core_props_game(self):
+        json_props_size = (
+            ('kind', 1),
+            ('hoverName', 1),
+            ('suffix', 2),
+            ('skipCond', 3),
+            ('noInteraction', 1),
+            ('roomStatus', 2),
+            ('roomVariable', 2)
+        )
+
+        core_stuff = [SelectionInfo(prop_name, size, idx, None) for idx, (prop_name, size) in enumerate(json_props_size)]
+        print('✨ DEBUG CORE INFO ✨')
+        for i, elem in enumerate(core_stuff):
+            print(core_stuff[i], i == core_stuff[i].row_idx)
+        
+        return
 
         
 

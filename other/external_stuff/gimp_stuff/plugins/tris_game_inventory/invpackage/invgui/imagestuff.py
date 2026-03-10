@@ -2,13 +2,6 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-# Grab Gtk and Gdk for 'copy to clipboard' method:
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
-
-gi.require_version('Gdk', '3.0')
-from gi.repository import Gdk
-
 from ..misc.generic_utils import GenericUtils
 
 class ImageStuff(GenericUtils):
@@ -198,10 +191,6 @@ class ImageStuff(GenericUtils):
         #print(json.dumps(room_res, indent = 0, sort_keys=True))
         self.output_string_to_clipboard(json.dumps(room_res, indent=None, sort_keys=True))
         return
-
-
-        # print(f"{props, len(props)}")
-        # print(f"{kind} - {room_props}, {other}")
 
         
 

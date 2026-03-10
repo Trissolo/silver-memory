@@ -110,7 +110,7 @@ class GameInventory(Gimp.PlugIn):
 
         from invpackage import InventoryDialog
 
-        dialog = InventoryDialog(image=image)
+        dialog = InventoryDialog(image=image, crossroads=False)
         dialog.run()
         dialog.destroy()
 

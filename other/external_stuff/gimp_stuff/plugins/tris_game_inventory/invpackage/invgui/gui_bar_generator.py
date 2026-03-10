@@ -86,6 +86,7 @@ class GuiBarGenerator(ImageStuff):
         if addToContentArea:
             self.get_content_area().pack_start(box, False, False, 1)
         return box
+    
     def placeholder_button_click(self, widget):
         model = self.tw.get_model()
         print("Model:", model)
