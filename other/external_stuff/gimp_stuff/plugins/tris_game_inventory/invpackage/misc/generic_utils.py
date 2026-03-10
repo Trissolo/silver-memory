@@ -28,8 +28,20 @@ class GenericUtils():
             assert GLib.file_test(path_as_str, GLib.FileTest.EXISTS), f"The file '{filename}.json' does not exist. Aborting."
             with open(path_as_str) as json_file:
                 res.append(json.load(json_file))
-            
+        
+        # check for duplicates
+        duplicates = []
+        for current_array, current_name in zip(res, name_file):
+            temp_set = set(current_array)
+            if len(current_array) != len(temp_set):
+                duplicates.append([f'❌ {current_name}.json  Not unique: "{c}".' for c in temp_set if current_array.count(c) != 1])
+
+        if len(duplicates):
+            self.output_message("\n".join(*duplicates)) # self.output_message(f"Duplicates:\n{'\n'.join(duplicates)}")
+
+
         return res[0] if len(res) == 1 else res
+    
     def load_json_vars(self):
         return self._load_local_json(["bool", "crumble", "nibble", "byte"])
     def load_json_hovernames(self):
