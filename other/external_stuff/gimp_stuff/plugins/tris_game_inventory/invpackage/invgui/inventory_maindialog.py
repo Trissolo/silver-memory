@@ -11,13 +11,14 @@ from gi.repository import Gtk
 
 from .gui_bar_generator import GuiBarGenerator
 from ..misc.selectioninfo import SelectionInfo
+from .singleChooser import SingleChooser
 
 class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     def __init__(self, image, crossroads, *args):
         # First of all
         super().__init__(title="Tris Inventory Generator", *args)
 
-        print(f"Crossroads: {type(crossroads)}")
+        print(f"Crossroads: {type(crossroads)} ({crossroads})")
         
         #0 the Dialog chores:
         self.set_keep_above(True)
@@ -41,18 +42,24 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         #5 Set the Layer!
 
         # self.update_layer()
+
+
         # test:
+        print("Test: 'Dialog' children")
         for child in self.get_content_area().get_children():
             print(child.get_name())
 
         #6 Ready!
-        self.build_tw()
+        self.prepare_rowInfos()
+        self.build_chooser_overnames()
+        #self.build_tw()
         self.update_layer()
-        self.grab_core_props_game()
         # self.tw_refresh_hard()
         # self.summary_debug()
         # self.generate_json()
-        self.load_json_hovernames()
+        # self.load_json_hovernames()
+
+        # END __init__ method
     
     def set_current_prop(self):
         #self.attach_array_to_current_layer()
@@ -60,32 +67,21 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
     def _on_destroy(self, widget):
         self.remove_image_references()
+
         self._top_label = None
-        print("Checking row_info:", self.row_infos[0])
+
         for elem in self.row_infos:
             elem.clear()
         self.row_infos = self.row_infos.clear()
+
         print("Inventory plugin destroyed!")
     
     def build_tw(self):
-        # self.get_content_area().pack_start(tw, False, False, 1)
-
-        row_infos = self.row_infos = []
+        row_infos = self.row_infos = self.prepare_rowInfos()
 
         self.curr_sel = None
 
-        properties_size = {
-            "kind": 1,
-            "hoverName": 1,
-            "suffix": 2,
-            "skipCond": 3,
-            "noInteraction": 1,
-            "roomStatus": 2,
-            "roomVariable": 2
-        }
         column_headers = ["Prop", "Readable", "Effective"]
-
-        print(f"Debug locals so far: {locals()}")
 
         # attribute mapping
 
@@ -114,9 +110,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         tw.color_set = "#66a"
 
         # populate the store:
-        for idx, (prop, size) in enumerate(properties_size.items()):
-            store.append([prop, tw.text_empty, tw.text_empty, tw.color_empty, tw.color_empty])
-            row_infos.append(SelectionInfo(prop, size, idx, None))
+        for row in row_infos:
+            store.append([row.prop, tw.text_empty, tw.text_empty, tw.color_empty, tw.color_empty])
         
         cell = Gtk.CellRendererText.new()
 
@@ -131,15 +126,17 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self.tw = tw
         
 
-    def on_active_row(self, liststore, row_idx, colu):
+    def on_active_row(self, treeview, row_idx, colu):
         print("On Active Row!")
         index_as_int = row_idx.get_indices()[0]
-        liststore.get_selection().unselect_all()
-        model = liststore.get_model()
+        treeview.get_selection().unselect_all()
+
+        # Additional tests:
+        model = treeview.get_model()
         if self.curr_sel is not None:
             model[self.curr_sel.row_idx][3] = model[self.curr_sel.row_idx][4]
-        model[index_as_int][3] = liststore.color_selected
-        model[index_as_int][4] = liststore.color_empty
+        model[index_as_int][3] = treeview.color_selected
+        model[index_as_int][4] = treeview.color_empty
         self.curr_sel = self.row_infos[index_as_int]
         print(f"CurrSel: {self.curr_sel}")
         print(f"Analogies? {index_as_int=} -> {self.curr_sel.row_idx} -*- {model[row_idx][0]=} -> {self.curr_sel.prop} {model[row_idx][0]}")
@@ -160,7 +157,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
                    #print(f"row[{idx}] = {value}")
                    row[idx]=value
         return True
-    def grab_core_props_game(self):
+    
+    def prepare_rowInfos(self):
         json_props_size = (
             ('kind', 1),
             ('hoverName', 1),
@@ -172,11 +170,24 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         )
 
         core_stuff = [SelectionInfo(prop_name, size, idx, None) for idx, (prop_name, size) in enumerate(json_props_size)]
-        print('✨ DEBUG CORE INFO ✨')
-        for i, elem in enumerate(core_stuff):
-            print(core_stuff[i], i == core_stuff[i].row_idx)
-        
-        return
+
+        self.row_infos = core_stuff
+
+        # print('✨ DEBUG CORE INFO ✨')
+        # for i, elem in enumerate(core_stuff):
+        #     print(core_stuff[i], i == elem.row_idx, "core_stuff[i]", core_stuff[i] == elem)       
+        return core_stuff
+    
+    def build_chooser_overnames(self):
+        ch = SingleChooser(source=self.load_json_hovernames(), var_kind=None)
+        self.get_content_area().pack_start(ch, True, True, 0)
+        self.row_infos[1].set_widget(ch)
+        ch.get_salient_widget().connect('row-activated', self.handler_chooser_overnames) #, self.han
+        return ch
+    def handler_chooser_overnames(self, listbox, row):
+        name_idx = row.idx
+        print(f"Choosed: {name_idx} -> {self.row_infos[1].wid.get_readable([name_idx])}")
+        pass
 
         
 

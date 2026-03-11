@@ -12,7 +12,7 @@ class ImageStuff(GenericUtils):
         '''Set the currently selected layer as active layer'''
         self.layer = self.image.get_selected_layers()[0]
         self.top_bar_write(self.layer.get_name())
-        self.tw_refresh_hard()
+        #self.tw_refresh_hard()
         return self
     
     def select_adjacent_layer(self, addendum = 1):
