@@ -12,6 +12,7 @@ from gi.repository import Gtk
 from .gui_bar_generator import GuiBarGenerator
 from ..misc.selectioninfo import SelectionInfo
 from .singleChooser import SingleChooser
+from .multiChooser import MultiChooser
 
 class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     def __init__(self, image, crossroads, *args):
@@ -30,13 +31,19 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self.image = image
         self.layer = None
 
-        #2 Populate the Top Bar
+        #2 'global' paraphernalia
+        self.curr_sel = None
+        self.row_infos = None
+
+        #3
+
+        #4 Populate the Top Bar
         self.generate_top_bar()
 
-        #3 Populate the Middle Bar
+        #5 Populate the Middle Bar
         self.generate_middle_bar()
 
-        #4 the core widgets!
+        #6 the core widgets!
         # ...
 
         #5 Set the Layer!
@@ -51,7 +58,12 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         #6 Ready!
         self.prepare_rowInfos()
-        self.build_chooser_overnames()
+        #self.build_chooser_overnames()
+
+        mc = MultiChooser(self.load_json_vars())
+        self.get_content_area().pack_start(mc, True, True, 0)
+
+        
         #self.build_tw()
         self.update_layer()
         # self.tw_refresh_hard()
@@ -125,7 +137,6 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         tw.show_all()
         self.tw = tw
         
-
     def on_active_row(self, treeview, row_idx, colu):
         print("On Active Row!")
         index_as_int = row_idx.get_indices()[0]

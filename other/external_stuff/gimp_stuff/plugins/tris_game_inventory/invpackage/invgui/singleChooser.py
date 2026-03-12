@@ -49,5 +49,3 @@ class SingleChooser(Gtk.Box):
     def destroy_source_ary(self, widget):
         print("destroy_source_ary!")
         self.source = self.source.clear()
-    def internal_handler(self, listbox, row):
-        print("internal")
