@@ -13,19 +13,21 @@ from .gui_bar_generator import GuiBarGenerator
 from ..misc.selectioninfo import SelectionInfo
 from .singleChooser import SingleChooser
 from .multiChooser import MultiChooser
+from .dictChooser import DictChooser
 
 class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     def __init__(self, image, crossroads, *args):
         # First of all
         super().__init__(title="Tris Inventory Generator", *args)
 
-        print(f"Crossroads: {type(crossroads)} ({crossroads})")
+        # Is this the Inventory Dialog (True) or the Properties Dialog (False)?
+        self.crossroads = crossroads
         
         #0 the Dialog chores:
         self.set_keep_above(True)
-        # self.add_buttons( "Done [close]", Gtk.ResponseType.OK)
         self.connect("destroy", self._on_destroy)
         self.set_name("Inv. Dialog")
+        # self.add_buttons( "Done [close]", Gtk.ResponseType.OK)
 
         #1 Set the Image and Current Layer:
         self.image = image
@@ -35,6 +37,9 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self.curr_sel = None
         self.row_infos = None
 
+        self.stack = None
+        self.tw = None
+
         #3
 
         #4 Populate the Top Bar
@@ -43,8 +48,20 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         #5 Populate the Middle Bar
         self.generate_middle_bar()
 
+        # the Paned!
+        paned = self._gui_element_paned()
+        stack = Gtk.Stack.new()
+        paned.pack2(stack)
+        self.prepare_rowInfos(stack=stack)
+        tw = self.build_tw()
+        paned.pack1(tw)
+        paned.show_all()
+        #print(stack.get_children())
+        self.stack = stack
+
         #6 the core widgets!
         # ...
+        
 
         #5 Set the Layer!
 
@@ -52,19 +69,21 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
 
         # test:
-        print("Test: 'Dialog' children")
+        print("Test: 'Dialog content area' children")
         for child in self.get_content_area().get_children():
             print(child.get_name())
 
         #6 Ready!
-        self.prepare_rowInfos()
-        #self.build_chooser_overnames()
+        
 
-        mc = MultiChooser(self.load_json_vars())
-        self.get_content_area().pack_start(mc, True, True, 0)
+        #self.curr_sel = self.row_infos[3]
+        #self.build_chooser_overnames(stack)
+        #self.build_chooser_vars(stack)
 
         
-        #self.build_tw()
+
+        
+        
         self.update_layer()
         # self.tw_refresh_hard()
         # self.summary_debug()
@@ -73,8 +92,10 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         # END __init__ method
     
-    def set_current_prop(self):
-        #self.attach_array_to_current_layer()
+    def set_current_prop(self, array):
+        compressed_ary = self.manage_array(array)
+        print(f"Attanching {array} ({compressed_ary}) to Prop: {self.curr_sel.prop}")
+        #self.attach_array_to_current_layer(self.curr_sel.prop, array)
         return
 
     def _on_destroy(self, widget):
@@ -89,7 +110,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         print("Inventory plugin destroyed!")
     
     def build_tw(self):
-        row_infos = self.row_infos = self.prepare_rowInfos()
+        row_infos = self.row_infos # = self.prepare_rowInfos()
 
         self.curr_sel = None
 
@@ -133,14 +154,18 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         
         tw.set_activate_on_single_click(True)
         tw.connect('row-activated', self.on_active_row)
-        self.get_content_area().pack_start(tw, False, False, 1)
+        # paned_container.pack1(tw)
         tw.show_all()
         self.tw = tw
+        return tw
         
     def on_active_row(self, treeview, row_idx, colu):
         print("On Active Row!")
         index_as_int = row_idx.get_indices()[0]
         treeview.get_selection().unselect_all()
+        self.curr_sel = self.row_infos[index_as_int]
+        print(f"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq {self.curr_sel.wid=}")
+        self.stack.set_visible_child(self.curr_sel.wid)
 
         # Additional tests:
         model = treeview.get_model()
@@ -148,7 +173,6 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
             model[self.curr_sel.row_idx][3] = model[self.curr_sel.row_idx][4]
         model[index_as_int][3] = treeview.color_selected
         model[index_as_int][4] = treeview.color_empty
-        self.curr_sel = self.row_infos[index_as_int]
         print(f"CurrSel: {self.curr_sel}")
         print(f"Analogies? {index_as_int=} -> {self.curr_sel.row_idx} -*- {model[row_idx][0]=} -> {self.curr_sel.prop} {model[row_idx][0]}")
     
@@ -169,18 +193,24 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
                    row[idx]=value
         return True
     
-    def prepare_rowInfos(self):
-        json_props_size = (
-            ('kind', 1),
-            ('hoverName', 1),
-            ('suffix', 2),
-            ('skipCond', 3),
-            ('noInteraction', 1),
-            ('roomStatus', 2),
-            ('roomVariable', 2)
-        )
+    def prepare_rowInfos(self, stack):
+        wid_kind = self.build_chooser_kind(isMonoChooser=False, stack_container=stack)
+        wid_unary = self.build_chooser_kind(isMonoChooser=True, stack_container=stack)
+        wid_wars = self.build_chooser_vars(stack)
+        wid_hevernames = self.build_chooser_overnames(stack)
 
-        core_stuff = [SelectionInfo(prop_name, size, idx, None) for idx, (prop_name, size) in enumerate(json_props_size)]
+        json_props_size = (
+            ('kind', 1, wid_kind),
+            ('hoverName', 1, wid_hevernames),
+            ('suffix', 2, wid_wars),
+            ('skipCond', 3, wid_wars),
+            ('noInteraction', 1, wid_unary),
+            ('roomStatus', 2, wid_wars),
+            ('roomVariable', 2, wid_wars)
+        )
+        print("Debug core_stuff")
+        [print(prop_name, size, wid) for idx, (prop_name, size, wid) in enumerate(json_props_size)]
+        core_stuff = [SelectionInfo(prop_name, size, idx, wid) for idx, (prop_name, size, wid) in enumerate(json_props_size)]
 
         self.row_infos = core_stuff
 
@@ -189,16 +219,43 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         #     print(core_stuff[i], i == elem.row_idx, "core_stuff[i]", core_stuff[i] == elem)       
         return core_stuff
     
-    def build_chooser_overnames(self):
+    def build_chooser_overnames(self, stack_container):
         ch = SingleChooser(source=self.load_json_hovernames(), var_kind=None)
-        self.get_content_area().pack_start(ch, True, True, 0)
-        self.row_infos[1].set_widget(ch)
-        ch.get_salient_widget().connect('row-activated', self.handler_chooser_overnames) #, self.han
+        #self.row_infos[1].set_widget(ch)
+        # signal
+        ch.get_salient_widget().connect('row-activated', self.handler_chooser_overnames)
+        # add to container
+        stack_container.add_named(ch, "widget overnames")
         return ch
     def handler_chooser_overnames(self, listbox, row):
         name_idx = row.idx
-        print(f"Choosed: {name_idx} -> {self.row_infos[1].wid.get_readable([name_idx])}")
-        pass
+        #print(f"Choosed: {name_idx} -> {self.row_infos[1].wid.get_readable([name_idx])}")
+        self.set_current_prop([name_idx])
+        return True
+    
+    def build_chooser_vars(self, stack_container):
+        mc = MultiChooser(self.load_json_vars())
+        # signal
+        for elem in mc.get_listboxes():
+           elem.connect('row-activated', self.handler_chooser_vars)
+        # add to container
+        stack_container.add_named(mc, "widget_vars")
+        return mc
+    def handler_chooser_vars(self, listbox, row):
+        print(f"New lbs [{listbox.var_kind}, {row.idx}]")
+        self.set_current_prop([listbox.var_kind, row.idx])
+    def build_chooser_kind(self, isMonoChooser, stack_container):
+        kc = DictChooser(isMonoChooser)
+        for elem in kc.get_salient_widgets():
+            elem.connect('clicked', self.handler_chooser_kind)
+        stack_container.add_named(kc, "widget_mono" if len(kc.source) == 1 else "widget_kinds")
+        return kc
+    def handler_chooser_kind(self, button):
+        print(f"Saving kind: {button.key}")
+        self.set_current_prop([button.key])
+
+
+
 
         
 

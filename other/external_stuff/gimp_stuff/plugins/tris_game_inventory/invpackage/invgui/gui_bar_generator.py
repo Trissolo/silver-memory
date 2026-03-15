@@ -86,6 +86,10 @@ class GuiBarGenerator(ImageStuff):
         if addToContentArea:
             self.get_content_area().pack_start(box, False, False, 1)
         return box
+    def _gui_element_paned(self):
+        paned = Gtk.Paned.new(orientation=Gtk.Orientation.HORIZONTAL)
+        self.get_content_area().pack_start(paned, True, True, 0)
+        return paned
     
     def placeholder_button_click(self, widget):
         model = self.tw.get_model()

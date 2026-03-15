@@ -141,6 +141,8 @@ class MainDialog(GimpUi.Dialog, DataGrabber, CrossDisciplinary):
         stack.get_parent().show_all()
         stack.set_visible_child(fakew)
 
+        print(f"🍈 Stack childern! {stack.get_children()}")# stack parent: {stack.get_parent().get_children()}")
+
         # 'Room Status' parasite 
         core_stuff[5]['wid'] = vars_wid
         # 'Room Var' parasite

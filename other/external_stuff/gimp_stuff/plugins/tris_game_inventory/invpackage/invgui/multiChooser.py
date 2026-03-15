@@ -21,6 +21,8 @@ class MultiChooser(Gtk.Box):
             name = bnames[idx]
             c.set_name(name)
             #print(c.get_name())
+
+            # condition stuff
             bits_amount = 1 << idx
             c.maximum = (1 << bits_amount) -1
             stack.add_titled(c, name, f"{name} (0-{(1<<bits_amount)-1})")
@@ -33,28 +35,17 @@ class MultiChooser(Gtk.Box):
 
         self.pack_start(stack_switcher, False, False, 0)
         self.pack_start(stack, True, True, 0)
-        #print(f"MultiChooser childrens: {self.get_children()[1].get_visible_child().idx}")
+        print(f"MultiChooser childrens:") # {self.get_children()[1].get_visible_child().idx}")
+        [print(f"{i}) {c.get_name()}") for i, c in enumerate(self.get_children())]
+
+        self.add_condition_widgets(stack_switcher)
         self.show_all()
         return
-
-        spinbutton = Gtk.SpinButton.new(Gtk.Adjustment.new(0, 0, 1, 1, 0, 0), 1, 0)
-        spinbutton.set_name("SPIN BUTTON")
-        spinbutton.set_width_chars(3)
-        spinbutton.set_valign(Gtk.Align.START)
-        #spinbutton.show()
-        conf_button = Gtk.Button.new_with_label("🔸")#Accept")
-        conf_button.set_valign(Gtk.Align.START)
-        conf_button.connect('clicked', self.on_confirm_clicked)
-        bottom_div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
-        bottom_div.pack_start(spinbutton, False, False, 0)
-        bottom_div.pack_start(conf_button, False, False, 0)
-        bottom_div.show_all()
-
-        #self.pack_start(spinbutton, True, True, 0)
-        self.pack_start(bottom_div, True, True, 0)
-        for b in stack_switcher.get_children():
-            #b.connect('group-changed', self.radiobutton_on_changed)
-            b.connect('clicked', self.radiobutton_on_changed)
+    def get_stack(self):
+        return self.get_children()[1]
+    def get_listboxes(self):
+        return (sc.get_listbox() for sc in self.get_stack().get_children())
+    
     def get_actual_visible(self):
         return self.get_children()[1].get_visible_child()
     def get_bottom_box(self):
@@ -63,10 +54,10 @@ class MultiChooser(Gtk.Box):
         print(f'Receiving {size}, so the bottom box visibility will be set to {size==3}')
         self.get_bottom_box().set_visible(size==3)
     def get_spinbutton(self):
-         print("Accessing:", self.get_bottom_box().get_children()[0].get_name())
-         return self.get_bottom_box().get_children()[0]
-    def get_kind_from_child(self):
-            return self.get_actual_visible().idx
+        print("HARDCODED Accessing:", self.get_bottom_box().get_children()[1].get_name())
+        return self.get_bottom_box().get_children()[1]
+    # def get_kind_from_child(self):
+    #         return self.get_actual_visible().idx
     def radiobutton_on_changed(self, radiobutton):
             if radiobutton.get_active():
                 spinbutton = self.get_spinbutton()
@@ -74,21 +65,45 @@ class MultiChooser(Gtk.Box):
                 spinbutton.set_value(0)
                 spinbutton.set_range(0, self.get_actual_visible().maximum)
     def on_confirm_clicked(self, button):
-        retrieved_spinbutton = button.get_parent().get_children()[0]
+        retrieved_spinbutton = button.get_parent().get_children()[1]
+        print(f"{button.get_parent() is self.get_bottom_box()=}")
         value = retrieved_spinbutton.get_value_as_int()
         print(f"Confirming: {value}")
         # test hiding entire widget:
-        if value == 99: 
-            button.get_parent().get_parent().hide()
-            fr = button.get_name()
-            wid = button
-            while not wid.get_name() == "az":
-                wid = wid.get_parent()
-            print(f"From: {fr}")
-            wid.greet()
+        # if value == 99: 
+        #     button.get_parent().get_parent().hide()
+        #     fr = button.get_name()
+        #     wid = button
+        #     while not wid.get_name() == "az":
+        #         wid = wid.get_parent()
+        #     print(f"From: {fr}")
+        #     wid.greet()
     def get_readable(self, arr, size):
-        #print("gjhgjhgjhghjgjhgjhghjghjghjghjArr:", arr)
         zero = arr[0]
         uno = arr[1]
         res = f"({self.bnames[zero]}) {self.source[zero][uno]}"
         return res
+    def add_condition_widgets(self, stack_switcher):
+        spinbutton = Gtk.SpinButton.new(Gtk.Adjustment.new(0, 0, 1, 1, 0, 0), 1, 0)
+        spinbutton.set_name("SPIN BUTTON")
+        spinbutton.set_width_chars(3)
+        spinbutton.set_valign(Gtk.Align.START)
+        conf_button = Gtk.Button.new_with_label("🔸")
+        conf_button.set_valign(Gtk.Align.START)
+        conf_button.connect('clicked', self.on_confirm_clicked)
+
+        cond_label = Gtk.Label.new("[ 1, 3, None]")
+        cond_label.set_valign(Gtk.Align.START)
+
+        bottom_div = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)
+        bottom_div.pack_start(cond_label, False, False, 0)
+        bottom_div.pack_start(spinbutton, False, False, 0)
+        bottom_div.pack_start(conf_button, False, False, 0)
+
+        bottom_div.show_all()
+        [print(f"{i}) {c.get_name()} - {c.__class__.__name__}") for i, c in enumerate(bottom_div.get_children())]
+
+        #self.pack_start(spinbutton, True, True, 0)
+        self.pack_start(bottom_div, True, True, 0)
+        for b in stack_switcher.get_children():
+            b.connect('clicked', self.radiobutton_on_changed)
