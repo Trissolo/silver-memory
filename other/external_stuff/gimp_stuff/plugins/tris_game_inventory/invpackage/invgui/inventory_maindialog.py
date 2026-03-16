@@ -108,7 +108,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         other_colums_color = first_colum_color + 1
 
-        print(f"{first_colum_color=}, {other_colums_color=}")
+        #print(f"{first_colum_color=}, {other_colums_color=}")
 
         mytypes = [str] * len(column_headers)
 
@@ -148,10 +148,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         print("On Active Row!")
         index_as_int = row_idx.get_indices()[0]
         treeview.get_selection().unselect_all()
-        #self.curr_sel = self.row_infos[index_as_int]
-        
 
-        # Additional tests:
+        # GUI tests:
         model = treeview.get_model()
         if self.curr_sel is not None:
             model[self.curr_sel.row_idx][3] = model[self.curr_sel.row_idx][4]
@@ -161,15 +159,13 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         # important
         self.curr_sel = self.row_infos[index_as_int]
         self.stack.set_visible_child(self.curr_sel.wid)
-        #print(f"CurrSel: {self.curr_sel}")
-        #print(f"Analogies? {index_as_int=} -> {self.curr_sel.row_idx} -*- {model[row_idx][0]=} -> {self.curr_sel.prop} {model[row_idx][0]}")
     
-    def tw_refresh_hard(self, tw=None, model=None):
-        if tw == None:
-            tw = self.tw
-            model = tw.get_model()
+    def tw_refresh_hard(self, model=None):
+        if model == None:
+            model = self.tw.get_model()
+
         props = self.layer.get_parasite_list()
-        #print(f"{props=}")
+
         for row in model:
             if row[0] in props:
                 row[3] = row[4] = self.CONST_COLOR_SET
@@ -177,7 +173,6 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
                 row[1] = f"{ary}"
             else:
                 for idx, value in enumerate([self.CONST_TEXT_EMPTY, self.CONST_TEXT_EMPTY, self.CONST_COLOR_EMPTY, self.CONST_COLOR_EMPTY], start=1):
-                   #print(f"row[{idx}] = {value}")
                    row[idx]=value
         return True
     
@@ -228,9 +223,6 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         self.row_infos = row_infos
 
-        # print('✨ DEBUG CORE INFO ✨')
-        # for i, elem in enumerate(row_infos):
-        #     print(row_infos[i], i == elem.row_idx, "row_infos[i]", row_infos[i] == elem)       
         return row_infos
     
     def build_chooser_overnames(self): #, stack_container):
@@ -242,7 +234,6 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         return ch
     def handler_chooser_overnames(self, listbox, row):
         name_idx = row.idx
-        #print(f"Choosed: {name_idx} -> {self.row_infos[1].wid.get_readable([name_idx])}")
         self.set_current_prop([name_idx])
         return True
     
@@ -266,45 +257,3 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     def handler_chooser_kind(self, button):
         print(f"Saving kind: {button.key}")
         self.set_current_prop([button.key])
-
-
-
-
-        
-
-
-
-'''
-import gi
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
-
-class MioDialogo(Gtk.Dialog):
-    def __init__(self, genitore):
-        # Inizializzazione con titolo e finestra genitore
-        #super().__init__(title="Esempio Sottoclasse", transient_for=genitore, flags=0)
-        super().__init__(title="Esempio Sottoclasse")
-        
-        # Aggiunta dei pulsanti standard nell'area delle azioni (in basso)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
-        # Accesso all'area dei contenuti per aggiungere widget personalizzati
-        area_contenuti = self.get_content_area()
-        etichetta = Gtk.Label(label="Vuoi confermare questa operazione?")
-        area_contenuti.add(etichetta)
-        # Mostra tutti i widget all'interno del dialogo
-        self.show_all()
-
-# Esempio di utilizzo (senza una finestra principale completa)
-dialogo = MioDialogo(None)
-risposta = dialogo.run()
-
-if risposta == Gtk.ResponseType.OK:
-    print("Hai cliccato OK")
-else:
-    print("Hai annullato")
-
-dialogo.destroy()
-'''
