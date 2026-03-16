@@ -45,6 +45,7 @@ class SingleChooser(Gtk.Box):
     def get_salient_widget(self):
         return self.get_listbox()
     def get_readable(self, arr, fakeparam=None):
+        print("SINGLE", arr)
         return f"{self.source[arr[0]]}"
     def destroy_source_ary(self, widget):
         print("destroy_source_ary!")

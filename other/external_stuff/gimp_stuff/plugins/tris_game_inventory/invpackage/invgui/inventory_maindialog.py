@@ -72,15 +72,20 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
             print(child.get_name())
 
         #10 Ready!
-        self.update_layer()
         self.curr_sel = self.row_infos[0]
+        self.update_layer()
 
         # END __init__ method
     
     def set_current_prop(self, array):
         compressed_ary = self.manage_array(array)
-        print(f"Attanching {array} ({compressed_ary}) to Prop: {self.curr_sel.prop}")
-        #self.attach_array_to_current_layer(self.curr_sel.prop, array)
+        print(f"Attaching {array} ({compressed_ary}) to Prop: {self.curr_sel.prop}")
+        self.attach_array_to_current_layer(self.curr_sel.prop, array)
+        row = self.tw.get_model()[self.curr_sel.row_idx]
+        row[1] = self.curr_sel.wid.get_readable(array, self.curr_sel.size)
+        row[2] = f"{array}"
+        row[3] = row[4] = self.CONST_COLOR_SET
+        
         return
 
     def _on_destroy(self, widget):
@@ -166,11 +171,15 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         props = self.layer.get_parasite_list()
 
-        for row in model:
+        
+
+        for property_index, row in enumerate(model):
             if row[0] in props:
                 row[3] = row[4] = self.CONST_COLOR_SET
                 ary = self.extract_array_from_parasite(row[0])
-                row[1] = f"{ary}"
+                print(f"✂️ tw_refresh_hard: {row[0]} {ary} {self.curr_sel.wid.get_name()}")
+                row[1] = f"{self.row_infos[property_index].wid.get_readable(ary, self.row_infos[property_index].size)}"
+                row[2] = f"{ary}"
             else:
                 for idx, value in enumerate([self.CONST_TEXT_EMPTY, self.CONST_TEXT_EMPTY, self.CONST_COLOR_EMPTY, self.CONST_COLOR_EMPTY], start=1):
                    row[idx]=value

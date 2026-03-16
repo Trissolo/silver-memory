@@ -54,7 +54,12 @@ class GuiBarGenerator(ImageStuff):
     
     def middle_bar_remove_parasite(self, button):
         print("Removing...")
-        return #self.detach_parasite_from_current_layer()
+        selected = self.curr_sel
+
+        self.detach_parasite_from_current_layer(selected.prop)
+        row = self.tw.get_model()[selected.row_idx]
+        row[1] = row [2] = self.CONST_TEXT_EMPTY
+        row[3] = "#784332"
     
     def generate_middle_bar(self):
         box = self._gui_element_box(name="Middle Bar")

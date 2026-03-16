@@ -78,7 +78,8 @@ class MultiChooser(Gtk.Box):
         #         wid = wid.get_parent()
         #     print(f"From: {fr}")
         #     wid.greet()
-    def get_readable(self, arr, size):
+    def get_readable(self, arr, size = None):
+        print("get_readable", arr)
         zero = arr[0]
         uno = arr[1]
         res = f"({self.bnames[zero]}) {self.source[zero][uno]}"
