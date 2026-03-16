@@ -49,7 +49,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self.generate_middle_bar()
 
         #6 the core widgets!
-        self.prepare_rowInfos(stack=self.stack)
+        self.prepare_rowInfos()
 
         #7 the TreeView
         tw = self.build_tw()
@@ -181,7 +181,11 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
                    row[idx]=value
         return True
     
-    def prepare_rowInfos(self, stack):
+    def prepare_rowInfos(self):
+        #return self.prepare_row_infos_game() if self.crossroads else self.prepare_row_infos_inventory()
+        return self.prepare_row_infos_inventory() if self.crossroads else self.prepare_rowInfos_game()
+    
+    def prepare_rowInfos_game(self):
         wid_kind = self.build_chooser_kind(isMonoChooser=False)
         wid_unary = self.build_chooser_kind(isMonoChooser=True)
         widget_vars = self.build_chooser_vars()
@@ -199,6 +203,27 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         
         # print("Debug row_infos")
         # [print(prop_name, size, wid) for idx, (prop_name, size, wid) in enumerate(json_props_size)]
+        row_infos = [SelectionInfo(prop_name, size, idx, wid) for idx, (prop_name, size, wid) in enumerate(json_props_size)]
+
+        self.row_infos = row_infos
+
+        # print('✨ DEBUG CORE INFO ✨')
+        # for i, elem in enumerate(row_infos):
+        #     print(row_infos[i], i == elem.row_idx, "row_infos[i]", row_infos[i] == elem)       
+        return row_infos
+    
+    def prepare_row_infos_inventory(self):
+        #wid_kind = self.build_chooser_kind(isMonoChooser=False)
+        wid_unary = self.build_chooser_kind(isMonoChooser=True)
+        #widget_vars = self.build_chooser_vars()
+        #widget_overnames = self.build_chooser_overnames()
+
+        json_props_size = (
+            ('cumulable', 1, wid_unary),
+            ('special', 1, wid_unary),
+            ('another_prop', 1, wid_unary)
+        )
+        
         row_infos = [SelectionInfo(prop_name, size, idx, wid) for idx, (prop_name, size, wid) in enumerate(json_props_size)]
 
         self.row_infos = row_infos
