@@ -36,6 +36,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         #2 'global' paraphernalia
         self.curr_sel = None
         self.row_infos = None
+        self._swap_condition_ary = [None] * 3
 
         #3 the Stack (empty for now)
         self.stack = Gtk.Stack.new()
@@ -55,9 +56,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         tw = self.build_tw()
 
         #8 initial message on stack
-        l = Gtk.Label("Select a property")
-        l.show()
-        self.stack.add_named(l, "startmessage")
+        self.stack.add_named(self._gui_element_label("Select a property on the left"), "startmessage")
         self.stack.set_visible_child_name("startmessage")
 
         #9 the Paned!
@@ -98,6 +97,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
             elem.clear()
         self.row_infos = self.row_infos.clear()
 
+        self._swap_condition_ary = self._swap_condition_ary.clear()
+
         print("Inventory plugin destroyed!")
     
     def build_tw(self):
@@ -129,8 +130,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         # constants AS!
         self.CONST_TEXT_EMPTY = "---"
-        self.CONST_COLOR_EMPTY = "#343434"
-        self.CONST_COLOR_SELECTED = "#ff0"
+        self.CONST_COLOR_EMPTY = "#333"
+        self.CONST_COLOR_SELECTED = "#454"
         self.CONST_COLOR_SET = "#66a"
 
         # populate the store:
@@ -157,13 +158,27 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         # GUI tests:
         model = treeview.get_model()
         if self.curr_sel is not None:
-            model[self.curr_sel.row_idx][3] = model[self.curr_sel.row_idx][4]
-        model[index_as_int][3] = self.CONST_COLOR_SELECTED
-        model[index_as_int][4] = self.CONST_COLOR_EMPTY
+            prev_row =  model[self.curr_sel.row_idx]
+            prev_row[3] = prev_row[4] = self.CONST_COLOR_EMPTY if prev_row[1] == self.CONST_TEXT_EMPTY else self.CONST_COLOR_SET
+        model[index_as_int][3] = model[index_as_int][4] = self.CONST_COLOR_SELECTED
+        #model[index_as_int][4] = self.CONST_COLOR_EMPTY if model[index_as_int][1] == self.CONST_TEXT_EMPTY else "#894532"
         
         # important
         self.curr_sel = self.row_infos[index_as_int]
+        self.show_appropriate_right_widget()
+
+    def show_appropriate_right_widget(self):
         self.stack.set_visible_child(self.curr_sel.wid)
+        if type(self.curr_sel.wid) is MultiChooser:
+            temp_multichooser = self.curr_sel.wid
+            temp_multichooser.deduce_bottom_box_visibility_by_size(self.curr_sel.size)
+            if self.curr_sel.size == 3:
+                print("Size is 3")
+                self._swap_condition_ary = [None] * 3
+                temp_multichooser.get_condition_preview_label().set_text("select the variable")
+            else:
+                print("Size is lesser than 3")
+        return
     
     def tw_refresh_hard(self, model=None):
         if model == None:
@@ -248,15 +263,39 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     
     def build_chooser_vars(self):
         mc = MultiChooser(self.load_json_vars())
-        # signal
+        # signal 
         for elem in mc.get_listboxes():
            elem.connect('row-activated', self.handler_chooser_vars)
+        #button confirm signal
+        mc.get_confirm_button().connect('clicked', self.handler_confirm_condition)
         # add to container
         self.stack.add_named(mc, "widget_vars")
         return mc
     def handler_chooser_vars(self, listbox, row):
-        print(f"New lbs [{listbox.var_kind}, {row.idx}]")
-        self.set_current_prop([listbox.var_kind, row.idx])
+        print(f"New lbs [{listbox.var_kind}, {row.idx}] SIZE: {self.curr_sel.size}")
+        if self.curr_sel.size == 2:
+            self.set_current_prop([listbox.var_kind, row.idx])
+            return
+        else:
+            self._swap_condition_ary[0] = listbox.var_kind
+            self._swap_condition_ary[1] = row.idx
+            self.curr_sel.wid.get_condition_preview_label().set_text(f"if {listbox.var_kind}, {row.idx} equals")
+    def handler_confirm_condition(self, confirm_button):
+        lab, spin, _ = confirm_button.get_parent().get_children()
+        retrieved_spinbutton = confirm_button.get_parent().get_children()[1]
+        value = retrieved_spinbutton.get_value_as_int()
+        self._swap_condition_ary[2] = value
+        print(f"🚌 Condition: {self._swap_condition_ary}")
+        if self._swap_condition_ary.count(None) != 0:
+            lab.set_text("Select condition first!")
+        else:
+            a, b, c = self._swap_condition_ary
+            lab.set_text(f"  If [{a}, {b}] equals ")
+            self.set_current_prop(self._swap_condition_ary)
+
+        #"bottom box get_children", lab.get_name(), spin.get_name(), confirm_button.get_name())
+
+        
     def build_chooser_kind(self, isMonoChooser):
         kc = DictChooser(isMonoChooser)
         for elem in kc.get_salient_widgets():

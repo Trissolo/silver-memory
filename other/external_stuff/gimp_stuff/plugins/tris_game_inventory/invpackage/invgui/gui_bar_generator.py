@@ -95,10 +95,14 @@ class GuiBarGenerator(ImageStuff):
         paned = Gtk.Paned.new(orientation=Gtk.Orientation.HORIZONTAL)
         self.get_content_area().pack_start(paned, True, True, 0)
         return paned
+    def _gui_element_label(self, text):
+        label = Gtk.Label(text)
+        label.show()
+        return label
     
     def placeholder_button_click(self, widget):
         model = self.tw.get_model()
         print("Model:", model)
-        model[self.curr_sel.row_idx][4] = self.tw.color_set 
+        model[self.curr_sel.row_idx][4] = self.self.CONST_COLOR_SET
         print(self.curr_sel)
         return print(f"Clicked {widget.get_name()}")
