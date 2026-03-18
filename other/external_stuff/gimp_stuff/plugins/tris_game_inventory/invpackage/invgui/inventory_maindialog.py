@@ -279,7 +279,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         else:
             self._swap_condition_ary[0] = listbox.var_kind
             self._swap_condition_ary[1] = row.idx
-            self.curr_sel.wid.get_condition_preview_label().set_text(f"if {listbox.var_kind}, {row.idx} equals")
+            self.curr_sel.wid.get_condition_preview_label().set_text(f"if {listbox.var_kind}, {row.idx} equals (?) -->")
     def handler_confirm_condition(self, confirm_button):
         lab, spin, _ = confirm_button.get_parent().get_children()
         retrieved_spinbutton = confirm_button.get_parent().get_children()[1]
@@ -287,10 +287,10 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self._swap_condition_ary[2] = value
         print(f"🚌 Condition: {self._swap_condition_ary}")
         if self._swap_condition_ary.count(None) != 0:
-            lab.set_text("Select condition first!")
+            lab.set_text("First of all SELECT the condition!")
         else:
             a, b, c = self._swap_condition_ary
-            lab.set_text(f"  If [{a}, {b}] equals ")
+            lab.set_text(f"  If [{a}, {b}] equals {c} <-> ")
             self.set_current_prop(self._swap_condition_ary)
 
         #"bottom box get_children", lab.get_name(), spin.get_name(), confirm_button.get_name())

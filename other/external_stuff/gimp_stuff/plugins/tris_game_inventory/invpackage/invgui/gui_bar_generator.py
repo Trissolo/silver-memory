@@ -34,7 +34,7 @@ class GuiBarGenerator(ImageStuff):
             (GimpUi.ICON_VIEW_REFRESH, self.top_bar_refresh_layer),
             (GimpUi.ICON_GO_PREVIOUS, self.top_bar_next_layer, -1),
             (GimpUi.ICON_GO_NEXT, self.top_bar_next_layer, 1),
-            (GimpUi.ICON_DOCUMENT_SAVE, self.placeholder_button_click)
+            (GimpUi.ICON_DOCUMENT_SAVE, self.top_bar_generate_json)
         )
 
         for params in temp_tuple:
@@ -101,8 +101,7 @@ class GuiBarGenerator(ImageStuff):
         return label
     
     def placeholder_button_click(self, widget):
-        model = self.tw.get_model()
-        print("Model:", model)
-        model[self.curr_sel.row_idx][4] = self.self.CONST_COLOR_SET
-        print(self.curr_sel)
-        return print(f"Clicked {widget.get_name()}")
+        print("Clicked button", widget.get_name())
+
+    def top_bar_generate_json(self, widget):
+        self.generate_json()
