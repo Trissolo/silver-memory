@@ -4,6 +4,7 @@ import { NONE, Scene } from 'phaser';
 import PMStroll from '../modules/actorStuff/pmStroll/PMStroll.mjs';
 
 // specials
+import Thing from '../modules/ThingClass.mjs';
 import RoomBackground from '../modules/RoomBackground.js';
 import Shield from '../modules/Shield.js';
 import Actor from '../modules/Actor.js';
@@ -97,20 +98,21 @@ export class Viewport extends Scene
         this.roomEmitter.on(Phaser.Time.Events.COMPLETE, this.userInteractionOn, this);
 
         // 2) Room 'things'
-        this.thingsGroup = this.add.group({createCallback: function (thing)
-            {
-                thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
-                .setVisible(false)
-                .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, thing.scene.onThingDown)
-                .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, thing.scene.onThingOver)
-                .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, thing.scene.onThingOut)
-                .rdata = null;
+        this.thingsGroup = this.add.group({classType: Thing})
+            // {createCallback: function (thing)
+            // {
+            //     thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
+            //     .setVisible(false)
+            //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, thing.scene.onThingDown)
+            //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, thing.scene.onThingOver)
+            //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, thing.scene.onThingOut)
+            //     .rdata = null;
 
-                thing.isThing = true;
-                thing.isTriggerArea = false;
-                thing.scene.cameras.cameras[1].ignore(thing);
-            }
-        });
+            //     thing.isThing = true;
+            //     thing.isTriggerArea = false;
+            //     thing.scene.cameras.cameras[1].ignore(thing);
+            // }
+        //});
 
         // 2b) Room's triggerzones
         this.triggerZones = new TriggerZoneManager(this);
@@ -219,8 +221,8 @@ export class Viewport extends Scene
             thing.disableInteractive()
               .setActive(false)
               .setVisible(false)
-              .setState(null)
-              .rdata = null;
+              .setThingIdx(null)
+              .setOwnData(null);
         }
 
         this.thingsContainer.clear();
@@ -271,14 +273,16 @@ export class Viewport extends Scene
         {
             if (thingData.kind === 1)
             {
-                //continue;
                 roomThing = this.triggerZones.get();
                 roomThing.input.hitArea.setTo(...thingData.rect);
+                 console.log(`Generating TRIGGER - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
                 // console.log("Rect hitArea:", roomThing.input.hitArea);
+                // continue;
             }
             else
             {
                 roomThing = this.thingsGroup.get(thingData.x, thingData.y);
+                console.log(`Generating Things - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
                 // set the frame, and, if needed, the texture
                 const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
                 roomThing.texture.key === atlasKey? roomThing.setFrame(assembledFrameName): roomThing.setTexture(atlasKey, assembledFrameName);
@@ -288,8 +292,8 @@ export class Viewport extends Scene
             roomThing
                 .setDepth(thingData.kind)
                 .setActive(true)
-                .setState(idx) // Unique ID of the thing among all the things in the room
-                .rdata = thingData;
+                .setThingIdx(idx) // Unique ID of the thing among all the things in the room
+                .setOwnData(thingData);
             
             // let's keep this thing in its container
             this.thingsContainer.set(idx, roomThing);
@@ -365,7 +369,7 @@ export class Viewport extends Scene
 
         console.log(`Clicked thing (${this.type})`);
 
-        scene.roomscript[this.state].call(scene, this, pointer);
+        scene.roomscript[this.thingIdx].call(scene, this, pointer);
     }
 
     onThingOver(pointer)

@@ -6,7 +6,7 @@ export default class rs0
     {
         console.log(thing.frame.name);
         // const roomJson = this.getJson(this.roomId);
-        // const tjson = roomJson.things[thing.state]
+        // const tjson = roomJson.things[thing.roomIdx]
         // console.dir(tjson);
         // console.log("SKIPCOND", tjson.skipCond)
         this.setAsCondition(thing.rdata.skipCond);
@@ -18,7 +18,7 @@ export default class rs0
     static 1(thing){
         console.log(thing.frame.name);
         const roomJson = this.getJson(0);
-        const tjson = roomJson.things[thing.state]
+        const tjson = roomJson.things[thing.roomIdx]
         // console.dir(tjson);
         // console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.getVarValue(tjson.suffix)}`)
         this.toggleBit(tjson.suffix);
@@ -47,7 +47,7 @@ export default class rs0
     // AREA
     static 4(thing, p)
     {
-        this.savegame._setActorLocation(this.player.id, 2, 288, 87, "NE", 0, true);
+        this.savegame._setActorLocation(this.player.id, 2, 288, 87, "NE", 0);
         this.player.walkTo(p.worldX, p.worldY);
         this.player.assignMission(()=>(this.drawRoom(2)));
 
@@ -87,7 +87,7 @@ export default class rs0
         console.log(thing.frame.name);
         console.dir('RData', this.roomJson);
         //const roomJson = this.getJson(0);
-        //const tjson = roomJson.things[thing.state];
+        //const tjson = roomJson.things[thing.roomIdx];
         //const {suffix: vcoords_for_suffix} = tjson;
         const {suffix: vcoords_for_suffix} = thing.rdata;
         console.log(vcoords_for_suffix);

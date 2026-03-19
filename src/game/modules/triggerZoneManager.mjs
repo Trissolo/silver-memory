@@ -1,3 +1,5 @@
+import TriggerZone from "./TriggerZone.mjs";
+
 export default class TriggerZoneManager
 {
     
@@ -24,23 +26,23 @@ export default class TriggerZoneManager
             }
         }
 
-        const zone = new Phaser.GameObjects.Zone(this.scene);
-        zone
-            .setActive(true)
-            .setOrigin(0)
-            .setDepth(1)
-            .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
-            .addToDisplayList()
-            .setSize(0, 0)
-            .rdata = null;
+        const zone = new TriggerZone(this.scene); //Phaser.GameObjects.Zone(this.scene);
+        // zone
+        //     .setActive(true)
+        //     .setOrigin(0)
+        //     .setDepth(1)
+        //     .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
+        //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
+        //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
+        //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
+        //     .addToDisplayList()
+        //     .setSize(0, 0)
+            //.setOwnData(null);
         
-        zone.isThing = true;
-        zone.isTriggerArea = true;
+        //zone.isThing = true;
+        //zone.isTriggerArea = true;
 
-        zone.scene.cameras.cameras[1].ignore(zone);
+        //zone.scene.cameras.cameras[1].ignore(zone);
             
         // console.log("Returning NEW TZone");
         return zone;
@@ -114,7 +116,7 @@ export default class TriggerZoneManager
 
                     triggerArea.isOccupied = true;
 
-                    return this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, actor, true);
+                    return this.scene.roomscript[triggerArea.thingIdx].call(this.scene, triggerArea, actor, true);
                 }
                 else if (triggerArea.isOccupied && !inside)
                 {
@@ -122,7 +124,7 @@ export default class TriggerZoneManager
 
                     triggerArea.isOccupied = false;
 
-                    this.scene.roomscript[triggerArea.state].call(this.scene, triggerArea, actor, false);
+                    this.scene.roomscript[triggerArea.thingIdx].call(this.scene, triggerArea, actor, false);
                 }
             }
         }

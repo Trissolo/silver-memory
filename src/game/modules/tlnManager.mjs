@@ -42,7 +42,7 @@ export default class ThingNameLabelManager
     manageOveredThing(thing)
     {
         console.log("ThingNameLabelManager is managing thing");
-        if (this.lastThing !== thing.state)
+        if (this.lastThing !== thing.thingIdx)
         {
             console.log("New label needed: calculating it");
             this.drawText(thing);
@@ -67,7 +67,7 @@ export default class ThingNameLabelManager
 
     drawText(thing)
     {
-        this.lastThing = thing.state;
+        this.lastThing = thing.thingIdx;
 
         const {bitmapText, labelTexture, fakeRect} = this;
         
