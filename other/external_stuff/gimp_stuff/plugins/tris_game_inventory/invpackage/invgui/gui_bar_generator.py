@@ -67,12 +67,23 @@ class GuiBarGenerator(ImageStuff):
         b = self._gui_element_default_icon_button(GimpUi.ICON_CLOSE, self.middle_bar_remove_parasite)
         box.pack_start(b, False, False, 2)
 
-        self._middle_label = Gtk.Label.new("Generic Message")
+        self._middle_label = self._gui_element_label("Generic Message", True)
         box.pack_start(self._middle_label, True, True, 2)
 
         box.show_all()
         return
-        
+    
+    def middle_bar_write(self, text):
+        borders = " " * 16
+        color = None
+        lab = self._middle_label
+        if lab.get_justify() == Gtk.Justification.LEFT:
+            lab.set_justify(Gtk.Justification.FILL)
+            color="#755"
+        else:
+            lab.set_justify(Gtk.Justification.LEFT)
+            color="#557"
+        return lab.set_markup(f'<span background="{color}">{borders}{text}{borders}</span>')
     
     @staticmethod
     def _gui_element_default_icon_button(icon_name, click_callback, custom_attribute = None):
@@ -95,8 +106,9 @@ class GuiBarGenerator(ImageStuff):
         paned = Gtk.Paned.new(orientation=Gtk.Orientation.HORIZONTAL)
         self.get_content_area().pack_start(paned, True, True, 0)
         return paned
-    def _gui_element_label(self, text):
+    def _gui_element_label(self, text, useMarkup = False):
         label = Gtk.Label(text)
+        label.set_use_markup(useMarkup)
         label.show()
         return label
     
@@ -105,3 +117,4 @@ class GuiBarGenerator(ImageStuff):
 
     def top_bar_generate_json(self, widget):
         self.generate_json()
+        self.middle_bar_write("You can now paste the JSON")
