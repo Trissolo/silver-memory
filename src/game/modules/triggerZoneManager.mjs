@@ -21,31 +21,11 @@ export default class TriggerZoneManager
             if (!zone.active)
             {
                 // console.log("Returning existing TZone");
-
                 return zone;
             }
         }
 
-        const zone = new TriggerZone(this.scene); //Phaser.GameObjects.Zone(this.scene);
-        // zone
-        //     .setActive(true)
-        //     .setOrigin(0)
-        //     .setDepth(1)
-        //     .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
-        //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
-        //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
-        //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
-        //     .addToDisplayList()
-        //     .setSize(0, 0)
-            //.setOwnData(null);
-        
-        //zone.isThing = true;
-        //zone.isTriggerArea = true;
-
-        //zone.scene.cameras.cameras[1].ignore(zone);
-            
-        // console.log("Returning NEW TZone");
-        return zone;
+        return new TriggerZone(this.scene);
     }
 
     supervise(triggerArea, effectuators, startImmediately) //, callIfIn, callIfOutside)

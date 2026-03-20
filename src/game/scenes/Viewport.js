@@ -166,7 +166,7 @@ export class Viewport extends Scene
         //this.bg.benchmarkRotation();
         const w = this.add.image(0, 0, 'atlasbase', 'item_wrench').setOrigin(0);
         const t = this.add.image(0, 0, 'atlasbase', 'gui_selected_item').setOrigin(0);
-        const wb = this.add.image(32, 0, 'atlasbase', 'item_wrench').setOrigin(0);
+        const card = this.add.image(32, 0, 'atlasbase', 'item_card_1').setOrigin(0);
         //this.cameras.main.ignore([t, this.add.grid(0, 0, 64, 128, 32, 32, 0x00b9f2).setAltFillStyle(0x016fce).setOutlineStyle().setOrigin(0)]);
         for (const camera of this.cameras.cameras)
         {

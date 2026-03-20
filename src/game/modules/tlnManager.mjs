@@ -36,6 +36,8 @@ export default class ThingNameLabelManager
 
         this.timeEvent.paused = true;
 
+        this.label.setVisible(false);
+
         return this;
     }
 

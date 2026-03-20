@@ -10,15 +10,14 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
         super(scene, 0, 0);
         this
             .setActive(true)
-            .setOrigin(0)
+            .setOrigin(0, 0)
             .setDepth(1)
             .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
-            .addToDisplayList()
-            .setSize(0, 0);
-            //.setOwnData(null);
+            .setSize(0, 0)
+            .addToDisplayList();
 
         this.scene.cameras.cameras[1].ignore(this);
     }
@@ -46,5 +45,10 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
     getThingIdx()
     {
         return this.thingIdx;
+    }
+
+    getHitArea()
+    {
+        return this.input.hitArea;
     }
 }

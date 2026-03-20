@@ -6,7 +6,7 @@ export default class rs0
     {
         console.log(thing.frame.name);
         // const roomJson = this.getJson(this.roomId);
-        // const tjson = roomJson.things[thing.roomIdx]
+        // const tjson = roomJson.things[thing.thingIdx]
         // console.dir(tjson);
         // console.log("SKIPCOND", tjson.skipCond)
         this.setAsCondition(thing.rdata.skipCond);
@@ -18,7 +18,7 @@ export default class rs0
     static 1(thing){
         console.log(thing.frame.name);
         const roomJson = this.getJson(0);
-        const tjson = roomJson.things[thing.roomIdx]
+        const tjson = roomJson.things[thing.thingIdx]
         // console.dir(tjson);
         // console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.getVarValue(tjson.suffix)}`)
         this.toggleBit(tjson.suffix);
@@ -54,7 +54,10 @@ export default class rs0
     }
 
     // AREA
-    static 5(thing){console.log(thing.input.hitArea);}
+    static 5(thing)
+    {
+        console.log("This one!", thing.getHitArea().contains(this.player.x, this.player.y));
+    }
 
     // crepa
     static 6(thing){console.log(thing.input.hitArea);}
@@ -87,7 +90,7 @@ export default class rs0
         console.log(thing.frame.name);
         console.dir('RData', this.roomJson);
         //const roomJson = this.getJson(0);
-        //const tjson = roomJson.things[thing.roomIdx];
+        //const tjson = roomJson.things[thing.thingIdx];
         //const {suffix: vcoords_for_suffix} = tjson;
         const {suffix: vcoords_for_suffix} = thing.rdata;
         console.log(vcoords_for_suffix);

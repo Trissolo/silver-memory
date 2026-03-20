@@ -1,5 +1,93 @@
 export default class rs1
 {
+    // porta0
+    static 0(thing)
+    {
+        console.log(thing.frame.name, "GAG!");
+
+        this.prepareRoomEvent(
+            [
+                {
+                    at: 0,
+                    target: this,
+                    run: this.userInteractionOff
+                },
+                {
+                    at: 500,
+                    run: () => {
+                        this.toggleBit(thing.rdata.suffix);
+                        this.refreshSpriteFrame(thing);
+                    }
+                },
+                {
+                    at: 800,
+                    run: () => {
+                        this.toggleBit(thing.rdata.suffix);
+                        this.refreshSpriteFrame(thing);
+                    }
+                },
+                {
+                    at: 1200,
+                    run: () => {
+                        this.toggleBit(thing.rdata.suffix);
+                        this.refreshSpriteFrame(thing);
+                    }
+                },
+                {
+                    at: 1500,
+                    run: console.log("RAZZUS", this)
+                }
+            ], true, true, this.roomscript.uffa, this);
+    }
+    
+    // passaggio
+    static 1(thing)
+    {
+        console.log(thing);
+    }
+    
+    // exitEst
+    static 2(ta, actor, boolInside)
+    {
+        console.log(ta);
+    }
+    
+    // exitWest
+    static 3(ta, actor, boolInside)
+    {
+        console.log(ta);
+    }
+    
+    // ITcardA
+    static 4(thing)
+    {
+        console.log(thing);
+    }
+    
+    // r1cabinetDoors1
+    static 5(thing)
+    {
+        const {suffix} = thing.rdata;
+        this.toggleBit(suffix);
+        this.refreshSpriteFrame(thing);
+    }
+    
+    // cabinet
+    static 6(thing)
+    {
+        console.log(thing);
+    }
+    
+    static uffa()
+    {
+        console.log("🩺 E questo era pending");
+        this.cameras.main.setBackgroundColor(0);
+    }
+}
+
+/*
+export default class rs1
+{
     // porta
     static 0(thing)
     {
@@ -78,3 +166,4 @@ export default class rs1
     }
 
 }
+*/
