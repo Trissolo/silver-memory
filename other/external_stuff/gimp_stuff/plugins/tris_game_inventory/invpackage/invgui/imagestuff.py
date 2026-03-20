@@ -184,12 +184,42 @@ class ImageStuff(GenericUtils):
             self.add_peculiar_properties(layer, obj, kind_value, parasites)
             for prop in parasites:
                 obj[prop] = self.get_final_value(prop, layer)
+        
+        # add polygons!
+        room_res['polys_params'] = self.extract_polys()
             
         self.output_string_to_clipboard(json.dumps(room_res, indent=None, sort_keys=True))
         return
     
     def _layer_iterator(self):
         return (l for l in self.image.get_layers() if l.get_visible() and 'kind' in l.get_parasite_list())
+    def extract_polys(self):
+        polys = {}
+        for path in self.image.get_paths():
+            if len(path.get_strokes()) == 0:
+                continue
+            res = []
+            for curr_stroke in path.get_strokes():
+                bp = path.stroke_get_points(curr_stroke).controlpoints
+                res.append(" ".join([str(int(x)) for pair in zip(bp[0::6], bp[1::6]) for x in pair]))
+            polys[path.get_name()] = res[0] if len(res) == 1 else res
+
+        res = {}
+        for key, val in polys.items():  #source_dict.items():
+            first_char = key[0]
+            
+            if first_char not in res:
+                res[first_char] = []
+            
+            # If the key is exactly the single character (e.g., "a"), 
+            # insert it at the front. Otherwise, append to the end.
+            if key == first_char:
+                res[first_char].insert(0, val)
+            else:
+                res[first_char].append(val)
+
+        #print(res)
+        return list(res.values())
 
         
 
