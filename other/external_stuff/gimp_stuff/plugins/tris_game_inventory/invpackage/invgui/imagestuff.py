@@ -125,9 +125,9 @@ class ImageStuff(GenericUtils):
         return True
     
     
-    @staticmethod
-    def extract_id_for_json(image):
-        name = image.get_name()
+    # @staticmethod
+    def extract_id_for_json(self):
+        name = self.image.get_name()
         pruned = name[4:-4]
         return int(pruned) if pruned.isdigit() else name
     
@@ -160,37 +160,36 @@ class ImageStuff(GenericUtils):
 
         props = ['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction', 'roomStatus', 'roomVariable']
 
-        kind, *other, room_props, _ = props #['kind', 'hoverName', 'suffix', 'skipCond', 'noInteraction', 'roomStatus', 'roomVariable']
+        kind, *other, room_props, _ = props
 
         room_props = props[-2:]
 
         things_array = []
-        room_res = {'things': things_array, 'id': self.extract_id_for_json(self.image)}
+        room_res = {'things': things_array, 'id': self.extract_id_for_json()}
 
-        for layer in (l for l in self.image.get_layers() if l.get_visible()):
+        for layer in self._layer_iterator():
             parasites = layer.get_parasite_list()
-            if kind in parasites:
-                kind_value = self.get_final_value(kind, layer)
-                if kind_value == -5:
-                    room_res['bg'] = layer.get_name()
-                    for rp in (potental_rp for potental_rp in room_props if potental_rp in parasites):
-                        room_res[rp] = self.get_final_value(rp, layer)
-                    continue
+            
+            kind_value = self.get_final_value(kind, layer)
+            if kind_value == -5:
+                room_res['bg'] = layer.get_name()
+                for rp in (potental_rp for potental_rp in room_props if potental_rp in parasites):
+                    room_res[rp] = self.get_final_value(rp, layer)
+                continue
 
-                obj = {kind: kind_value}
-                things_array.append(obj)
-                parasites.remove(kind)
-                print(f"Props to add: {parasites}")
-                self.add_peculiar_properties(layer, obj, kind_value, parasites)
-                for prop in parasites:
-                    obj[prop] = self.get_final_value(prop, layer)
-                
-            else:
-                print(f"the Layer {layer.get_name()} has no 'Kind' assigned - '{len(parasites)}' in total")
-        
-        #print(json.dumps(room_res, indent = 0, sort_keys=True))
+            obj = {kind: kind_value}
+            things_array.append(obj)
+            parasites.remove(kind)
+            print(f"Props to add: {parasites}")
+            self.add_peculiar_properties(layer, obj, kind_value, parasites)
+            for prop in parasites:
+                obj[prop] = self.get_final_value(prop, layer)
+            
         self.output_string_to_clipboard(json.dumps(room_res, indent=None, sort_keys=True))
         return
+    
+    def _layer_iterator(self):
+        return (l for l in self.image.get_layers() if l.get_visible() and 'kind' in l.get_parasite_list())
 
         
 

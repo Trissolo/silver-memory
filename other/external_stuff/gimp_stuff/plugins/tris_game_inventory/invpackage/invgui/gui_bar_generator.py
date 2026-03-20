@@ -34,7 +34,9 @@ class GuiBarGenerator(ImageStuff):
             (GimpUi.ICON_VIEW_REFRESH, self.top_bar_refresh_layer),
             (GimpUi.ICON_GO_PREVIOUS, self.top_bar_next_layer, -1),
             (GimpUi.ICON_GO_NEXT, self.top_bar_next_layer, 1),
-            (GimpUi.ICON_DOCUMENT_SAVE, self.top_bar_generate_json)
+            (GimpUi.ICON_DOCUMENT_SAVE, self.top_bar_generate_json),
+            (GimpUi.ICON_FORMAT_JUSTIFY_LEFT, self.top_bar_generate_script)
+            #(GimpUi.ICON_TOOL_CAGE, self.get_polygons, ),
         )
 
         for params in temp_tuple:
@@ -118,3 +120,33 @@ class GuiBarGenerator(ImageStuff):
     def top_bar_generate_json(self, widget):
         self.generate_json()
         self.middle_bar_write("You can now paste the JSON")
+    def top_bar_generate_script(self, widget):
+        res = []
+        triggerArea_params = '(ta, actor, boolInside)'
+        thing_params = '(thing)'
+        
+        for i, layer in enumerate(self._layer_iterator()): #(l for l in self.image.get_layers() if 'kind' in l.get_parasite_list() and self.extract_array_from_parasite('kind', l)[0] > 0)):
+            current_kind = self.extract_array_from_parasite('kind', layer)[0]
+
+            if current_kind == -5:
+                continue
+
+            isTriggerZone = current_kind == 1
+
+            for scripttext in (
+            '',
+            f"// {layer.get_name()}",
+            f'static {i}{triggerArea_params if isTriggerZone else thing_params}',
+            '{',
+            f'    console.log({"ta" if isTriggerZone else "thing"});',
+            '}'
+            ):
+                res.append(scripttext)
+
+        res = '\n    '.join(res)
+
+        header = f'export default class rs{self.extract_id_for_json()}'
+
+        self.output_string_to_clipboard(f'{header}\n{{{res}\n}}\n')
+
+        return self.middle_bar_write("Script ready")
