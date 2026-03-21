@@ -341,13 +341,18 @@ export default class Actor extends Phaser.GameObjects.Sprite
 
     setPolygonalMapByIndex(visibilityMapIndex = 0, idx)
     {
-        console.log("Current json", this.scene.roomJson);
+        // console.log("Current json", this.scene.roomJson);
         this.polygonalMapIdx = visibilityMapIndex;
         //console.log("setPolygonalMapByIndex)",  this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex]);
         //console.log("SCENE.ROOM", this.scene.roomJson.visMaps[visibilityMapIndex]);
         this.polygonalMap = idx === undefined? this.scene.roomJson.visMaps[visibilityMapIndex] : this.scene.getJson(this.scene.roomId).visMaps[visibilityMapIndex];
 
         return this;
+    }
+
+    getPolygonalMapIdx()
+    {
+        return this.polygonalMapIdx;
     }
 
     // panic(pomap, stvec, endvec)

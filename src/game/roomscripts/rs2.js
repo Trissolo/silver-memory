@@ -23,7 +23,11 @@ export default class rs2
     static 1(thing){console.log(thing.frame.name);}
 
     // ponte
-    static 2(thing){console.log(thing.frame.name);}
+    static 2(thing)
+    {
+        console.log(thing.frame.name);
+        this.input.forceDownState(this.input.activePointer, this.bg);
+    }
 
     // siglight
     static 3(thing)
@@ -32,17 +36,18 @@ export default class rs2
     }
 
     // AREA
-    static 4(thing, pointer)
+    static 4(ta, pointer)
     {
         console.log("AREA4, uscita sud");
-        
+        this.toAnotherRoom(ta, 0, 227, 44, "S", 0);
     }
 
     // AREA
-    static 5(thing, pointer)
+    static 5(ta, pointer)
     {
         console.log(arguments.length === 3? "Triggered callback":"Click on zone");
         console.log("TRigger 5");
+        this.toAnotherRoom(ta, 4, 221, 124, "W", 0);
         //console.log(thing, pointer);
     }
 

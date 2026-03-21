@@ -1,3 +1,5 @@
+import { Viewport } from "../scenes/Viewport";
+
 export default class rs1
 {
     // porta0
@@ -5,67 +7,67 @@ export default class rs1
     {
         console.log(thing.frame.name, "GAG!");
 
-        this.prepareRoomEvent(
-            [
-                {
-                    at: 0,
-                    target: this,
-                    run: this.userInteractionOff
-                },
-                {
-                    at: 500,
-                    run: () => {
-                        this.toggleBit(thing.rdata.suffix);
-                        this.refreshSpriteFrame(thing);
-                    }
-                },
-                {
-                    at: 800,
-                    run: () => {
-                        this.toggleBit(thing.rdata.suffix);
-                        this.refreshSpriteFrame(thing);
-                    }
-                },
-                {
-                    at: 1200,
-                    run: () => {
-                        this.toggleBit(thing.rdata.suffix);
-                        this.refreshSpriteFrame(thing);
-                    }
-                },
-                {
-                    at: 1500,
-                    run: console.log("RAZZUS", this)
-                }
-            ], true, true, this.roomscript.uffa, this);
+        // this.prepareRoomEvent(
+        //     [
+        //         {
+        //             at: 0,
+        //             target: this,
+        //             run: this.userInteractionOff
+        //         },
+        //         {
+        //             at: 500,
+        //             run: () => {
+        //                 this.toggleBit(thing.rdata.suffix);
+        //                 this.refreshSpriteFrame(thing);
+        //             }
+        //         },
+        //         {
+        //             at: 800,
+        //             run: () => {
+        //                 this.toggleBit(thing.rdata.suffix);
+        //                 this.refreshSpriteFrame(thing);
+        //             }
+        //         },
+        //         {
+        //             at: 1200,
+        //             run: () => {
+        //                 this.toggleBit(thing.rdata.suffix);
+        //                 this.refreshSpriteFrame(thing);
+        //             }
+        //         },
+        //         {
+        //             at: 1500,
+        //             run: console.log("RAZZUS", this)
+        //         }
+        //     ], true, true, this.roomscript.uffa, this);
     }
     
     // passaggio
     static 1(thing)
     {
-        console.log(thing);
+        console.log("Passaggio", this.player.getPolygonalMapIdx());
+        if (this.player.getPolygonalMapIdx() === 1)
+        {
+            this.input.forceDownState(this.input.activePointer, this.bg);
+        }
     }
     
     // exitEst
     static 2(ta, actor, boolInside)
     {
         console.log(ta);
-    }
-    
-    // exitWest
-    static 3(ta, actor, boolInside)
-    {
-        console.log(ta);
+        // this.toAnotherRoom(ta, 1, 33, 82, "NE", 1);
+        this.toAnotherRoom(ta, 0, 23, this.input.activePointer.worldY, "E", 0);
     }
     
     // ITcardA
-    static 4(thing)
+    static 3(thing)
     {
         console.log(thing);
     }
     
     // r1cabinetDoors1
-    static 5(thing)
+    static 4(thing)
     {
         const {suffix} = thing.rdata;
         this.toggleBit(suffix);
@@ -73,7 +75,32 @@ export default class rs1
     }
     
     // cabinet
+    static 5(thing)
+    {
+        console.log(thing);
+    }
+    
+    // r1_walk_behind
     static 6(thing)
+    {
+        console.log(thing);
+    }
+    
+    // westCover
+    static 7(thing)
+    {
+        console.log(thing);
+    }
+    
+    // r1_exitWest
+    static 8(ta, actor, boolInside)
+    {
+        console.log(ta);
+        this.input.forceDownState(this.input.activePointer, this.bg);
+    }
+    
+    // otherRoomFloor
+    static 10(thing)
     {
         console.log(thing);
     }
@@ -166,4 +193,12 @@ export default class rs1
     }
 
 }
+
+
+// last
+export default class rs1
+{
+    
+}
+
 */

@@ -43,15 +43,15 @@ export default class ThingNameLabelManager
 
     manageOveredThing(thing)
     {
-        console.log("ThingNameLabelManager is managing thing");
+        // console.log("ThingNameLabelManager is managing thing");
         if (this.lastThing !== thing.thingIdx)
         {
-            console.log("New label needed: calculating it");
+            // console.log("New label needed: calculating it");
             this.drawText(thing);
         }
         else
         {
-            console.log("Recycling label");
+            // console.log("Recycling label");
 
             this.label.setVisible(true);
             
@@ -81,7 +81,7 @@ export default class ThingNameLabelManager
 
         fakeRect.setSize(width + border + border, height + border + border);
 
-        console.log("Local:", width, height, "fakeRect", fakeRect)
+        // console.log("Local:", width, height, "fakeRect", fakeRect)
 
         labelTexture
             .clear()
@@ -116,7 +116,7 @@ export default class ThingNameLabelManager
         }
         else
         {
-            console.log("Stopping label timer");
+            // console.log("Stopping label timer");
             this.timeEvent.paused = true;
         }
     }

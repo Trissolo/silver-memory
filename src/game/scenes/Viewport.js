@@ -275,14 +275,14 @@ export class Viewport extends Scene
             {
                 roomThing = this.triggerZones.get();
                 roomThing.input.hitArea.setTo(...thingData.rect);
-                 console.log(`Generating TRIGGER - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
+                // console.log(`Generating TRIGGER - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
                 // console.log("Rect hitArea:", roomThing.input.hitArea);
                 // continue;
             }
             else
             {
                 roomThing = this.thingsGroup.get(thingData.x, thingData.y);
-                console.log(`Generating Things - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
+                // console.log(`Generating Things - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
                 // set the frame, and, if needed, the texture
                 const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
                 roomThing.texture.key === atlasKey? roomThing.setFrame(assembledFrameName): roomThing.setTexture(atlasKey, assembledFrameName);
@@ -319,9 +319,6 @@ export class Viewport extends Scene
             if (thingData.noInteraction)
             {
                 roomThing.disableInteractive(false);
-
-                // do we really have to continue?
-                continue;
             }
             else
             {
@@ -374,9 +371,9 @@ export class Viewport extends Scene
 
     onThingOver(pointer)
     {
-        console.log(`Over`);
+        // console.log(`Over`);
 
-        this.scene._infoThing(this);
+        // this.scene._infoThing(this);
 
         // obj.first?.second
 
@@ -395,7 +392,8 @@ export class Viewport extends Scene
 
     onThingOut(pointer)
     {
-        console.log("Out");
+        //console.log("Out");
+
         this.scene.labelManager.label.setVisible(false);
     }
 
@@ -568,12 +566,12 @@ export class Viewport extends Scene
         {
             const {id} = actor;
             placement = savegame.locations[id];
-            console.log("actorPlacement:", id, placement, "POLYMAP", placement.polygonalMap);
+            console.log("actorPlacement:", id, placement, "POLYMAP", placement.polygonalMapIdx);
             if (placement.room === roomId)
             {
                 actor.setPosition(placement.x, placement.y)
                 .setStandingFrame(placement.facing)
-                .setPolygonalMapByIndex(placement.polygonalMap)
+                .setPolygonalMapByIndex(placement.polygonalMapIdx)
                 .show();
 
                 // // camera follow      
@@ -637,6 +635,23 @@ export class Viewport extends Scene
         this.player.storeCurrentPlacement();
 
         this.setCurrentPlayer(id, gotoRoom);
+    }
+
+    toAnotherRoom(triggerZone, roomId, x, y, facing, polyMapIdx)
+    {
+        console.log(`🍕 toAnotherRoom. From ${this.roomId} to ${roomId} {${x}, ${y}}`);
+        this.savegame._setActorLocation(this.player.id, roomId, x, y, facing, polyMapIdx);
+
+        if (triggerZone.containsVector(this.player))
+        {
+            this.drawRoom(roomId);
+        }
+        else
+        {
+            const p = this.input.activePointer;
+            this.player.walkTo(p.worldX, p.worldY);
+            this.player.assignMission(()=>(this.drawRoom(roomId)));
+        }
     }
 
     // update(time, delta)

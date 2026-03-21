@@ -47,9 +47,10 @@ export default class rs0
     // AREA
     static 4(thing, p)
     {
-        this.savegame._setActorLocation(this.player.id, 2, 288, 87, "NE", 0);
-        this.player.walkTo(p.worldX, p.worldY);
-        this.player.assignMission(()=>(this.drawRoom(2)));
+        // this.savegame._setActorLocation(this.player.id, 2, 288, 87, "NE", 0);
+        // this.player.walkTo(p.worldX, p.worldY);
+        // this.player.assignMission(()=>(this.drawRoom(2)));
+        this.toAnotherRoom(thing, 2, 288, 87, "NE", 0);
 
     }
 
@@ -57,6 +58,7 @@ export default class rs0
     static 5(thing)
     {
         console.log("This one!", thing.getHitArea().contains(this.player.x, this.player.y));
+        this.toAnotherRoom(thing, 1, 135, this.input.activePointer.worldY, "W", 0);
     }
 
     // crepa

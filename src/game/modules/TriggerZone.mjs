@@ -51,4 +51,9 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
     {
         return this.input.hitArea;
     }
+
+    containsVector(vector)
+    {
+        return this.getHitArea().contains(vector.x, vector.y);
+    }
 }

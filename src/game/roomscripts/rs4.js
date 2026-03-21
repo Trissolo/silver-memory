@@ -30,5 +30,8 @@ export default class rs4
     static 2(thing){console.log(thing.frame.name);}
 
     // AREA
-    static 3(thing){console.log(thing);}
+    static 3(ta)
+    {
+        this.toAnotherRoom(ta, 3, 22, 67, "E", 0);
+    }
 }
