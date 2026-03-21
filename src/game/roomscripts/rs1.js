@@ -48,7 +48,7 @@ export default class rs1
         console.log("Passaggio", this.player.getPolygonalMapIdx());
         if (this.player.getPolygonalMapIdx() === 1)
         {
-            this.input.forceDownState(this.input.activePointer, this.bg);
+            this.emulateBgClick();
         }
     }
     
@@ -96,7 +96,7 @@ export default class rs1
     static 8(ta, actor, boolInside)
     {
         console.log(ta);
-        this.input.forceDownState(this.input.activePointer, this.bg);
+        this.emulateBgClick();
     }
     
     // otherRoomFloor
@@ -192,13 +192,6 @@ export default class rs1
         this.cameras.main.setBackgroundColor(0);
     }
 
-}
-
-
-// last
-export default class rs1
-{
-    
 }
 
 */

@@ -11,7 +11,7 @@ export default class TriggerZoneManager
     constructor(scene)
     {
         this.scene = scene;
-        this.timeEvent = this.scene.time.addEvent({ paused: true, delay: 500, callback: this.check, callbackScope: this, loop: true });
+        this.timeEvent = this.scene.time.addEvent({ paused: true, delay: 90, callback: this.check, callbackScope: this, loop: true });
     }
 
     get()

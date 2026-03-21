@@ -654,6 +654,11 @@ export class Viewport extends Scene
         }
     }
 
+    emulateBgClick()
+    {
+        this.input.forceDownState(this.input.activePointer, this.bg);
+    }
+
     // update(time, delta)
     // {
     //     if (this.player.walk.aTargetExists)

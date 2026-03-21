@@ -1,3 +1,5 @@
+import TriggerZone from "../modules/TriggerZone.mjs";
+
 export default class rs2
 {
     static onRoomReady()
@@ -26,7 +28,7 @@ export default class rs2
     static 2(thing)
     {
         console.log(thing.frame.name);
-        this.input.forceDownState(this.input.activePointer, this.bg);
+        this.emulateBgClick();
     }
 
     // siglight
@@ -58,8 +60,25 @@ export default class rs2
     }
 
     // AREA
+    /**
+     * @this {Viewport}
+     * @param {TriggerZone} ta
+     * @param {*} actor 
+     * @param {*} boolInside 
+     */
     static 7(ta, actor, boolInside)
     {
+        if (typeof boolInside === 'boolean')
+        {
+            console.log(ta.getOwnData())
+            // spec. value
+            const bridgeStatus = this.getVarValue(this.getExistentThing(2).getOwnData().skipCond[0]);
+            if (bridgeStatus === 0)
+            {
+                actor.walkTo(ta.getHitArea().centerX > actor.x? 42:145, actor.y);
+            }
+        }
+        console.log("Boolinside:", typeof boolInside, boolInside)
         console.log(arguments.length === 3? "Triggered callback":"Click on zone");
             
         this.cameras.main.setBackgroundColor(Phaser.Math.Between(255, 0xbababa));

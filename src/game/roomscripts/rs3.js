@@ -11,7 +11,7 @@ export default class rs3
     static 1(ta, actor, boolInside)
     {
         console.log(ta);
-        this.toAnotherRoom(ta, 2, 20, this.input.activePointer.worldY, "E", 0);
+        this.toAnotherRoom(ta, 2, 30, 40, "E", 0);
     }
     
     // us
