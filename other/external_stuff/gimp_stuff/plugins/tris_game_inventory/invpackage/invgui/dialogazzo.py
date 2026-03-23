@@ -1,3 +1,4 @@
+'''
 import gi
 
 gi.require_version("Gimp", "3.0")
@@ -109,6 +110,45 @@ class PixelBitstream:
 #test = PixelBitstream(Gimp.get_images()[0].get_layers()[0])
 #test.process()
 #test.destroy()
+'''
+def bitstream(layer):
+    layer = layer
+    width = layer.get_width()
+    height = layer.get_height()
+    bitstream = []
+    
+    byte = 0
+    bit_count = 0
+    for pixel in (layer.get_pixel(x, y) for y in range(height) for x in range(width)):
+        if pixel is None:
+            break
+        
+        # Shift and set bit if the pixel is red
+        byte <<= 1
+        byte |= (1 if pixel.get_rgba().red == 1.0 else 0)
+        bit_count += 1
+        
+        if bit_count == 8:
+            bitstream.append(byte)
+            byte = 0
+            bit_count = 0
+    
+    # Avoid fencepost error
+    if bit_count != 0:
+        # Shift the bits to the left to align them as a full byte 
+        # (e.g., 101 becomes 10100000) or keep as-is based on your protocol
+        byte <<= (8 - bit_count)
+        bitstream.append(byte)
+    binary_str = "".join(f"{b:08b}" for b in bitstream)
+        
+    # Chunk the string by the layer width for a visual 'map'
+    for i in range(0, len(binary_str), width):
+        print(binary_str[i : i + width])
+    print(f'oriX = {width};\noriY = {height};')
+    return bitstream
+    
+image = Gimp.get_images()[0]
+bitstream(image.get_layers()[0])
 
 '''
 class Example extends Phaser.Scene
