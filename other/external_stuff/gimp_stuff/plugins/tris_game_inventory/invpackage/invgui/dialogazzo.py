@@ -9,48 +9,171 @@ from gi.repository import GimpUi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-class PixelBitstream():
+class PixelBitstream:
     def __init__(self, layer):
         self.layer = layer
-        self.x = 0
-        self.y = 0
         self.width = layer.get_width()
-        self.end = False
+        self.height = layer.get_height()
         self.bitstream = []
-    def advance(self):
-        self.x += 1
-        if self.x == self.width:
-            self.x = 0
-            self.y += 1
-    def get_byte(self):
+    @property
+    def pixels(self):
+        """A generator that yields pixels row by row."""
+        for y in range(self.height):
+            for x in range(self.width):
+                yield self.layer.get_pixel(x, y)
+    def process(self):
+        """Reads pixels into 8-bit chunks until the layer ends."""
         byte = 0
-        for i in range(8):
-            value = self.layer.get_pixel(self.x, self.y)
-            byte <<= 1
-            if value is None and not self.end:
-                self.end = True
-            if value and value.get_rgba().red == 1.0:
-                byte |= 1
-            #byte |= 0 if (self.end is True or value.get_rgba().red) == 0.0 else 1
-            self.advance()
-        return self.bitstream.append(byte)
-    def start(self):
-        while not self.end:
-            self.get_byte()
-        self._result(self.bitstream)
-        return self.bitstream
-    def destroy(self):
-        self.layer = None
-        self.bitstream = self.bitstream.clear()
-        return None
-    def _result(self, res):
-        str_stream = "".join([f"{elem:0>8b}" for elem in res])
-        k = self.width
-        chunks = [str_stream[i:i+k] for i in range(0, len(str_stream), k)]
-        for elem in chunks:
-            print(elem)
-        return str_stream
+        bit_count = 0
         
+        for pixel in self.pixels:
+            if pixel is None:
+                break
+                
+            # Shift and set bit if the pixel is red
+            byte = (byte << 1) | (1 if pixel.get_rgba().red == 1.0 else 0)
+            bit_count += 1
+            
+            if bit_count == 8:
+                self.bitstream.append(byte)
+                byte = 0
+                bit_count = 0
+        
+        # Avoid fencepost error
+        if bit_count != 0:
+            # Shift the bits to the left to align them as a full byte 
+            # (e.g., 101 becomes 10100000) or keep as-is based on your protocol
+            byte <<= (8 - bit_count)
+            self.bitstream.append(byte)
+        self.show_summary()
+        return self.bitstream
+    def show_summary(self):
+        """Prints a binary visualization of the bitstream."""
+        # Convert all bytes to binary strings at once
+        binary_str = "".join(f"{b:08b}" for b in self.bitstream)
+        
+        # Chunk the string by the layer width for a visual 'map'
+        for i in range(0, len(binary_str), self.width):
+            print(binary_str[i : i + self.width])
+        print(f'oriX = {self.width};\noriY = {self.height};')
+        #print(f'{self.bitstream};')
+        return binary_str
+    def reset_stream(self):
+        return self.bitstream.clear()
+    def destroy(self):
+        """Resets the stream data."""
+        self.bitstream = self.reset_stream()
+        self.layer = None
+    def save_to_file(self, filepath):
+        """Writes the bitstream as a binary file."""
+        try:
+            # Convert list of ints [0, 255] directly to a bytes object
+            binary_data = bytes(self.bitstream)
+            
+            with open(filepath, "wb") as f:
+                f.write(binary_data)
+                
+            print(f"Successfully saved {len(binary_data)} bytes to {filepath}")
+        except IOError as e:
+            print(f"Error saving file: {e}")
+    
+    def apply_to_layer(self, target_layer):
+        """Writes the bitstream back into a GIMP layer as red/black pixels."""
+        # 1. Create a bit generator to yield 1s and 0s one by one
+        def bit_generator():
+            for byte in self.bitstream:
+                for i in range(7, -1, -1):  # Extract bits from MSB to LSB
+                    yield (byte >> i) & 1
+        
+        bits = bit_generator()
+        width = target_layer.get_width()
+        height = target_layer.get_height()
+        colorA = Gimp.context_get_foreground()
+        colorB = colorA.duplicate()
+        colorA.set_rgba(1.0, 1.0, 1.0, 1.0)
+        colorB.set_rgba(0.0, 0.0, 0.0, 0.0)
+        
+        # 2. Iterate through pixels and set colors based on bits
+        for y in range(height):
+            for x in range(width):
+                try:
+                    bit = next(bits)
+                    # Create a Gimp.RGB color (Red for 1, Black for 0)
+                    #color = Gimp.RGB()
+                    color = colorA if bit else colorB
+                    target_layer.set_pixel(x, y, color)
+                except StopIteration:
+                    return # No more bits left to write
+
+
+#test = PixelBitstream(Gimp.get_images()[0].get_layers()[0])
+#test.process()
+#test.destroy()
+
+'''
+class Example extends Phaser.Scene
+{
+oriX = 31;
+oriY = 13;
+base = [63, 143, 159, 254, 0, 0, 0, 4, 0, 0, 0, 4, 4, 7, 249, 136, 28, 7, 247, 144, 124, 7, 230, 97, 252, 7, 192, 199, 248, 7, 25, 159, 248, 6, 122, 63, 248, 4, 102, 0, 0, 0, 8, 0, 0, 0, 26, 126, 3, 255, 224];
+
+    create ()
+    {
+        const buffer = new Uint8Array(this.oriX * this.oriY * 4);
+
+        let idx = 0;
+
+        for (const elem of this.base)
+        {
+            for (let pos = 7; pos >= 0; pos--) 
+            {
+                const val = ((elem >> pos) & 1)? 255: 0;
+    
+                for (let i = 0; i < 4; i++)
+                {
+                    buffer[idx++] = val;
+                }
+            }
+        }
+
+        console.log(idx, buffer)
+        
+        console.log(this.textures.addUint8Array("test", buffer, this.oriX, this.oriY));
+
+        this.add.image(20,20,'test').setOrigin(0).setScale(6);
+
+        return false;
+        
+        const config = {
+            image: 'test',
+            width: 8,
+            height: 8,
+            chars: '0123456789%ab',
+            charsPerRow: 13
+        }
+            
+
+        this.cache.bitmapFont.add('font0', Phaser.GameObjects.RetroFont.Parse(this, config));
+        
+        
+        this.add.bitmapText(10, 10, 'font0', "50%aaab").setScale(3).setOrigin(0);
+    } 
+}
+
+
+const config = {
+    type: Phaser.WEBGL,
+    width: 800,
+    height: 600,
+    backgroundColor: '#2d2d2d',
+    parent: 'phaser-example',
+    scene: Example
+};
+
+const game = new Phaser.Game(config);
+'''
+
+
 
 '''
 class Example extends Phaser.Scene
@@ -61,19 +184,15 @@ class Example extends Phaser.Scene
 
     create ()
     {
-        console.log(this.base.length)// === this.oriX * this.oriY)
-        
-        const buffer = new Uint8Array(this.oriX * this.oriY*4);//this.base.length * 4); //this.cache.binary.get('mod');
-        let idx = 0
+        const buffer = new Uint8Array(this.oriX * this.oriY * 4);
+
+        let idx = 0;
+
         for (const elem of this.base)
         {
-            //console.log(elem.toString(2))
             for (const char of elem.toString(2).padStart(8, "0"))
             {
-                //console.log(char)
-                
                 const val = char === "1"? 255 : 0
-                //console.log(elem, idx++)
                 buffer[idx++] = val;
                 buffer[idx++] = val;
                 buffer[idx++] = val;
@@ -117,6 +236,53 @@ const config = {
 
 const game = new Phaser.Game(config);
 '''
+
+'''
+class PixelBitstream():
+    def __init__(self, layer):
+        self.layer = layer
+        self.x = 0
+        self.y = 0
+        self.width = layer.get_width()
+        self.end = False
+        self.bitstream = []
+    def advance(self):
+        self.x += 1
+        if self.x == self.width:
+            self.x = 0
+            self.y += 1
+    def get_byte(self):
+        byte = 0
+        for i in range(8):
+            value = self.layer.get_pixel(self.x, self.y)
+            byte <<= 1
+            if value is None and not self.end:
+                self.end = True
+            if value and value.get_rgba().red == 1.0:
+                byte |= 1
+            #byte |= 0 if (self.end is True or value.get_rgba().red) == 0.0 else 1
+            self.advance()
+        return self.bitstream.append(byte)
+    def start(self):
+        while not self.end:
+            self.get_byte()
+        self._result(self.bitstream)
+        return self.bitstream
+    def destroy(self):
+        self.layer = None
+        self.bitstream = self.bitstream.clear()
+        return None
+    def _result(self, res):
+        str_stream = "".join([f"{elem:0>8b}" for elem in res])
+        k = self.width
+        chunks = [str_stream[i:i+k] for i in range(0, len(str_stream), k)]
+        for elem in chunks:
+            print(elem)
+        return str_stream
+'''        
+
+
+
 
 
 '''
