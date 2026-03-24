@@ -14,6 +14,7 @@ from ..misc.selectioninfo import SelectionInfo
 from .singleChooser import SingleChooser
 from .multiChooser import MultiChooser
 from .dictChooser import DictChooser
+from .unaryChooser import UnaryChooser
 
 class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     def __init__(self, image, crossroads, *args):
@@ -205,8 +206,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         return self.prepare_row_infos_inventory() if self.crossroads else self.prepare_rowInfos_game()
     
     def prepare_rowInfos_game(self):
-        wid_kind = self.build_chooser_kind(isMonoChooser=False)
-        wid_unary = self.build_chooser_kind(isMonoChooser=True)
+        wid_kind = self.build_chooser_kind()
+        wid_unary = self.build_unary()
         widget_vars = self.build_chooser_vars()
         widget_overnames = self.build_chooser_overnames()
 
@@ -232,8 +233,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         return row_infos
     
     def prepare_row_infos_inventory(self):
-        #wid_kind = self.build_chooser_kind(isMonoChooser=False)
-        wid_unary = self.build_chooser_kind(isMonoChooser=True)
+        #wid_kind = self.build_chooser_kind()
+        wid_unary = self.build_unary()
         #widget_vars = self.build_chooser_vars()
         #widget_overnames = self.build_chooser_overnames()
 
@@ -296,8 +297,8 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         #"bottom box get_children", lab.get_name(), spin.get_name(), confirm_button.get_name())
 
         
-    def build_chooser_kind(self, isMonoChooser):
-        kc = DictChooser(isMonoChooser)
+    def build_chooser_kind(self):
+        kc = DictChooser()
         for elem in kc.get_salient_widgets():
             elem.connect('clicked', self.handler_chooser_kind)
         self.stack.add_named(kc, "widget_mono" if len(kc.source) == 1 else "widget_kinds")
@@ -305,3 +306,9 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
     def handler_chooser_kind(self, button):
         print(f"Saving kind: {button.key}")
         self.set_current_prop([button.key])
+    def build_unary(self):
+        unary = UnaryChooser()
+        unary.get_salient_widget().connect('clicked', self.handler_chooser_kind)
+        self.stack.add_named(unary, "widget_mono")
+        return unary
+

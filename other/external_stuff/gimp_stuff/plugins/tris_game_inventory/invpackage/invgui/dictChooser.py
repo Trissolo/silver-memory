@@ -3,17 +3,17 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 class DictChooser(Gtk.Box):
-    def __init__(self, isMonoChooser=False):
+    def __init__(self):#, isMonoChooser=False):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-        tempnames = None
-        if isMonoChooser:
-            self.set_name("MonoChooser")
-            self.source = {1: "<- is set"}
-            tempnames = {1: "Add prop."}
-        else:
-            self.set_name("kindselectorbox")
-            self.source = tempnames = self.kind_dictionary()
-        for key, value in tempnames.items():
+        #tempnames = None
+        # if isMonoChooser:
+        #     self.set_name("MonoChooser")
+        #     self.source = {1: "<- is set"}
+        #     tempnames = {1: "Add prop."}
+        # else:
+        self.set_name("kindselectorbox")
+        self.source = self.kind_dictionary()
+        for key, value in self.source.items():
             button = Gtk.Button.new_with_label(f"{value} ({key})")
             button.key = key
             button.set_halign(1)

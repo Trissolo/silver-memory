@@ -111,6 +111,11 @@ class PixelBitstream:
 #test.process()
 #test.destroy()
 '''
+import gi
+
+gi.require_version("Gimp", "3.0")
+from gi.repository import Gimp
+
 def bitstream(layer):
     layer = layer
     width = layer.get_width()
