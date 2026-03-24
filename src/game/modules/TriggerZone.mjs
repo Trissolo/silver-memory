@@ -4,6 +4,8 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
     isTriggerArea = true;
     rdata = null;
     thingIdx = null
+    isOccupied = false;
+
 
     constructor(scene, x, y)
     {

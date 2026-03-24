@@ -15,8 +15,14 @@ export default class Shield extends Phaser.GameObjects.Image
         .setOrigin(0)
         .addToDisplayList()
         .lower();
+
         //console.log('Scene Scale', this.scene.scale.baseSize);
         //console.log('Main camera size', this.scene.cameras.main.width, this.scene.cameras.main.height);
+        
+        console.log("The 'cameraFilter' property has a value of '0' if a game object is drawn by each camera ->", this.cameraFilter);
+        this.raise();
+        this.scene.cameras.cameras[1].ignore(this);
+        console.log("However, if the second camera does not draw an object, its 'cameraFilter' property has a value of '2' ->", this.cameraFilter);
   }
 
   raise()
