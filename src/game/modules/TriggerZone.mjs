@@ -33,8 +33,6 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
             .addToDisplayList();
 
         this.scene.cameras.cameras[1].ignore(this);
-        console.log("New TriggerZone", this.input);
-        console.log("creating TZ!- polyparams:", polyParams);
     }
 
 

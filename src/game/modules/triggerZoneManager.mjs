@@ -17,6 +17,7 @@ export default class TriggerZoneManager
 
     get(polyParams)
     {
+        console.log("TZContainer SIZE:", this.polyChildren.size, this.children.size);
         const zoneContainer = polyParams? this.polyChildren: this.children
         for (const zone of zoneContainer)
         {

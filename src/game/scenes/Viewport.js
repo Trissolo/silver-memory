@@ -273,20 +273,18 @@ export class Viewport extends Scene
         {
             if (thingData.kind === 1)
             {
-                console.log("POLY o RECT?", thingData.poly, thingData.rect);
                 if (thingData.poly)
                 {
-                    roomThing = this.triggerZones.get(thingData.poly)
+                    roomThing = this.triggerZones.get(thingData.poly);
+
                     roomThing.input.hitArea.setTo(thingData.poly);
                 }
                 else
                 {    
                     roomThing = this.triggerZones.get();
+                    
                     roomThing.input.hitArea.setTo(...thingData.rect);
                 }
-                // console.log(`Generating TRIGGER - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
-                console.log("TriggerZone:", thingData);
-                // continue;
             }
             else
             {
