@@ -2,19 +2,30 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
 {
     isThing = true;
     isTriggerArea = true;
+    hasPolygon = false;
     rdata = null;
     thingIdx = null
     isOccupied = false;
 
 
-    constructor(scene, x, y)
+    constructor(scene, polyParams)
     {
         super(scene, 0, 0);
+        
+        if (polyParams)
+        {
+            this.hasPolygon = true;
+            this.setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer', hitArea: new Phaser.Geom.Polygon(polyParams), hitAreaCallback: Phaser.Geom.Polygon.Contains})
+        }
+        else
+        {        
+            this.setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'});
+        }
+
         this
             .setActive(true)
             .setOrigin(0, 0)
             .setDepth(1)
-            .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
@@ -22,6 +33,8 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
             .addToDisplayList();
 
         this.scene.cameras.cameras[1].ignore(this);
+        console.log("New TriggerZone", this.input);
+        console.log("creating TZ!- polyparams:", polyParams);
     }
 
 

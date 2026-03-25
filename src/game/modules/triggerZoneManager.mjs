@@ -5,6 +5,7 @@ export default class TriggerZoneManager
     
     scene;
     children = new Set();
+    polyChildren = new Set();
     scrutinizedOnes = new Map();
     timeEvent;
 
@@ -14,9 +15,10 @@ export default class TriggerZoneManager
         this.timeEvent = this.scene.time.addEvent({ paused: true, delay: 90, callback: this.check, callbackScope: this, loop: true });
     }
 
-    get()
+    get(polyParams)
     {
-        for (const zone of this.children)
+        const zoneContainer = polyParams? this.polyChildren: this.children
+        for (const zone of zoneContainer)
         {
             if (!zone.active)
             {
@@ -25,7 +27,9 @@ export default class TriggerZoneManager
             }
         }
 
-        return new TriggerZone(this.scene);
+        const zone = new TriggerZone(this.scene, polyParams);
+        zoneContainer.add(zone);
+        return zone;
     }
 
     supervise(triggerArea, effectuators, startImmediately) //, callIfIn, callIfOutside)

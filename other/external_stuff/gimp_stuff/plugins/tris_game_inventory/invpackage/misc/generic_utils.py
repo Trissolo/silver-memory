@@ -39,7 +39,6 @@ class GenericUtils():
         if len(duplicates):
             self.output_message("\n".join(*duplicates)) # self.output_message(f"Duplicates:\n{'\n'.join(duplicates)}")
 
-
         return res[0] if len(res) == 1 else res
     
     def load_json_vars(self):

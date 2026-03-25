@@ -131,11 +131,15 @@ class ImageStuff(GenericUtils):
         pruned = name[4:-4]
         return int(pruned) if pruned.isdigit() else name
     
-    @staticmethod
-    def add_peculiar_properties(layer, obj, kind_value, remaining_props):
+    #@staticmethod
+    def add_peculiar_properties(self, layer, obj, kind_value, remaining_props):
         _succ, x, y = layer.get_offsets()
         if kind_value == 1:
-            obj['rect'] = [x, y, layer.get_width(), layer.get_height()]
+            pot_poly = self.extract_poly_hitarea(layer)
+            if pot_poly:
+                obj['poly'] = pot_poly
+            else:
+                obj['rect'] = [x, y, layer.get_width(), layer.get_height()]
             if 'suffix' in remaining_props:
                 print("Removing 'suffix'")
                 remaining_props.remove('suffix')
@@ -196,7 +200,7 @@ class ImageStuff(GenericUtils):
     def extract_polys(self):
         polys = {}
         for path in self.image.get_paths():
-            if len(path.get_strokes()) == 0:
+            if len(path.get_strokes()) == 0 or len(path.get_name()) > 5:
                 continue
             res = []
             for curr_stroke in path.get_strokes():
@@ -220,6 +224,15 @@ class ImageStuff(GenericUtils):
 
         #print(res)
         return list(res.values())
+    def extract_poly_hitarea(self, layer):
+        gene = (p for p in self.image.get_paths() if p.get_name() == layer.get_name())
+        result = None
+        for path in gene:
+            for curr_stroke in path.get_strokes():
+                bp = path.stroke_get_points(curr_stroke).controlpoints
+                result = " ".join([str(int(x)) for pair in zip(bp[0::6], bp[1::6]) for x in pair])
+        return result
+    
 
         
 

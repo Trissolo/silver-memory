@@ -168,12 +168,12 @@ export class Viewport extends Scene
         const t = this.add.image(0, 0, 'atlasbase', 'gui_selected_item').setOrigin(0);
         const card = this.add.image(32, 0, 'atlasbase', 'item_card_1').setOrigin(0);
         //this.cameras.main.ignore([t, this.add.grid(0, 0, 64, 128, 32, 32, 0x00b9f2).setAltFillStyle(0x016fce).setOutlineStyle().setOrigin(0)]);
-        for (const camera of this.cameras.cameras)
-        {
-            const {x, y, width, height, scrollX, scrollY} = camera;
+        // for (const camera of this.cameras.cameras)
+        // {
+        //     const {x, y, width, height, scrollX, scrollY} = camera;
 
-            console.log(x, y, width, height, scrollX, scrollY);
-        }
+        //     console.log(x, y, width, height, scrollX, scrollY);
+        // }
     }
 
     pressedZ(eve)
@@ -273,10 +273,19 @@ export class Viewport extends Scene
         {
             if (thingData.kind === 1)
             {
-                roomThing = this.triggerZones.get();
-                roomThing.input.hitArea.setTo(...thingData.rect);
+                console.log("POLY o RECT?", thingData.poly, thingData.rect);
+                if (thingData.poly)
+                {
+                    roomThing = this.triggerZones.get(thingData.poly)
+                    roomThing.input.hitArea.setTo(thingData.poly);
+                }
+                else
+                {    
+                    roomThing = this.triggerZones.get();
+                    roomThing.input.hitArea.setTo(...thingData.rect);
+                }
                 // console.log(`Generating TRIGGER - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
-                // console.log("Rect hitArea:", roomThing.input.hitArea);
+                console.log("TriggerZone:", thingData);
                 // continue;
             }
             else

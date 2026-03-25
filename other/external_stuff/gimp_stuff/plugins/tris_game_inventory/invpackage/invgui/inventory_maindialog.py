@@ -301,7 +301,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         kc = DictChooser()
         for elem in kc.get_salient_widgets():
             elem.connect('clicked', self.handler_chooser_kind)
-        self.stack.add_named(kc, "widget_mono" if len(kc.source) == 1 else "widget_kinds")
+        self.stack.add_named(kc, "widget_kinds")
         return kc
     def handler_chooser_kind(self, button):
         print(f"Saving kind: {button.key}")
