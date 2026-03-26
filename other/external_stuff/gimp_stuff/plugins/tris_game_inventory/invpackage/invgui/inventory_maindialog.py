@@ -44,7 +44,6 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self.stack = Gtk.Stack.new()
         self.tw = Gtk.TreeView.new()
 
-
         #4 Populate the Top Bar
         self.generate_top_bar()
 

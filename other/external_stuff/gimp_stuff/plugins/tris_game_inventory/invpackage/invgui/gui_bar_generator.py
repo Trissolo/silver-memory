@@ -25,7 +25,7 @@ class GuiBarGenerator(ImageStuff):
     def top_bar_next_layer(self, button):
         self.select_adjacent_layer(button.dir).update_layer()
 
-    def generate_top_bar(self):
+    def generate_top_bar_game(self):
         # container
         box = self._gui_element_box(name="Top Bar")
 
@@ -36,6 +36,37 @@ class GuiBarGenerator(ImageStuff):
             (GimpUi.ICON_GO_NEXT, self.top_bar_next_layer, 1),
             (GimpUi.ICON_DOCUMENT_SAVE, self.top_bar_generate_json),
             (GimpUi.ICON_FORMAT_JUSTIFY_LEFT, self.top_bar_generate_script)
+            #(GimpUi.ICON_TOOL_CAGE, self.get_polygons, ),
+        )
+
+        for params in temp_tuple:
+            b = self._gui_element_default_icon_button(*params)
+            box.pack_start(b, False, False, 2)
+     
+        # add label
+        self._top_label = label = Gtk.Label.new("Layer name")
+        box.pack_start(label, True, True, 2)
+        #box.set_center_widget(label)
+        box.reorder_child(label, 3)
+        
+        
+        # Done! Show the Bar!
+        box.show_all()
+        return True
+    
+    def generate_top_bar(self):
+        return self.generate_top_bar_game() if self.crossroads else self.generate_top_bar_inventory()
+    
+    def generate_top_bar_inventory(self):
+        box = self._gui_element_box(name="Top Bar")
+
+        # params
+        temp_tuple = (
+            (GimpUi.ICON_VIEW_REFRESH, self.top_bar_refresh_layer),
+            (GimpUi.ICON_GO_PREVIOUS, self.top_bar_next_layer, -1),
+            (GimpUi.ICON_GO_NEXT, self.top_bar_next_layer, 1),
+            (GimpUi.ICON_DOCUMENT_SAVE, self.top_bar_generate_inventory_script),
+            #(GimpUi.ICON_FORMAT_JUSTIFY_LEFT, self.top_bar_generate_script)
             #(GimpUi.ICON_TOOL_CAGE, self.get_polygons, ),
         )
 
@@ -150,3 +181,6 @@ class GuiBarGenerator(ImageStuff):
         self.output_string_to_clipboard(f'{header}\n{{{res}\n}}\n')
 
         return self.middle_bar_write("Script ready")
+    def top_bar_generate_inventory_script(self, button):
+        print("Generating inventory")
+        pass
