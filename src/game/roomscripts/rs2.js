@@ -75,7 +75,8 @@ export default class rs2
             const bridgeStatus = this.getVarValue(this.getExistentThing(2).getOwnData().skipCond[0]);
             if (bridgeStatus === 0)
             {
-                actor.walkTo(ta.getHitArea().centerX > actor.x? 42:145, actor.y);
+                const hitArea = ta.hasPolygon? Phaser.Geom.Polygon.GetAABB(ta.getHitArea()): ta.getHitArea();
+                actor.walkTo(hitArea.centerX > actor.x? 42:145, actor.y);
             }
         }
         console.log("Boolinside:", typeof boolInside, boolInside)
