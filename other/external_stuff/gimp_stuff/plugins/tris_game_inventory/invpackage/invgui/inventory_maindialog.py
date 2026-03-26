@@ -23,6 +23,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
 
         # Is this the Inventory Dialog (True) or the Properties Dialog (False)?
         self.crossroads = crossroads
+        print(f"{crossroads=}")
         
         #0 the Dialog chores:
         self.set_keep_above(True)
@@ -51,7 +52,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         self.generate_middle_bar()
 
         #6 the core widgets!
-        self.prepare_rowInfos()
+        self.prepare_row_infos()
 
         #7 the TreeView
         tw = self.build_tw()
@@ -201,11 +202,10 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
                    row[idx]=value
         return True
     
-    def prepare_rowInfos(self):
-        #return self.prepare_row_infos_game() if self.crossroads else self.prepare_row_infos_inventory()
-        return self.prepare_row_infos_inventory() if self.crossroads else self.prepare_rowInfos_game()
+    def prepare_row_infos(self):
+        return self.prepare_row_infos_game() if self.crossroads else self.prepare_row_infos_inventory()
     
-    def prepare_rowInfos_game(self):
+    def prepare_row_infos_game(self):
         wid_kind = self.build_chooser_kind()
         wid_unary = self.build_unary()
         widget_vars = self.build_chooser_vars()
@@ -239,9 +239,9 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         #widget_overnames = self.build_chooser_overnames()
 
         json_props_size = (
+            ('isItem', 1, wid_unary),
             ('cumulable', 1, wid_unary),
-            ('special', 1, wid_unary),
-            ('another_prop', 1, wid_unary)
+            ('special', 1, wid_unary)
         )
         
         row_infos = [SelectionInfo(prop_name, size, idx, wid) for idx, (prop_name, size, wid) in enumerate(json_props_size)]

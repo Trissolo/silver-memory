@@ -73,6 +73,15 @@ class GameInventory(Gimp.PlugIn):
         )
 
         procedure.set_attribution("Tris", "---", "2026")
+
+        procedure.add_boolean_argument(
+            "crossroads",
+            "Dialog for JSON Game properties (True-Checked) or Inventory properties (False-Unchecked)?",
+            "Determine what Dialog will be built.",
+            True,
+            GObject.ParamFlags.READWRITE,
+        )
+
         return procedure
     
 
@@ -110,7 +119,12 @@ class GameInventory(Gimp.PlugIn):
 
         from invpackage import InventoryDialog
 
-        dialog = InventoryDialog(image=image, crossroads=False)
+        options_dialog = GimpUi.ProcedureDialog.new(procedure, config, "title_test")
+        options_dialog.fill(["crossroads"])
+        options_dialog.run()
+        options_dialog.destroy()
+
+        dialog = InventoryDialog(image=image, crossroads=config.get_property("crossroads"))
         dialog.run()
         dialog.destroy()
 
