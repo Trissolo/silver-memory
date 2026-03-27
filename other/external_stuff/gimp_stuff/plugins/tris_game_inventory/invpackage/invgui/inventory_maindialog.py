@@ -21,14 +21,15 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         # First of all
         super().__init__(title="Tris Inventory Generator", *args)
 
-        # Is this the Inventory Dialog (True) or the Properties Dialog (False)?
+        # Is this the Inventory Dialog (-1) or the Properties Dialog (>= 0)?
         self.crossroads = crossroads
         print(f"{crossroads=}")
         
         #0 the Dialog chores:
         self.set_keep_above(True)
         self.connect("destroy", self._on_destroy)
-        self.set_name("Inv. Dialog")
+        self.set_name("Inv. Dialog" if crossroads == -1 else 'JSON properties Dialog')
+        self.set_title(self.get_name())
         # self.add_buttons( "Done [close]", Gtk.ResponseType.OK)
 
         #1 Set the Image and Current Layer:
@@ -202,7 +203,7 @@ class InventoryDialog(GimpUi.Dialog, GuiBarGenerator):
         return True
     
     def prepare_row_infos(self):
-        return self.prepare_row_infos_game() if self.crossroads else self.prepare_row_infos_inventory()
+        return self.prepare_row_infos_game() if self.crossroads != -1 else self.prepare_row_infos_inventory()
     
     def prepare_row_infos_game(self):
         wid_kind = self.build_chooser_kind()

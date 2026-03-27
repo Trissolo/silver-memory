@@ -47,6 +47,9 @@ from gi.repository import GObject
 
 # our plugin class
 class GameInventory(Gimp.PlugIn):
+    user_bool_name = 'crossroads'
+    user_int_name = 'room_number'
+
     # procedure(s) name in Procedure Browser. Note that this string value CANNOT have underscores, only hyphens/dashes
     def do_query_procedures(self):
         return ["tris-game-inventory-editor"]
@@ -74,12 +77,22 @@ class GameInventory(Gimp.PlugIn):
 
         procedure.set_attribution("Tris", "---", "2026")
 
-        procedure.add_boolean_argument(
-            "crossroads",
-            "Dialog for JSON Game properties (True-Checked) or Inventory properties (False-Unchecked)?",
-            "Determine what Dialog will be built.",
-            True,
-            GObject.ParamFlags.READWRITE,
+        # procedure.add_boolean_argument(
+        #     self.user_bool_name,
+        #     "Dialog for JSON Game properties (True-Checked) or Inventory properties (False-Unchecked)?",
+        #     "Determine what Dialog will be built.",
+        #     True,
+        #     GObject.ParamFlags.READWRITE,
+        # )
+
+        procedure.add_int_argument(
+            self.user_int_name,
+            'Room ID',
+            'The room id in the JSON. Use -1 to generate the inventory',
+            -1,
+            256,
+            -1,
+            GObject.ParamFlags.READWRITE
         )
 
         return procedure
@@ -120,11 +133,11 @@ class GameInventory(Gimp.PlugIn):
         from invpackage import InventoryDialog
 
         options_dialog = GimpUi.ProcedureDialog.new(procedure, config, "title_test")
-        options_dialog.fill(["crossroads"])
+        options_dialog.fill()
         options_dialog.run()
         options_dialog.destroy()
 
-        dialog = InventoryDialog(image=image, crossroads=config.get_property("crossroads"))
+        dialog = InventoryDialog(image=image, crossroads=config.get_property(self.user_int_name))
         dialog.run()
         dialog.destroy()
 

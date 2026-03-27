@@ -169,7 +169,7 @@ class ImageStuff(GenericUtils):
         room_props = props[-2:]
 
         things_array = []
-        room_res = {'things': things_array, 'id': self.extract_id_for_json()}
+        room_res = {'things': things_array, 'id': self.crossroads} # self.extract_id_for_json()}
 
         for layer in self._layer_iterator():
             parasites = layer.get_parasite_list()

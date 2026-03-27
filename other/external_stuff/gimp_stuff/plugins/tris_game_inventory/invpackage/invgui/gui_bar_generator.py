@@ -55,7 +55,7 @@ class GuiBarGenerator(ImageStuff):
         return True
     
     def generate_top_bar(self):
-        return self.generate_top_bar_game() if self.crossroads else self.generate_top_bar_inventory()
+        return self.generate_top_bar_game() if self.crossroads != -1 else self.generate_top_bar_inventory()
     
     def generate_top_bar_inventory(self):
         box = self._gui_element_box(name="Top Bar")
@@ -153,7 +153,12 @@ class GuiBarGenerator(ImageStuff):
         self.middle_bar_write("You can now paste the JSON")
     def top_bar_generate_script(self, widget):
         res = []
+
+        # optional common function:
+        res.append('\n    // static onRoomReady(){}')
+
         triggerArea_params = '(ta, actor, boolInside)'
+
         thing_params = '(thing)'
         
         for i, layer in enumerate(self._layer_iterator()): #(l for l in self.image.get_layers() if 'kind' in l.get_parasite_list() and self.extract_array_from_parasite('kind', l)[0] > 0)):
@@ -177,6 +182,7 @@ class GuiBarGenerator(ImageStuff):
         res = '\n    '.join(res)
 
         header = f'export default class rs{self.extract_id_for_json()}'
+
 
         self.output_string_to_clipboard(f'{header}\n{{{res}\n}}\n')
 
