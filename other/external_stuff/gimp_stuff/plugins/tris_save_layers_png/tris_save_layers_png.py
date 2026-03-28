@@ -192,16 +192,20 @@ class SaveLayersPng(Gimp.PlugIn):
         #success = result.index(0)
         return pdb_proc, pconf
 
-    def save_single_layer(self, layer, dest, pdb_proc, pconf, folder_path):
+    def save_single_layer(self, layer, dest, folder_path):
         dest_layer = Gimp.Layer.new_from_drawable(layer, dest)
         dest.insert_layer(dest_layer, None, 0)
         dest.resize_to_layers()
         
         # using new_build_filenamev()
-        pconf.set_property('file',  Gio.File.new_build_filenamev([folder_path, f"{layer.get_name()}.png"]))
+        #pconf.set_property('file',  Gio.File.new_build_filenamev([folder_path, f"{layer.get_name()}.png"]))
+        #new_file = Gio.File.new_for_path("/home/USER/Graphics/using_gimp/from_console.xcf")
+        new_file = Gio.File.new_build_filenamev([folder_path, f"{layer.get_name()}.png"])
+        Gimp.file_save(Gimp.RunMode.NONINTERACTIVE, dest, new_file, None)
         print("- Writing file:", folder_path, f"{layer.get_name()}.png")
-        pdb_proc.run(pconf)
+        #pdb_proc.run(pconf)
         dest.remove_layer(dest_layer)
+        dest.clean_all()
         return True
 
 
@@ -244,16 +248,21 @@ class SaveLayersPng(Gimp.PlugIn):
         # folder path stuff: 
         user_selected_folder = user_selected_folder.get_path()
 
+        # layer_to_process
+        layer_to_process = [l for l in image.get_layers() if l.get_visible()]
+        layers_amount = len(layer_to_process)
+
         # Iterate layers:
         ##message = ""
         if len(image.get_layers()):
             dest_image = Gimp.Image.new(1, 1, 0)
-            pdb_proc, pconf = self.prepare_pdb_procedure(dest_image)
-            for layer in (l for l in image.get_layers() if l.get_visible()):
+            # pdb_proc, pconf = self.prepare_pdb_procedure(dest_image)
+            for curr_layer, layer in enumerate(layer_to_process, start=1):
                 if experimental_bool and "kind" in layer.get_parasite_list() and layer.get_parasite('kind').get_data()[0] == 49:
                     print(f"Skipping: {layer.get_name()} because it is a Trigger Area")
                     continue
-                self.save_single_layer(layer, dest_image, pdb_proc, pconf, user_selected_folder)
+                print(f'Layer {curr_layer}/{layers_amount}')
+                self.save_single_layer(layer, dest_image, user_selected_folder)
 
             dest_image.delete()
         # else:
