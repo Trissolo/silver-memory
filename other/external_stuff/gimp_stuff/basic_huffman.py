@@ -22,17 +22,17 @@ class Node:  # HEAP NODE CLASS
 
 cwd = os.getcwd()
 
-encoding_map = ('utf-8', 'windows-1252')
 encoding_idx = 1
+encoding_map = ('utf-8', 'windows-1252')
 
 def compress(path, mode=0):  # COMPRESS FILE DATA
     if mode == 0:
         name = str(os.path.splitext(path)[0])
-        data = str(read_file(path), 'utf-8')
+        data = str(read_file(path), current_encoding())
         freq_map = frequency_map(data)
         language_map, compressed_header = huffman_coding(freq_map)
         output = encode(data, language_map, compressed_header, mode=mode)
-        output = bytes(output, 'UTF-8')
+        output = bytes(output, current_encoding())
         size = create_output(output, name + ".bin", 0)
     elif mode == 1:
         os.chdir(path)
@@ -40,11 +40,11 @@ def compress(path, mode=0):  # COMPRESS FILE DATA
         for file in os.listdir(path):
             if file.endswith(".txt"):
                 data += read_file(file, mode=0) + b'\x11\x22\x33'
-        data = str(data, 'utf-8')
+        data = str(data, current_encoding())
         freq_map = frequency_map(data)
         language_map, compressed_header = huffman_coding(freq_map)
         output = encode(data, language_map, compressed_header, mode=mode)
-        output = bytes(output, 'UTF-8')
+        output = bytes(output, current_encoding())
         os.chdir('..')
         size = create_output(output, os.path.basename(path) + "_compressed.bin", 0)
         os.chdir(cwd)
@@ -133,7 +133,7 @@ def create_output(data, name, mode=0):  # CREATE OUTPUT FILE
             exit(-1)
     else:
         try:
-            output_path = open(name, "w", encoding='utf-8', newline='\n')
+            output_path = open(name, "w", encoding=current_encoding(), newline='\n')
             output_path.write(data)
             print("Success, data saved at: " + name)
             return os.stat(name).st_size
@@ -172,11 +172,11 @@ def decompress(path):  # DECOMPRESS FILE DATA
         for i in range(0, len(output), 8):
             b_arr.append(int(output[i:i + 8], 2))
 
-        create_output(str(b_arr, 'utf-8'), name + '.txt', mode=1)
+        create_output(str(b_arr, current_encoding()), name + '.txt', mode=1)
     else:
         op_files = array.array('B', data).tobytes().split(b'\x11\x22\x33')
         for i, file in enumerate(op_files[0:len(op_files) - 1]):
-            create_output(str(op_files[i][:len(op_files[i])], 'utf-8'), name + str(i) + '.txt', mode=1)
+            create_output(str(op_files[i][:len(op_files[i])], current_encoding()), name + str(i) + '.txt', mode=1)
 
 
 def decode_tree(data):  # DECODE TREE FROM HEADER
@@ -221,7 +221,10 @@ def read_file(path, mode=0):  # READ FILE DATA
         return data
 
 def current_encoding(idx = None):
-    print(encoding_map, encoding_idx)
+    global encoding_idx
+    if idx is not None:
+        encoding_idx = 0 if idx == 0 else 1
+    #print(encoding_map, encoding_idx)
     return encoding_map[encoding_idx]
 
 
@@ -507,6 +510,6 @@ const config = {
     scene: [TestScene]
 };
 
-window.game = new Phaser.Game(config)
+window.game = new Phaser.Game(config);
 
 '''
