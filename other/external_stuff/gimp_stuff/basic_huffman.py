@@ -305,7 +305,7 @@ if __name__ == '__main__':
 '''
 class Node
 {
-    constructor(char=null, value=null, left=null, right=null)
+    constructor(char = null, value = null, left = null, right = null)
     {
         this.value = value
         this.char = char
@@ -325,175 +325,174 @@ class Node
 
     get_char()
     {
-        return this.char;    
+        return this.char;
     }
 }
 
 class TestScene extends Phaser.Scene
 {
-  constructor ()
-  {
-    super({ key: 'TestScene' });
-  }
+    mask;
+    byte;
+    position;
 
-  preload ()
-  {
-    //this.load.binary('mio', 'assets/mio.bin', Uint8Array);
-    this.load.binary('mio', 'assets/lorem.bin', Uint8Array)
-    //this.load.binary('mio', 'assets/large_text.bin', Uint8Array)
-  }
-  
-  create()
-  {
-    this.file = this.cache.binary.get('mio');
-    
-    const {byteLength} = this.file;
-    
-    // testing file is loaded
-    for (let i = 0; i < 3; i++)
+    constructor()
     {
-	  this.printByte(this.file[i], typeof this.file[i]);
-    }
-    
-    // SETUP:
-    
-    //this.src = 0;
-    //this.mask = 0;
-    //this.byte = 0;
-    
-    this.reset();
-    
-    // initialised:
-    this.debugStatus();
-     
-    
-    // real start
-    this.reset();
-    this.getBits(1);
-    
-    
-	// tree    
-    const root = this.decode_tree();
-    
-    // rebuild frequencies dict
-    const dictionary = this.assign_code(root, '')
-   
-    console.log(dictionary);
-     
-    
-    
-    console.log("From here");
-    
-    // hmmmm b
-    console.log("Before");
-    this.debugStatus();
-    
-    const padding = this.getBits(8);
-    console.log(`Padding value: ${padding}`);
-    
-    // hmmmm a
-    console.log("After");
-    this.debugStatus();
-    
-    this.getBits(padding);
-
-    
-    let code = "";
-    const output = []
-    while (this.src < byteLength)
-    {
-      code += this.getBits();
-      const currletter = dictionary[code]
-      if (currletter)
-      {
-        output.push(dictionary[code]);
-        //console.log(currletter);
-        code = "";
-      }
-    }
-    
-    console.log(output.join(""));
-  }
-  
-  printByte(num, ...args)
-  {
-    console.log(`${num} ${num.toString(2).padStart(8, '0')}`, ...args);
-  }
-  
-  reset()
-  {
-    this.src = 0;
-    this.mask = 0;
-    this.byte = 0;
-  }
-  
-  debugStatus()
-  {
-    console.log(`src: ${this.src}, mask: ${this.mask}, byte: ${this.byte}`);
-  }
-  
-  getBits(numbits = 1)
-  {
-	let i;
-    let bits = 0;
-
-	for (i = 0; i < numbits; i++)
-	{
-		if (this.mask === 0)
+        super(
         {
-			this.byte = this.file[this.src++];
-			this.mask = 0x80;
-		}
-		bits <<= 1;
-		bits |= this.byte & this.mask ? 1 : 0;
-		this.mask >>= 1;
-	}
+            key: 'TestScene'
+        });
+    }
 
-	return bits;
-  }
-  
-  decode_tree() //# DECODE TREE FROM HEADER
-  {
-    const char = this.getBits()
+    preload()
+    {
+        this.load.binary('mio', 'assets/mio.bin', Uint8Array);
+        //this.load.binary('mio', 'assets/lorem.bin', Uint8Array);
+        //this.load.binary('mio', 'assets/large_text.bin', Uint8Array)
+    }
 
-    if (char == 1)
+    create()
     {
-      const gag = this.getBits(8);
-      // console.log(gag, String.fromCharCode(gag))
-        return new Node(String.fromCharCode(gag));
+        this.buffer = this.iterBytes(this.cache.binary.get('mio'));
+        
+        this.cache.binary.remove('mio');
+
+        // initialised:
+        this.debugStatus();
+
+
+        // real start
+        this.mask = 0;
+        this.byte = 0;
+
+        this.getBits(1);
+
+
+        // tree    
+        const root = this.decode_tree();
+
+        // rebuild frequencies dict
+        const dictionary = this.assign_code(root, '');
+
+        console.log(dictionary);
+
+
+
+        console.log("From here");
+
+        // hmmmm b
+        console.log("Before");
+        this.debugStatus();
+
+        const padding = this.getBits(8);
+        console.log(`Padding value: ${padding}`);
+
+        // hmmmm a
+        console.log("After");
+        this.debugStatus();
+
+        this.getBits(padding);
+
+
+        let code = "";
+        const output = [];
+
+        while (!this.position.done)
+        {
+            code += this.getBits();
+            
+            if (dictionary.has(code))
+            {
+                output.push(dictionary.get(code));
+                // console.log(currletter);
+                code = "";
+            }
+        }
+      
+        // Done!
+        console.log(output.join(""));
+
     }
-    else
+
+    printByte(num, ...args)
     {
-        const left = this.decode_tree();
-        const right = this.decode_tree();
-        return new Node(null, null, left, right);
+        console.log(`${num} ${num.toString(2).padStart(8, '0')}`, ...args);
     }
-  }
   
-  assign_code(node, code='')//:  # ASSIGN CODES TO A HUFFMAN TREE
-  {
-    if (node.is_leaf())
+    *iterBytes(file)
     {
-      const temp = {}
-      temp[code] = node.get_char();
-      return temp;
-        //return ({node.get_char(): code})
+        for (let i = 0; i < file.byteLength; i++)
+        {
+          yield file[i];
+        }
     }
-    const d = {};
-    Object.assign(d, this.assign_code(node.left, code + '0'));
-    Object.assign(d, this.assign_code(node.right, code + '1'));
-    //d.update(assign_code(node.left, code + '0'))
-    //d.update(assign_code(node.right, code + '1'))
-    return d;
-  }
-  } // end TestScene
-    
+
+    advance()
+    {
+        this.position = this.buffer.next();
+        return this.position;
+    }
+
+    debugStatus()
+    {
+        console.log(`mask: ${this.mask}, byte: ${this.byte}`);
+    }
+
+    getBits(numbits = 1)
+    {
+        let i;
+        let bits = 0;
+
+        for (i = 0; i < numbits; i++)
+        {
+            if (this.mask === 0)
+            {
+                this.byte = this.advance().value;
+                this.mask = 0x80;
+            }
+            bits <<= 1;
+            bits |= this.byte & this.mask ? 1 : 0;
+            this.mask >>= 1;
+        }
+
+        return bits;
+    }
+
+    decode_tree() //# DECODE TREE FROM HEADER
+    {
+        const char = this.getBits()
+
+        if (char == 1)
+        {
+            const gag = this.getBits(8);
+
+            return new Node(String.fromCharCode(gag));
+        }
+        else
+        {
+            const left = this.decode_tree();
+            const right = this.decode_tree();
+            return new Node(null, null, left, right);
+        }
+    }
+
+    assign_code(node, code = '')
+    {
+        if (node.is_leaf())
+        {
+            return new Map().set(code, node.get_char());
+        }
+        return new Map([...this.assign_code(node.left, code + '0'), ...this.assign_code(node.right, code + '1')]);
+        
+    }
+} // end TestScene
+
 const config = {
     type: Phaser.WEBGL,
     parent: "gameContainer",
     pixelArt: true,
     backgroundColor: '#320822',
-    scale: {
+    scale:
+    {
         mode: Phaser.Scale.NONE,
         //autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 200,
@@ -509,4 +508,5 @@ const config = {
 };
 
 window.game = new Phaser.Game(config)
+
 '''
