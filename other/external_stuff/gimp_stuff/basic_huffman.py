@@ -1,3 +1,5 @@
+# from: https://github.com/omarxadel/huffman-coding
+
 import os
 import timeit
 import array
@@ -79,9 +81,9 @@ def huffman_coding(freq_map):  # HUFFMAN CODING ALGORITHM
         nodes[i:i] = [node]
     compressed_tree = encode_tree(nodes[0], "")
     d = assign_code(nodes[0], '')
-    print("Byte\tCode\t\tNew code")
+    print("Char\t\tByte\t\tCode\t\tNew code")
     for key in d.keys():
-        print(str(ord(key)) + "\t\t" + f'{(ord(key)):08b}' + "\t" + str(d[key]))
+        print(f'key: {key}\t\t{ord(key)}\t\t{(ord(key)):08b}\t{str(d[key])}')
     return d, compressed_tree
 
 

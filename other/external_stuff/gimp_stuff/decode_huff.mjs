@@ -13,11 +13,6 @@ class Node
         return this.left === null;
     }
 
-    get_value()
-    {
-        return this.value;
-    }
-
     get_char()
     {
         return this.char;
@@ -31,11 +26,14 @@ class DecodeHuffman
     constructor(file)
     {
         this.bitstream = this.bitGenerator(file);
-        
+
+        // skips the control bit set by the compression algorithm
         this.getBit();
 
+        // Reconstruct the Huffman tree
         const root = this.decodeTree();
 
+        // Get the character-code map back
         const dictionary = this.assign_code(root, '');
 
         console.log(dictionary);
@@ -65,6 +63,7 @@ class DecodeHuffman
         }
 
         // destroy
+        this.bitstream.return();
         this.bitstream = undefined;
         
         console.log(output.join(''));
