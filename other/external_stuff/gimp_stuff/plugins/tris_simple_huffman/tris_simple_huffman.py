@@ -48,7 +48,7 @@ class StreamGen():
             self.reset()
     def addChar(self, c):
         if c in self.usable:
-            print(f'{c=}')
+            # print(f'{c=}')
             for bas in self.usable.get(c):
                 self.addBit(bas)
         else:
@@ -91,7 +91,7 @@ class HufEncoder:
     def __init__(self, file):
         self._file = file
         self._decode_list = ['utf-8', 'windows-1252']
-        self.decode_idx = 0
+        self.decode_idx = 1
         #self.text = text
         self.root = self.build_huffman_tree(self.text)
         self.huffman_dict = {}
@@ -101,23 +101,11 @@ class HufEncoder:
     def text(self):
         return self._file_content() 
        
-    #@staticmethod
     def _file_content(self):
         success, content, etag = self._file.load_contents(None)
-        qqq = content.decode(self._decode_list[self.decode_idx])
-        print("ENC:", self._decode_list[self.decode_idx])
-        for char in qqq:
+        for char in content.decode(self._decode_list[self.decode_idx]):
             yield char
-
-        # Qui il file è già chiuso lato sistema operativo.
-        # Puoi elaborare 'content' senza preoccuparti di altro.
-        # ['utf-8', 'windows-1252']
-        #print(content.decode('utf-8'))
-        # for row in open(complete_path, "r"):
-        #     for char in row:
-        #         yield char
-        # yield chr(254)
-        
+      
     def _file_length(complete_path):
         count = 0
         for row in open(complete_path, "r"):
@@ -151,7 +139,6 @@ class HufEncoder:
             writer.addChar(node.get_char())
         else:
             writer.addBit(0)
-            #node = Node(None, None)
             self.preorder_traversal(node.left, writer)
             self.preorder_traversal(node.right, writer)
 
@@ -219,93 +206,80 @@ class TrisHuffman(Gimp.PlugIn):
                 
 
         #from HERE!
-        
         test_huff = HufEncoder(source_file)
-        print(f'{test_huff.root=}')
+
         test_huff.generate_codes(test_huff.root, "", test_huff.huffman_dict)
-        print(f'{test_huff.huffman_dict}\n{len(test_huff.huffman_dict)}')
-        print(f'{test_huff.writer.res=}')
         
         test_huff.preorder_traversal(test_huff.root, test_huff.writer)
-        print(f'{test_huff.writer.res=}')
+
         encoded_text = ''.join(test_huff.huffman_dict[char] for char in test_huff.text)
+
         for char in encoded_text:
-            #print(char)
             test_huff.writer.addBit(char)
         
-        #print(f'{encoded_text=}')
+        print(f'{folder.get_path()}]\n{source_file.get_basename()[:-4]}')
+
         res = test_huff.writer.get_output()
-        #print()
-        #a = [c for c in test_huff.text]
 
-        #Gimp.message(f'Hello world!\n[{folder.get_path()}]\n{source_file.get_path()}')
+        with open(f'{folder.get_path()}{GLib.DIR_SEPARATOR_S}{source_file.get_basename()[:-4]}.thf', "wb") as binary_file:
+            binary_file.write(bytes(res))
+        
         Gimp.message(f"{res}")
-        #encoded_text = test_huff.huffman_encoding()
-        #print("Encoded Text:", encoded_text)
-        #print("Huffman Codes:", test_huff.huffman_dict)
 
 
-        #
-        # test_huff.writer.res
-        #[10, 13, 61, 77, 161, 149, 58, 61, 36, 167, 72, 20, 101, 85, 72, 162]
-        #for i in encoded_text:
-        #    test_huff.writer.addBit(i)
-
-        #res = test_huff.writer.get_output()
 
         # do what you want to do, then, in case of success, return:
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
     
-    def read_text(self, file):
-        try:
-            # Carica il contenuto. Restituisce (successo, byte_content, etag)
-            success, content, etag = file.load_contents(None)
+    # def read_text(self, file):
+    #     try:
+    #         # Carica il contenuto. Restituisce (successo, byte_content, etag)
+    #         success, content, etag = file.load_contents(None)
             
-            if success:
-                # Il contenuto viene restituito come byte, quindi va decodificato in stringa
-                text_content = content.decode('utf-8')
-                print(text_content)
-        except Exception as e:
-            print(f"Errore durante la lettura del file: {e}")
-    def get_content(self, file):
+    #         if success:
+    #             # Il contenuto viene restituito come byte, quindi va decodificato in stringa
+    #             text_content = content.decode('utf-8')
+    #             print(text_content)
+    #     except Exception as e:
+    #         print(f"Errore durante la lettura del file: {e}")
+    #def get_content(self, file):
         success, content, etag = file.load_contents(None)
 
         # Qui il file è già chiuso lato sistema operativo.
         # Puoi elaborare 'content' senza preoccuparti di altro.
         # ['utf-8', 'windows-1252']
-        print(content.decode('utf-8'))
-    def cheppa(self, file):
-        try:
-            # 2. Apri lo stream di lettura (FileInputStream)
-            input_stream = file.read(None)
+        # print(content.decode('utf-8'))
+    # def cheppa(self, file):
+    #     try:
+    #         # 2. Apri lo stream di lettura (FileInputStream)
+    #         input_stream = file.read(None)
             
-            # 3. Avvolgi lo stream in un DataInputStream per leggere le righe
-            data_stream = Gio.DataInputStream.new(input_stream)
+    #         # 3. Avvolgi lo stream in un DataInputStream per leggere le righe
+    #         data_stream = Gio.DataInputStream.new(input_stream)
             
-            while True:
-                # 4. Leggi la riga. Restituisce (linea_in_byte, lunghezza)
-                line_bytes, length = data_stream.read_line(None)
+    #         while True:
+    #             # 4. Leggi la riga. Restituisce (linea_in_byte, lunghezza)
+    #             line_bytes, length = data_stream.read_line(None)
                 
-                # Se line_bytes è None, abbiamo raggiunto la fine del file (EOF)
-                if line_bytes is None:
-                    break
+    #             # Se line_bytes è None, abbiamo raggiunto la fine del file (EOF)
+    #             if line_bytes is None:
+    #                 break
                     
-                # Decodifica i byte in stringa (rimuovendo eventuali spazi/newline extra se necessario)
-                line_text = line_bytes.decode('utf-8')
-                print(line_text)
+    #             # Decodifica i byte in stringa (rimuovendo eventuali spazi/newline extra se necessario)
+    #             line_text = line_bytes.decode('utf-8')
+    #             print(line_text)
 
-            # Chiudi lo stream una volta finito
-            input_stream.close(None)
+    #         # Chiudi lo stream una volta finito
+    #         input_stream.close(None)
 
-        except Exception as e:
-            print(f"Errore durante la lettura: {e}")
+    #     except Exception as e:
+    #         print(f"Errore durante la lettura: {e}")
 
 Gimp.main(TrisHuffman.__gtype__, sys.argv)
 
 
 
 '''
-// [7, 36, 2, 232, 157, 41, 212, 193, 49, 156, 205, 101, 193, 81, 217, 72, 74, 221, 246, 237, 34, 9, 101, 190, 230, 88, 237, 197, 214, 208, 87, 110, 22, 194, 195, 101, 28, 50, 101, 100, 179, 218, 80, 165, 201, 168, 84, 47, 127, 254, 7, 157, 170, 54, 180, 217, 116, 134, 158, 7, 79, 133, 216, 252, 140, 56, 252, 82, 222, 217, 56, 203, 195, 192, 233, 163, 83, 238, 236, 210, 38, 19, 119, 181, 231, 191, 95, 139, 63, 183, 238, 24, 192, 157, 49, 189, 153, 233, 126, 20, 183, 184, 222, 173, 107, 120, 120, 29, 133, 155, 40, 194, 177, 169, 199, 226, 252, 41, 111, 113, 189, 57, 246, 201, 70, 50, 240, 240, 92, 135, 129, 233, 30, 93, 116, 133, 85, 228, 82, 163, 205, 124]
 const {clear, log, dir} = console;
 
 class Node
@@ -331,14 +305,13 @@ class Node
 class DecodeHuffman
 {
     processedBytes = 0;
-    gag = [7, 36, 2, 232, 157, 41, 212, 193, 49, 156, 205, 101, 193, 81, 217, 72, 74, 221, 246, 237, 34, 9, 101, 190, 230, 88, 237, 197, 214, 208, 87, 110, 22, 194, 195, 101, 28, 50, 101, 100, 179, 218, 80, 165, 201, 168, 84, 47, 127, 254, 7, 157, 170, 54, 180, 217, 116, 134, 158, 7, 79, 133, 216, 252, 140, 56, 252, 82, 222, 217, 56, 203, 195, 192, 233, 163, 83, 238, 236, 210, 38, 19, 119, 181, 231, 191, 95, 139, 63, 183, 238, 24, 192, 157, 49, 189, 153, 233, 126, 20, 183, 184, 222, 173, 107, 120, 120, 29, 133, 155, 40, 194, 177, 169, 199, 226, 252, 41, 111, 113, 189, 57, 246, 201, 70, 50, 240, 240, 92, 135, 129, 233, 30, 93, 116, 133, 85, 228, 82, 163, 205, 124];
     bitstream;
   
     constructor(file)
     {
-        this.bitstream = this.bitGenerator();
-        const total_len = this.gag.length;
-        const padding = this.gag[0]
+        this.bitstream = this.bitGenerator(file);
+        const total_len = file.length;
+        const padding = file[0]
         this.getAdjacentBits(8)
         console.log("padding", padding, total_len)
 
@@ -396,9 +369,9 @@ class DecodeHuffman
         
     }
 
-    *bitGenerator(typedArray=false)
+    *bitGenerator(typedArray)
     {
-        for (const byte of this.gag)
+        for (const byte of typedArray)
         {
           this.processedBytes += 1;
           //console.log(this.processedBytes);
@@ -466,7 +439,13 @@ class TestScene extends Phaser.Scene
     super({ key: 'TestScene' });
   }
 
-
+preload()
+    {
+        this.load.binary('mio', 'assets/promessi.thf', Uint8Array);
+        // this.load.binary('mio', 'assets/lorem.bin', Uint8Array);
+        // this.load.binary('mio', 'assets/large_text.bin', Uint8Array);
+        // this.load.binary('mio', 'assets/commedia.bin', Uint8Array)
+    }
 
     create()
     {
