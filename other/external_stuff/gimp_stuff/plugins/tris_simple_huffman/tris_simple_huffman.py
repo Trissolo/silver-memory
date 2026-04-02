@@ -88,13 +88,29 @@ class Node:
 
 
 class HufEncoder:
-    def __init__(self, file):
+    def __init__(self, file, folder, user_string):
         self._file = file
-        self._decode_list = ['utf-8', 'windows-1252']
-        self.decode_idx = 1
-        #self.text = text
+
+        self._user_string = user_string
+
+        file_name = "default" if len(user_string) != 0 else file.get_basename()[:-4]
+
+        self.output_path = f'{folder.get_path()}{GLib.DIR_SEPARATOR_S}{file_name}.thf'
+
+        # string encoding stuff
+        self._decode_list = ['cp1252', 'windows-1252', 'ascii', 'raw_unicode_escape', 'utf-8']
+        self.decode_idx = 0
+        self.string_encoding = self._decode_list[self.decode_idx]
+
+        #self.text now is a property
+
+        # the Huffman tree (nodes containing nodea)
         self.root = self.build_huffman_tree(self.text)
+
+        # the dictionary (key -> string of zeroes and ones, value -> a one sized string with the char)
         self.huffman_dict = {}
+
+        # our Writer
         self.writer = StreamGen()
 
     @property
@@ -102,8 +118,14 @@ class HufEncoder:
         return self._file_content() 
        
     def _file_content(self):
-        success, content, etag = self._file.load_contents(None)
-        for char in content.decode(self._decode_list[self.decode_idx]):
+        to_process = None
+        if len(self._user_string) != 0:
+            to_process = self._user_string
+        else:
+            success, content, etag = self._file.load_contents(None)
+            to_process = content.decode(self.string_encoding)
+        
+        for char in to_process:
             yield char
       
     def _file_length(complete_path):
@@ -158,6 +180,7 @@ class HufEncoder:
 class TrisHuffman(Gimp.PlugIn):
     ARGU_DEST_FOLDER = 'dest-folder'
     ARGU_FILE_TO_COMPRESS = 'file-to-compress'
+    ARGU_TEST_STRING = 'test-string'
     def do_query_procedures(self):
         return [ "tris-simple-huffman" ]
     def do_set_i18n (self, name):
@@ -169,16 +192,7 @@ class TrisHuffman(Gimp.PlugIn):
         procedure.add_menu_path( '<Image>/Filters/[[Tris]]/' )
         procedure.set_documentation("Simple Huffman Encoder", "A simple Huffman Encoder fortext files", name)
         procedure.set_attribution("Tris", "att_name", "2026")
-        procedure.add_file_argument(
-            # GimpProcedure* procedure,
-            self.ARGU_DEST_FOLDER,  # const gchar* name,
-            "Destination folder for the compressed file",  # const gchar* nick,
-            None,  # const gchar* blurb,
-            Gimp.FileChooserAction.SELECT_FOLDER,  # GimpFileChooserAction action,
-            True,  # gboolean none_ok,
-            None,  # GFile* default_file,
-            GObject.ParamFlags.READWRITE,  # GParamFlags flags
-        )
+        
         procedure.add_file_argument(
             # GimpProcedure* procedure,
             self.ARGU_FILE_TO_COMPRESS,  # const gchar* name,
@@ -189,6 +203,27 @@ class TrisHuffman(Gimp.PlugIn):
             None,  # GFile* default_file,
             GObject.ParamFlags.READWRITE #READABLE,  # GParamFlags flags
         )
+
+        procedure.add_file_argument(
+            # GimpProcedure* procedure,
+            self.ARGU_DEST_FOLDER,  # const gchar* name,
+            "Destination folder for the compressed file",  # const gchar* nick,
+            None,  # const gchar* blurb,
+            Gimp.FileChooserAction.SELECT_FOLDER,  # GimpFileChooserAction action,
+            True,  # gboolean none_ok,
+            None,  # GFile* default_file,
+            GObject.ParamFlags.READWRITE,  # GParamFlags flags
+        )
+
+        procedure.add_string_argument (
+            #GimpProcedure* procedure,
+            self.ARGU_TEST_STRING, #const gchar* name,
+            'The string to compress (the file will be ignored)',  #const gchar* nick,
+            'blurb for test string', #const gchar* blurb,
+            'ARGU_STRING_value',     #const gchar* value,
+            GObject.ParamFlags.READWRITE #GParamFlags flags
+        )
+
         return procedure
     
     def run(self, procedure, run_mode, image, drawables, config, run_data):
@@ -203,10 +238,13 @@ class TrisHuffman(Gimp.PlugIn):
 
         folder = config.get_property(self.ARGU_DEST_FOLDER)
         source_file = config.get_property(self.ARGU_FILE_TO_COMPRESS)
+        user_string = config.get_property(self.ARGU_TEST_STRING)
+
+        print(f'{user_string} ({len(user_string)} chars)')
                 
 
         #from HERE!
-        test_huff = HufEncoder(source_file)
+        test_huff = HufEncoder(source_file, folder, user_string)
 
         test_huff.generate_codes(test_huff.root, "", test_huff.huffman_dict)
         
@@ -221,12 +259,10 @@ class TrisHuffman(Gimp.PlugIn):
 
         res = test_huff.writer.get_output()
 
-        with open(f'{folder.get_path()}{GLib.DIR_SEPARATOR_S}{source_file.get_basename()[:-4]}.thf', "wb") as binary_file:
+        with open(test_huff.output_path, "wb") as binary_file:
             binary_file.write(bytes(res))
         
-        Gimp.message(f"{res}")
-
-
+        Gimp.message(f'{test_huff.output_path}')   # \n{res}')
 
         # do what you want to do, then, in case of success, return:
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
@@ -280,8 +316,7 @@ Gimp.main(TrisHuffman.__gtype__, sys.argv)
 
 
 '''
-const {clear, log, dir} = console;
-
+console.clear();
 class Node
 {
     constructor(char = null, left = null, right = null)
@@ -311,8 +346,8 @@ class DecodeHuffman
     {
         this.bitstream = this.bitGenerator(file);
         const total_len = file.length;
-        const padding = file[0]
-        this.getAdjacentBits(8)
+        const padding = this.getAdjacentBits(8)
+        
         console.log("padding", padding, total_len)
 
         // skips the control bit set by the compression algorithm
@@ -475,4 +510,201 @@ const config = {
 
 window.game = new Phaser.Game(config)
 
+'''
+
+'''
+console.clear();
+class Node
+{
+    constructor(char = null, left = null, right = null)
+    {
+        this.char = char;
+        this.left = left;
+        this.right = right;
+    }
+
+    is_leaf()
+    {
+        return this.left === null;
+    }
+
+    get_char()
+    {
+        return this.char;
+    }
+}
+
+class DecodeHuffman
+{
+    processedBytes = 0;
+    bitstream;
+  
+    constructor(file)
+    {
+        this.bitstream = this.bitGenerator(file);
+      
+        const total_len = file.length;
+      
+        let padding = this.getAdjacentBits(8);
+        
+        console.log("padding", padding, total_len)
+
+        // Reconstruct the Huffman tree
+        const root = this.decodeTree();
+
+        // Get the character-code map back
+        const dictionary = this.assign_code(root, '');
+
+        console.log(dictionary);
+   		
+		// Decode!
+        const output = [];
+
+        let code = "";
+
+        const process = () => {
+          
+        	code += this.getBit().value;
+            
+            if (dictionary.has(code))
+            {
+                output.push(dictionary.get(code));
+
+                code = "";
+            }
+        }
+
+        while (this.processedBytes < total_len)
+        {
+            process()    
+        }
+      
+        if (padding)
+        {
+          while (padding--)
+          {
+              process()
+          }
+        }
+      
+//         for (let i = 0; i < padding; i++)
+//         {
+//             process()
+//         }
+
+        // destroy
+        this.bitstream.return();
+      
+        this.bitstream = undefined;
+      
+        // manage output
+        console.log(output.join(''));
+        
+    }
+
+    *bitGenerator(typedArray)
+    {
+        for (const byte of typedArray)
+        {
+          this.processedBytes += 1;
+          
+            // Iterate bits from Most Significant to Least Significant
+            for (let i = 7; i >= 0; i--)
+            {
+                yield (byte >> i) & 1;
+            }
+          
+        }
+    }
+
+    getBit() 
+    {
+        return this.bitstream.next();
+    }
+    getAdjacentBits(amount)
+    {
+        let bits = 0;
+
+        for (let i = 0; i < amount; i++)
+        {
+            bits <<= 1;
+
+            bits |= this.getBit().value;
+        }
+
+        return bits;
+    }
+
+    decodeTree()
+    {
+        const char = this.getBit().value;
+
+        if (char == 1)
+        {
+            return new Node(String.fromCharCode(this.getAdjacentBits(8)));
+        }
+
+        else
+        {
+            const left = this.decodeTree();
+            const right = this.decodeTree();
+            return new Node(null, left, right);
+        }
+    }
+
+    assign_code(node, code = '')
+    {
+        if (node.is_leaf())
+        {
+            return new Map().set(code, node.get_char());
+        }
+
+        return new Map([...this.assign_code(node.left, code + '0'), ...this.assign_code(node.right, code + '1')]);
+        
+    }
+}
+class TestScene extends Phaser.Scene
+{
+ 
+  constructor ()
+  {
+    super({ key: 'TestScene' });
+  }
+
+preload()
+    {
+        //this.load.binary('mio', 'assets/promessi.thf', Uint8Array);
+        this.load.binary('mio', 'assets/coso.thf', Uint8Array);
+        // this.load.binary('mio', 'assets/lorem.bin', Uint8Array);
+        // this.load.binary('mio', 'assets/large_text.bin', Uint8Array);
+        // this.load.binary('mio', 'assets/commedia.bin', Uint8Array)
+    }
+
+    create()
+    {
+       new DecodeHuffman(this.cache.binary.get('mio'));
+    }
+} // end TestScene
+    
+const config = {
+    type: Phaser.WEBGL,
+    parent: "gameContainer",
+    pixelArt: true,
+    backgroundColor: '#320822',
+    scale: {
+        mode: Phaser.Scale.NONE,
+        //autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 200,
+        height: 200,
+        zoom: 2
+    },
+    //loader: {
+    //  baseURL: 'https://labs.phaser.io/',
+    //  baseURL: 'https://i.ibb.co/YhGPn4S',
+    //  crossOrigin: 'anonymous'
+    //},
+    scene: [TestScene]
+};
+
+window.game = new Phaser.Game(config);
 '''
