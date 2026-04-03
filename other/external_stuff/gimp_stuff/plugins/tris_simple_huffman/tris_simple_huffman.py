@@ -59,12 +59,15 @@ class StreamGen():
         #     print(f'{i} {byte:08b} {byte:>3}')
         return self.res
     def finalize(self):
-        if self.idx != 0:
-            i = self.idx
-            print(f'Last bit was incomplete (idx was {i}')
+        i = self.idx
+        if i != 0:
             self.byte <<= (8 - i)
-            self.res.append(self.byte)
-            self.res.insert(0, i)
+            print(f'🌊 Last Byte shifted {8 - i}')
+        else:
+            print('🫧 Fit flawlessly')
+        self.res.insert(0, i)
+        self.res.append(self.byte)
+
 
 # 2. the node class
 class Node:
@@ -88,8 +91,6 @@ class Node:
 
 
 # 3. the Encoder Class
-
-
 class HufEncoder:
     def __init__(self, file, folder, user_string):
         self._file = file
@@ -105,10 +106,8 @@ class HufEncoder:
         self.decode_idx = 0
         self.string_encoding = self._decode_list[self.decode_idx]
 
-        #self.text now is a property
-
         # the Huffman tree (nodes containing nodea)
-        self.root = self.build_huffman_tree(self.text)
+        self.root = self.build_tree(self.text)
 
         # the dictionary (key -> string of zeroes and ones, value -> a one sized string with the char)
         self.huffman_dict = {}
@@ -131,13 +130,7 @@ class HufEncoder:
         for char in to_process:
             yield char
       
-    # def _file_length(complete_path):
-    #     count = 0
-    #     for row in open(complete_path, "r"):
-    #         count += len(row)
-    #     return count
-
-    def build_huffman_tree(self, text):
+    def build_tree(self, text):
         frequency = Counter(text)
         heap = [Node(char, freq) for char, freq in frequency.items()]
         heapq.heapify(heap)
@@ -158,11 +151,7 @@ class HufEncoder:
             self.generate_codes(node.left, prefix + "0", huffman_dict)
             self.generate_codes(node.right, prefix + "1", huffman_dict)
     
-    def preorder_traversal(self, node, writer):  # ENCODE TREE FOR HEADER
-        # print(f"🪝 {node}")
-        # if not node:
-        #     print("🏁 No node: returning")
-        #     return
+    def preorder_traversal(self, node, writer):
         if node.is_leaf():
             writer.addBit(1)
             writer.addChar(node.get_char())
@@ -180,17 +169,6 @@ class HufEncoder:
             self.writer.addBit(char)
         
         return self.writer.get_output()
-
-        
-        
-    # def huffman_encoding(self):
-    #     text = self.text
-    #     huffman_dict = self.huffman_dict
-    #     self.generate_codes(self.root, "", huffman_dict)
-    #     encoded_text = ''.join(huffman_dict[char] for char in text)
-    #     return encoded_text
-                
-    
 
 # 4. the Plugin class
 class TrisHuffman(Gimp.PlugIn):
@@ -258,14 +236,14 @@ class TrisHuffman(Gimp.PlugIn):
 
         # from HERE!
         if user_action:      
-            test_huff = HufEncoder(source_file, folder, user_string)
+            temp_encoder = HufEncoder(source_file, folder, user_string)
         
-            res = test_huff.execute()
+            res = temp_encoder.execute()
 
-            with open(test_huff.output_path, "wb") as binary_file:
+            with open(temp_encoder.output_path, "wb") as binary_file:
                 binary_file.write(bytes(res))
         
-            Gimp.message(f'Done!\nWrote: {test_huff.output_path}')
+            Gimp.message(f'Done!\nWrote: {temp_encoder.output_path}')
 
         print('(Huffman Done)')
         # do what you want to do, then, in case of success, return:
@@ -276,6 +254,7 @@ Gimp.main(TrisHuffman.__gtype__, sys.argv)
 
 
 '''
+// abcdefggggabc //Fits
 console.clear();
 class Node
 {
@@ -316,7 +295,7 @@ class DecodeHuffman
         const root = this.decodeTree();
 
         // Get the character-code map back
-        const dictionary = this.assign_code(root, '');
+        const dictionary = this.codeToCharsMapping(root, '');
 
         console.log(dictionary);
    		
@@ -339,14 +318,14 @@ class DecodeHuffman
 
         while (this.processedBytes < total_len)
         {
-            process()    
+            process();
         }
 
         if (padding)
         {
             while (padding--)
             {
-                process()
+                process();
             }
         }
       
@@ -409,14 +388,14 @@ class DecodeHuffman
         }
     }
 
-    assign_code(node, code = '')
+    codeToCharsMapping(node, code = '')
     {
         if (node.is_leaf())
         {
             return new Map().set(code, node.get_char());
         }
 
-        return new Map([...this.assign_code(node.left, code + '0'), ...this.assign_code(node.right, code + '1')]);
+        return new Map([...this.codeToCharsMapping(node.left, code + '0'), ...this.codeToCharsMapping(node.right, code + '1')]);
         
     }
 }  // End DecodeHuffman
@@ -432,7 +411,7 @@ class TestScene extends Phaser.Scene
 preload()
     {
         //this.load.binary('mio', 'assets/promessi.thf', Uint8Array);
-        this.load.binary('mio', 'assets/coso.thf', Uint8Array);
+        this.load.binary('mio', 'assets/default.thf', Uint8Array);
         // this.load.binary('mio', 'assets/default.thf', Uint8Array);
         // this.load.binary('mio', 'assets/lorem.bin', Uint8Array);
         // this.load.binary('mio', 'assets/large_text.bin', Uint8Array);
