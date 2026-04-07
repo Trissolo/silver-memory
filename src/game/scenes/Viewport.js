@@ -349,8 +349,6 @@ export class Viewport extends Scene
         this.roomscript.onRoomReady?.call(this);
 
         this.input.enabled = true;
-
-        // this.roomscript[2]?.call(this, this.bg);
     }
 
     //the scope is the GameObject
@@ -369,32 +367,11 @@ export class Viewport extends Scene
 
         // this.scene._infoThing(this);
 
-        // obj.first?.second
-
         if (this.rdata?.hoverName)
         {
             this.scene.labelManager.manageOveredThing(this, pointer, relX, relY);
         }
-
-        // if (this.rdata && this.rdata.hoverName)
-        // {   
-        //     const varIdx = this.rdata.hoverName; //this.scene.getVarValue(this.rdata.hoverName);
-
-        //     console.log(`hoverName idx ${varIdx}: ${this.scene.labelManager.hovernames[varIdx]}`);
-        // }
     }
-
-    onThingOut(pointer)
-    {
-        //console.log("Out");
-
-        this.scene.labelManager.label.setVisible(false);
-    }
-
-    // onThingMove(pointer, rx, ry, event)
-    // {
-        
-    // }
 
     // varsvars
     getVarValue(vcoords)

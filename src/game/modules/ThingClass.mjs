@@ -15,7 +15,7 @@ export default class Thing extends Phaser.GameObjects.Sprite
         .setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
         .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
         .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
-        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.onThingOut)
+        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
         .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
         
         .addToDisplayList();

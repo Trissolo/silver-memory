@@ -3,7 +3,6 @@ import hovernames from '../gamedata/hovernames.json';
 export default class ThingNameLabelManager
 {  
     scene;
-    timeEvent;
     fakeRect = new Phaser.Geom.Rectangle();
     labelTexture;
     bitmapText;
@@ -21,8 +20,6 @@ export default class ThingNameLabelManager
             //.tintFill(true)
             .setOrigin(0); 
         
-        // this.timeEvent = scene.time.addEvent({ paused: true, delay: 60, callback: this.updLabelPosition, callbackScope: this, loop: true });
-
         this.labelTexture = scene.textures.addDynamicTexture('dynat', 80, 12);
 
         this.label = scene.add.image(0, 0, 'dynat').setOrigin(0).setVisible(false).setDepth(1e9);
@@ -34,8 +31,6 @@ export default class ThingNameLabelManager
     {
         this.lastThing = null;
 
-        // this.timeEvent.paused = true;
-
         this.label.setVisible(false);
 
         return this;
@@ -43,10 +38,8 @@ export default class ThingNameLabelManager
 
     manageOveredThing(thing, pointer, relX, relY)
     {
-        // console.log("ThingNameLabelManager is managing thing");
         if (this.lastThing !== thing.thingIdx)
         {
-            // console.log("New label needed: calculating it");
             this.drawText(thing, pointer);
         }
         else
@@ -54,8 +47,6 @@ export default class ThingNameLabelManager
             // console.log("Recycling label");
 
             this.label.setVisible(true);
-            
-            // this.timeEvent.paused = false;
         }
     }
 
@@ -81,8 +72,6 @@ export default class ThingNameLabelManager
 
         fakeRect.setSize(width + border + border, height + border + border);
 
-        // console.log("Local:", width, height, "fakeRect", fakeRect)
-
         labelTexture
             .clear()
             .fill(0x5656a6, 1, 0, 0, fakeRect.width, fakeRect.height)
@@ -90,11 +79,8 @@ export default class ThingNameLabelManager
         
 
         this.setLabelPosition(pointer);
-        //this.scene.input.forceState(pointer, thing, gameObjectEvent, inputPluginEvent, [setCursor]);
 
         this.label.setVisible(true);
-
-        // this.timeEvent.paused = false;
     }
 
     setLabelPosition(pointer, rx, ry)
@@ -105,22 +91,12 @@ export default class ThingNameLabelManager
         const ny = Phaser.Math.Clamp(y + this.border, 0, this.camBounds.bottom - this.fakeRect.height);
 
         this.label.setPosition(nx, ny);
-
-        //this.label.setPosition(x - (this.fakeRect.width >> 1), y + this.border);
     }
 
-    // updLabelPosition(pointer)
-    // {
-    //     if(this.label.visible)
-    //     {
-    //         this.setLabelPosition(pointer);
-    //     }
-    //     // else
-    //     // {
-    //     //     // console.log("Stopping label timer");
-    //     //     this.timeEvent.paused = true;
-    //     // }
-    // }
+    hideLabel()
+    {
+        this.label.setVisible(false);
+    }
 
     destroy()
     {
