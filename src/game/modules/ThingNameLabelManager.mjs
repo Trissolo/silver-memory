@@ -21,7 +21,7 @@ export default class ThingNameLabelManager
             //.tintFill(true)
             .setOrigin(0); 
         
-        this.timeEvent = scene.time.addEvent({ paused: true, delay: 60, callback: this.updLabelPosition, callbackScope: this, loop: true });
+        // this.timeEvent = scene.time.addEvent({ paused: true, delay: 60, callback: this.updLabelPosition, callbackScope: this, loop: true });
 
         this.labelTexture = scene.textures.addDynamicTexture('dynat', 80, 12);
 
@@ -34,20 +34,20 @@ export default class ThingNameLabelManager
     {
         this.lastThing = null;
 
-        this.timeEvent.paused = true;
+        // this.timeEvent.paused = true;
 
         this.label.setVisible(false);
 
         return this;
     }
 
-    manageOveredThing(thing)
+    manageOveredThing(thing, pointer, relX, relY)
     {
         // console.log("ThingNameLabelManager is managing thing");
         if (this.lastThing !== thing.thingIdx)
         {
             // console.log("New label needed: calculating it");
-            this.drawText(thing);
+            this.drawText(thing, pointer);
         }
         else
         {
@@ -55,7 +55,7 @@ export default class ThingNameLabelManager
 
             this.label.setVisible(true);
             
-            this.timeEvent.paused = false;
+            // this.timeEvent.paused = false;
         }
     }
 
@@ -67,13 +67,13 @@ export default class ThingNameLabelManager
     //     }      
     // }
 
-    drawText(thing)
+    drawText(thing, pointer, relX, relY)
     {
         this.lastThing = thing.thingIdx;
 
         const {bitmapText, labelTexture, fakeRect} = this;
         
-        thing.isTriggerArea?  bitmapText.setTintFill(0xdada67) : bitmapText.clearTint();
+        // thing.isTriggerArea?  bitmapText.setTintFill(0xdada67) : bitmapText.clearTint();
 
         const {local: {width, height}} = bitmapText.setText(hovernames[thing.rdata.hoverName]).getTextBounds();
 
@@ -89,16 +89,17 @@ export default class ThingNameLabelManager
             .draw(bitmapText, border, border, 1);
         
 
-        this.setLabelPosition();
+        this.setLabelPosition(pointer);
+        //this.scene.input.forceState(pointer, thing, gameObjectEvent, inputPluginEvent, [setCursor]);
 
         this.label.setVisible(true);
 
-        this.timeEvent.paused = false;
+        // this.timeEvent.paused = false;
     }
 
-    setLabelPosition()
+    setLabelPosition(pointer, rx, ry)
     {
-        const {worldX: x, worldY: y} = this.scene.input.activePointer;
+        const {worldX: x, worldY: y} = pointer;
 
         const nx = Phaser.Math.Clamp(x - (this.fakeRect.width >> 1), this.camBounds.x, this.camBounds.right - this.fakeRect.width);
         const ny = Phaser.Math.Clamp(y + this.border, 0, this.camBounds.bottom - this.fakeRect.height);
@@ -108,18 +109,18 @@ export default class ThingNameLabelManager
         //this.label.setPosition(x - (this.fakeRect.width >> 1), y + this.border);
     }
 
-    updLabelPosition()
-    {
-        if(this.label.visible)
-        {
-            this.setLabelPosition();
-        }
-        else
-        {
-            // console.log("Stopping label timer");
-            this.timeEvent.paused = true;
-        }
-    }
+    // updLabelPosition(pointer)
+    // {
+    //     if(this.label.visible)
+    //     {
+    //         this.setLabelPosition(pointer);
+    //     }
+    //     // else
+    //     // {
+    //     //     // console.log("Stopping label timer");
+    //     //     this.timeEvent.paused = true;
+    //     // }
+    // }
 
     destroy()
     {

@@ -10,7 +10,7 @@ import Shield from '../modules/Shield.js';
 import Actor from '../modules/Actor.js';
 // import RoomEvents from './RoomEvents/genericRoomEvents.js'
 import TriggerZoneManager from '../modules/triggerZoneManager.mjs';
-import ThingNameLabelManager from '../modules/tlnManager.mjs';
+import ThingNameLabelManager from '../modules/ThingNameLabelManager.mjs';
 import SaveGame from '../modules/savegame.mjs';
 
 export class Viewport extends Scene
@@ -99,20 +99,6 @@ export class Viewport extends Scene
 
         // 2) Room 'things'
         this.thingsGroup = this.add.group({classType: Thing})
-            // {createCallback: function (thing)
-            // {
-            //     thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
-            //     .setVisible(false)
-            //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, thing.scene.onThingDown)
-            //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, thing.scene.onThingOver)
-            //     .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, thing.scene.onThingOut)
-            //     .rdata = null;
-
-            //     thing.isThing = true;
-            //     thing.isTriggerArea = false;
-            //     thing.scene.cameras.cameras[1].ignore(thing);
-            // }
-        //});
 
         // 2b) Room's triggerzones
         this.triggerZones = new TriggerZoneManager(this);
@@ -187,6 +173,7 @@ export class Viewport extends Scene
     pressedX(eve)
     {
         console.log("Pressed 'X'");
+        console.log(`scene Timers: ${this.time._active.length}`, this.time._active);
 
         // VarManager._debug();
     }
@@ -242,7 +229,7 @@ export class Viewport extends Scene
 
         this.varyingDepthSprites.clear();
 
-        this.bg.hide() //setVisible(false);
+        this.bg.hide();
 
         this.player.hide().walk.stopAndClear();
 
@@ -376,7 +363,7 @@ export class Viewport extends Scene
         scene.roomscript[this.thingIdx].call(scene, this, pointer);
     }
 
-    onThingOver(pointer)
+    onThingOver(pointer, relX, relY)
     {
         // console.log(`Over`);
 
@@ -386,7 +373,7 @@ export class Viewport extends Scene
 
         if (this.rdata?.hoverName)
         {
-            this.scene.labelManager.manageOveredThing(this);
+            this.scene.labelManager.manageOveredThing(this, pointer, relX, relY);
         }
 
         // if (this.rdata && this.rdata.hoverName)
@@ -403,6 +390,11 @@ export class Viewport extends Scene
 
         this.scene.labelManager.label.setVisible(false);
     }
+
+    // onThingMove(pointer, rx, ry, event)
+    // {
+        
+    // }
 
     // varsvars
     getVarValue(vcoords)
