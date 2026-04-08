@@ -21,16 +21,19 @@ class StreamGen():
     def __init__(self):
         self.byte = 0
         self.idx = 0
-        self.res = []
+
+        # the first byte will contain the padding. Let's assume that it's 0, for now
+        self.res = [0]
+
         self._allowed = {0, 1, '0', '1'}
         self.usable = dict()
         [self.usable.update({chr(n): f'{n:08b}'}) for n in range(8, 256)]
     def reset(self):
         self.byte = 0
         self.idx = 0
-    def clearAll(self):
-        self.reset()
-        self.res.clear()
+    # def clearAll(self):
+    #     self.reset()
+    #     self.res.clear()
     @staticmethod
     def _integer_to_string(num):
         return f'{num:08b}'
@@ -59,13 +62,19 @@ class StreamGen():
         #     print(f'{i} {byte:08b} {byte:>3}')
         return self.res
     def finalize(self):
-        i = self.idx
-        if i != 0:
-            self.byte <<= (8 - i)
-            print(f'🌊 Last Byte shifted {8 - i}')
+        #i = self.idx
+        if self.idx != 0:
+            self.byte <<= (8 - self.idx)
+            # self.res.append(self.byte)
+            self.res[0] = self.idx
+            print(f'🌊 Last Byte shifted {8 - self.idx}. And the first byte has just been updated.')
         else:
             print('🫧 Fit flawlessly')
-        self.res.insert(0, i)
+        print(f'Finalizing: {self.idx}')
+        print(f'Before: {self.res[0]}, {self.res[1]}')
+        # self.res.insert(0, self.idx)
+        
+        print(f'After: {self.res[0]}, {self.res[1]}, {self.res[2]}')
         self.res.append(self.byte)
 
 
@@ -244,8 +253,12 @@ class TrisHuffman(Gimp.PlugIn):
 
             with open(temp_encoder.output_path, "wb") as binary_file:
                 binary_file.write(bytes(res))
-        
+
+            Gimp.message_set_handler(Gimp.MessageHandlerType.MESSAGE_BOX)
+
             Gimp.message(f'Done!\nWrote: {temp_encoder.output_path}')
+
+            Gimp.message_set_handler(Gimp.MessageHandlerType.CONSOLE)
 
         print('(Huffman Done)')
         # do what you want to do, then, in case of success, return:
