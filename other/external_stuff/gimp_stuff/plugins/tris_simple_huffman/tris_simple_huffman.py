@@ -181,9 +181,11 @@ class TrisHuffman(Gimp.PlugIn):
         return False
     def do_create_procedure(self, name="tris-simple-huffman"):
         procedure = Gimp.ImageProcedure.new(self, name, Gimp.PDBProcType.PLUGIN, self.run, None)
-        #procedure.set_image_types("*")
+        # procedure.set_image_types("*")
         procedure.set_menu_label("[Tris] 🗜️ Simple Huffman Encoder")
         procedure.add_menu_path( '<Image>/Filters/[[Tris]]/' )
+        # procedure.set_menu_label("_Python 3 Hello World")
+        # procedure.add_menu_path( '<Image>/Tris/')
         procedure.set_documentation("Simple Huffman Encoder", "A simple Huffman Encoder fortext files", name)
         procedure.set_attribution("Tris", "att_name", "2026")
         
@@ -214,7 +216,7 @@ class TrisHuffman(Gimp.PlugIn):
             self.ARGU_TEST_STRING, #const gchar* name,
             'The string to compress (the file will be ignored)',  #const gchar* nick,
             'blurb for test string', #const gchar* blurb,
-            'ARGU_STRING_value',     #const gchar* value,
+            '',     #const gchar* value,
             GObject.ParamFlags.READWRITE #GParamFlags flags
         )
 
