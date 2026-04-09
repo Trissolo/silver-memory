@@ -46,10 +46,10 @@ export class Controller extends Scene
 
     prepareBase()
     {
-        this.dbsSelectionRect = this.add.image(6, 7, 'atlasbase', 'pixelA')
+        this.dbsSelectionRect = this.add.image(6, 6, 'atlasbase', 'pixelA')
             .setOrigin(0)
             .setVisible(false)
-            .setScale(190, 7);
+            .setScale(190, 6);
 
         this.dbsList = this.add.bitmapText(8, 8, "font0", "Press 'x'")
             .setOrigin(0)
@@ -58,6 +58,9 @@ export class Controller extends Scene
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.onListOver)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.onListOut)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.onListMove);
+
+        this.dbsList.wordWrapCharCode = 160;
+        this.dbsList.charColors.length = 0;
 
         this.dbsTitle = this.add.bitmapText(8, 98, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
     }
@@ -70,7 +73,10 @@ export class Controller extends Scene
                 'Exit',
                 'Blammo 1.0',
                 'ArmorAll 1.0',
-                'BattleChess 2.0'
+                'BattleChess 2.0',
+                'Hammer 2.0',
+                'Logic Bomb 5.0',
+                'DoorStop 4.0'
             ];
         }
 
@@ -100,12 +106,22 @@ export class Controller extends Scene
     onListOut()
     {
         this.scene.dbsSelectionRect.setVisible(false);
+        this.charColors.length = 0;
     }
 
     onListMove(pointer, locX, locY, event)
     {
         const {lineHeight} = this.fontData;
-        this.scene.dbsSelectionRect.y = this.y + Math.floor(locY / lineHeight) * lineHeight - 1;
+        this.scene.dbsSelectionRect.y = this.y + Math.floor(locY / lineHeight) * lineHeight;
+        this.charColors.length = 0;
+        const {word} = this.getTextBounds().words[Math.floor(locY / lineHeight)];
+        //this.setCharacterTint()
+        this.setWordTint(word, 1, true, this.scene.cameras.main.backgroundColor._color);
+    }
+
+    onListDown()
+    {
+        return;
     }
 
     // get_important_scenes()
