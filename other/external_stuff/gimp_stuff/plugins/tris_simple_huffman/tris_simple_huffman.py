@@ -25,6 +25,8 @@ class StreamGen():
         # the first byte will contain the padding. Let's assume that it's 0, for now
         self.res = [0]
 
+        self.bit_count = 0
+
         self._allowed = {0, 1, '0', '1'}
         self.usable = dict()
         [self.usable.update({chr(n): f'{n:08b}'}) for n in range(8, 256)]
@@ -44,6 +46,7 @@ class StreamGen():
             bit = 0 if bit == '0' else 1
         self.byte <<= 1
         self.idx +=1
+        self.bit_count += 1
         if bit:
             self.byte |= 1
         if self.idx == 8:
@@ -76,6 +79,7 @@ class StreamGen():
         
         print(f'After: {self.res[0]}, {self.res[1]}, {self.res[2]}')
         self.res.append(self.byte)
+        print(f'{self.bit_count=} | {self.idx=}. Ary.length (including firs byte): {(len(self.res ) - 1) * 8}')
 
 
 # 2. the node class
