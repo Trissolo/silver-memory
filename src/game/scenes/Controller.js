@@ -1,11 +1,13 @@
 import { Scene } from 'phaser';
 import RoomEvents from './RoomEvents/genericRoomEvents.js'
+import DataBaseList from '../modules/DataBaseList.mjs';
 
 export class Controller extends Scene
 {
-    param = [];
     roomEmitter;
-    _container = new Set();
+    // _container = new Set();
+
+    dbsList;
 
     constructor ()
     {
@@ -20,11 +22,15 @@ export class Controller extends Scene
     create ()
     {
         // console.log("CONTROLLER") //, this.roomEmitter);
+
         this.prepareBase();
-        // this.text = this.add.bitmapText(8, 8, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
-        this.dbsSetList();
+
+        this.dbsList.setList(); //['Exit to Main', 'Cryptology 1.0', 'CopTalk 4.0']);
+
         this.input.keyboard.once('keydown-C', this.prezzed_c_cont, this);
-        // this.input.keyboard.on('keydown-M', this.pressedM, this);
+
+        this.input.keyboard.on('keydown-M', this.pressedM, this);
+
         // this.scene.start('Viewport');
     }
 
@@ -36,7 +42,23 @@ export class Controller extends Scene
     pressedM()
     {
         console.log('Controller: pressed M-key');
+
+        this.dbsList.forceSelection(2);
     }
+
+    prepareBase()
+    {
+        this.dbsSelectionRect = this.add.image(16, 6, 'atlasbase', 'pixelA')
+            .setOrigin(0)
+            .setVisible(false)
+            .setScale(190, 6);
+
+        this.dbsList = new DataBaseList(this);
+
+        this.dbsTitle = this.add.bitmapText(8, 98, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
+    }
+
+    
 
     // _installScene(recScene)
     // {
@@ -51,97 +73,7 @@ export class Controller extends Scene
     //     }
     // }
 
-    prepareBase()
-    {
-        this.dbsSelectionRect = this.add.image(16, 6, 'atlasbase', 'pixelA')
-            .setOrigin(0)
-            .setVisible(false)
-            .setScale(190, 6);
-
-        this.dbsList = this.add.bitmapText(8, 8, "font0", "Press 'x'")
-            .setOrigin(0)
-            .setVisible(false)
-            .setInteractive()
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.onListOver)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.onListOut)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.onListMove);
-
-        this.dbsList.wordWrapCharCode = 160;
-        this.dbsList.charColors.length = 0;
-
-        this.dbsTitle = this.add.bitmapText(8, 98, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
-    }
-
-    dbsSetList(param)
-    {
-        if (param === undefined)
-        {
-            param = [
-                'Exit',
-                'Blammo 1.0',
-                'ArmorAll 1.0',
-                'BattleChess 2.0',
-                'Hammer 2.0',
-                'Logic Bomb 5.0',
-                'DoorStop 4.0'
-            ];
-        }
-
-        this.param = param;
-
-        const list = [];
-
-        const marker = 'X123456789';
-
-        console.log(this.dbsList)
-
-        for (const [idx, listItem] of param.entries())
-        {
-            list.push(`${marker.charAt(idx)}. ${listItem}`);
-        }
-
-        const {local} = this.dbsList.setText(list).getTextBounds();
-
-        Phaser.Geom.Rectangle.CopyFrom(local, this.dbsList.input.hitArea);
-
-        this.dbsList.input.hitArea.height -= 1;
-
-        this.dbsList.setVisible(true);
-    }
-
-    onListOver()
-    {
-        this.scene.dbsSelectionRect.setVisible(true);
-    }
-
-    onListOut()
-    {
-        this.scene.dbsSelectionRect.setVisible(false);
-        this.charColors.length = 0;
-    }
-
-    onListMove(pointer, locX, locY, event)
-    {
-        const {lineHeight} = this.fontData;
-
-        const rowIdx = Math.floor(locY / lineHeight);
-
-        this.scene.dbsSelectionRect.y = this.y + rowIdx * lineHeight;
-
-        this.charColors.length = 0;
-
-        const {param} = this.scene;
-
-        this.setCharacterTint(this.text.indexOf(param[rowIdx]) - rowIdx, param[rowIdx].length, true, 0x320822); //this.scene.cameras.main.backgroundColor._color);
-
-        // const {word} = this.getTextBounds().words[Math.floor(locY / lineHeight)];
-        // this.setWordTint(word, 1, true, this.scene.cameras.main.backgroundColor._color);
-    }
-
-    onListDown()
-    {
-        return;
-    }
+    
 
     // get_important_scenes()
     // {
