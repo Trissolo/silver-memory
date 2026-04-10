@@ -3,6 +3,7 @@ import RoomEvents from './RoomEvents/genericRoomEvents.js'
 
 export class Controller extends Scene
 {
+    param = [];
     roomEmitter;
     _container = new Set();
 
@@ -23,12 +24,18 @@ export class Controller extends Scene
         // this.text = this.add.bitmapText(8, 8, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
         this.dbsSetList();
         this.input.keyboard.once('keydown-C', this.prezzed_c_cont, this);
-        //this.scene.start('Viewport');
+        // this.input.keyboard.on('keydown-M', this.pressedM, this);
+        // this.scene.start('Viewport');
     }
 
     prezzed_c_cont()
     {
         this.scene.switch('Viewport');
+    }
+
+    pressedM()
+    {
+        console.log('Controller: pressed M-key');
     }
 
     // _installScene(recScene)
@@ -46,7 +53,7 @@ export class Controller extends Scene
 
     prepareBase()
     {
-        this.dbsSelectionRect = this.add.image(6, 6, 'atlasbase', 'pixelA')
+        this.dbsSelectionRect = this.add.image(16, 6, 'atlasbase', 'pixelA')
             .setOrigin(0)
             .setVisible(false)
             .setScale(190, 6);
@@ -80,6 +87,8 @@ export class Controller extends Scene
             ];
         }
 
+        this.param = param;
+
         const list = [];
 
         const marker = 'X123456789';
@@ -94,6 +103,8 @@ export class Controller extends Scene
         const {local} = this.dbsList.setText(list).getTextBounds();
 
         Phaser.Geom.Rectangle.CopyFrom(local, this.dbsList.input.hitArea);
+
+        this.dbsList.input.hitArea.height -= 1;
 
         this.dbsList.setVisible(true);
     }
@@ -112,11 +123,19 @@ export class Controller extends Scene
     onListMove(pointer, locX, locY, event)
     {
         const {lineHeight} = this.fontData;
-        this.scene.dbsSelectionRect.y = this.y + Math.floor(locY / lineHeight) * lineHeight;
+
+        const rowIdx = Math.floor(locY / lineHeight);
+
+        this.scene.dbsSelectionRect.y = this.y + rowIdx * lineHeight;
+
         this.charColors.length = 0;
-        const {word} = this.getTextBounds().words[Math.floor(locY / lineHeight)];
-        //this.setCharacterTint()
-        this.setWordTint(word, 1, true, this.scene.cameras.main.backgroundColor._color);
+
+        const {param} = this.scene;
+
+        this.setCharacterTint(this.text.indexOf(param[rowIdx]) - rowIdx, param[rowIdx].length, true, 0x320822); //this.scene.cameras.main.backgroundColor._color);
+
+        // const {word} = this.getTextBounds().words[Math.floor(locY / lineHeight)];
+        // this.setWordTint(word, 1, true, this.scene.cameras.main.backgroundColor._color);
     }
 
     onListDown()
