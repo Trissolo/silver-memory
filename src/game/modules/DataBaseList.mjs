@@ -1,8 +1,12 @@
 export default class DataBaseList extends Phaser.GameObjects.BitmapText
 {
     listData;
-    marker = 'X123456789';
+
     row;
+
+    marker = 'X123456789';
+
+    _inThrottle = true;
 
     constructor(scene)
     {
@@ -22,6 +26,8 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
 
     clearList()
     {
+        this.setVisible(false);
+
         this.disableInteractive();
 
         this.row = undefined;
@@ -52,7 +58,7 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
 
         this.charColors.length = 0;
 
-        const {local} = this.setText(param.map((el, i) => `${this.marker.charAt(i)}. ${el}`)).getTextBounds();
+        const {local} = this.setText(param.map(this.utilGetListElement, this)).getTextBounds();
 
         Phaser.Geom.Rectangle.CopyFrom(local, this.input.hitArea);
 
@@ -74,7 +80,7 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
     {
         const {row} = this;
 
-        const rowElement = this.listData[row]
+        const rowElement = this.listData[row];
 
         this.scene.dbsSelectionRect.y = this.y + row * this.fontData.lineHeight;
 
@@ -93,12 +99,14 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
         {
             this.row = currRow;
 
-            if (currRow >= 0)
-            {
-                console.log('isNumbRow', currRow);
+            this.setSelection();
 
-                this.setSelection();
-            }
+            // if (currRow >= 0)
+            // {
+            //     console.log('isNumbRow', currRow);
+
+            //     this.setSelection();
+            // }
         }
 
     }
@@ -114,6 +122,13 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
 
     onListMove(pointer, locX, locY, event)
     {
+        if (this._inThrottle = !this._inThrottle)
+        {
+            console.log("Skipping, but I'm not sure if it's needed");
+
+            return;
+        }
+
         const currRow = this.deriveRowIdx(locY);
 
         if (this.row !== currRow)
@@ -146,6 +161,11 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
 
             this.scene.input.forceDownState(this.scene.input.activePointer, this);
         }
+    }
+
+    utilGetListElement(element, index, array)
+    {
+        return `${this.marker.charAt(index)}. ${element}`;
     }
 
     destroy()

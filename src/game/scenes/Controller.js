@@ -25,7 +25,7 @@ export class Controller extends Scene
 
         this.prepareBase();
 
-        this.dbsList.setList(); //['Exit to Main', 'Cryptology 1.0', 'CopTalk 4.0']);
+        this.dbsList.setList(); // ['Exit to Main', 'Cryptology 1.0', 'CopTalk 4.0']);
 
         this.input.keyboard.once('keydown-C', this.prezzed_c_cont, this);
 
@@ -55,7 +55,9 @@ export class Controller extends Scene
 
         this.dbsList = new DataBaseList(this);
 
-        this.dbsTitle = this.add.bitmapText(8, 98, "font0", "Press 'C'\n+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
+        this.dbsTitle = this.add.bitmapText(8, 98, "font0", "Press 'C'")
+            .setDepth(1e9)
+            .setOrigin(0);
     }
 
     
@@ -74,7 +76,6 @@ export class Controller extends Scene
     // }
 
     
-
     // get_important_scenes()
     // {
     //     const res = [];
