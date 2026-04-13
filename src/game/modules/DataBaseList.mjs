@@ -1,4 +1,18 @@
-export default class DataBaseList extends Phaser.GameObjects.BitmapText
+const componentGag = {
+    //constructor()
+    qwer: 234,
+    myGag: function ()
+    {
+        return console.log("MyGag called", this.qwer);
+    }
+}
+
+// Object.assign(DataBaseList.prototype, componentGag);
+
+/**
+ * @extends componentGag
+ */
+class DataBaseList extends Phaser.GameObjects.BitmapText
 {
     listData;
 
@@ -20,6 +34,10 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.onListDown);
         
         this.addToDisplayList();
+
+        Object.assign(this.constructor.prototype, componentGag);
+
+        this.myGag();
 
         // this.wordWrapCharCode = 160;
     }
@@ -180,3 +198,5 @@ export default class DataBaseList extends Phaser.GameObjects.BitmapText
         super.destroy();
     }
 }
+
+export default DataBaseList;

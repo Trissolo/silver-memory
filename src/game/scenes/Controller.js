@@ -54,7 +54,7 @@ export class Controller extends Scene
             .setScale(190, 6);
 
         this.dbsList = new DataBaseList(this);
-
+        
         this.dbsTitle = this.add.bitmapText(8, 98, "font0", "Press 'C'")
             .setDepth(1e9)
             .setOrigin(0);
