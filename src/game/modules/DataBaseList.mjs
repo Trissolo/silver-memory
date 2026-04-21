@@ -22,6 +22,9 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
 
     _inThrottle = true;
 
+    // trick
+    myGag;
+
     constructor(scene)
     {
         super(scene, 8, 8, 'font0', '')
@@ -35,9 +38,11 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
         
         this.addToDisplayList();
 
-        Object.assign(this.constructor.prototype, componentGag);
+        ///Object.assign(this.constructor.prototype, componentGag);
+        Object.defineProperties(this, Object.getOwnPropertyDescriptors(componentGag));
 
         this.myGag();
+        console.log(this.myGag.toString(), this.qwer);
 
         // this.wordWrapCharCode = 160;
     }
