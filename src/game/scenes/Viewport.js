@@ -283,7 +283,7 @@ export class Viewport extends Scene
                 roomThing = this.thingsGroup.get(thingData.x, thingData.y);
                 // console.log(`Generating Things - position: ${roomThing.x}, ${roomThing.y} isntanceOf Thing? ${roomThing instanceof Thing}`);
                 // set the frame, and, if needed, the texture
-                const assembledFrameName = `${thingData.frame}${thingData.suffix? this.getVarValue(thingData.suffix): ""}`;
+                const assembledFrameName = `${thingData.frame}${thingData.suffix? this.varsGetValue(thingData.suffix): ""}`;
                 roomThing.texture.key === atlasKey? roomThing.setFrame(assembledFrameName): roomThing.setTexture(atlasKey, assembledFrameName);
             }
                                 
@@ -324,7 +324,7 @@ export class Viewport extends Scene
                 roomThing.setInteractive();
             }
             
-            if (thingData.skipCond && this.conditionIsSatisfied(thingData.skipCond))
+            if (thingData.skipCond && this.varsConditionIsSatisfied(thingData.skipCond))
             {
                 console.log("Skipping",thingData);
                 continue;
@@ -379,23 +379,23 @@ export class Viewport extends Scene
     }
 
     // varsvars
-    getVarValue(vcoords)
+    varsGetValue(vcoords)
     {
         if (Array.isArray(vcoords))
         {
-            console.warn(`'getVarValue' received an array, then attempted to consider the value at position [0]`, ary);
+            console.warn(`'varsGetValue' received an array, then attempted to consider the value at position [0]`, ary);
 
             vcoords = vcoords[0];
         }
         return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2);
     }
 
-    conditionIsSatisfied(ary)
+    varsConditionIsSatisfied(ary)
     {
         return VarManager.newHandleAny(ary[0] & 3, ary[0] >>> 2) === ary[1];
     }
 
-    setVariable(vcoords, newValue)
+    varsSetValue(vcoords, newValue)
     {
         // console.log(`Writing the value: ${newValue} to var identified with kind: ${ary&3}, idx: ${ary>>>2}`);
         VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, newValue);
@@ -403,10 +403,10 @@ export class Viewport extends Scene
 
     setAsCondition(condition_ary)
     {
-        this.setVariable(condition_ary[0], condition_ary[1]);
+        this.varsSetValue(condition_ary[0], condition_ary[1]);
     }
 
-    toggleBit(vcoords)
+    varsToggleBit(vcoords)
     {
         //console.log("Toggle param is array? (An INTEGER is required)", Array.isArray(vcoords));
         if (Array.isArray(vcoords))
@@ -471,14 +471,14 @@ export class Viewport extends Scene
     refreshSpriteFrame(go)
     {
         //console.log("Number.isInteger", Number.isInteger(quickValue));
-        return go.setFrame(`${go.rdata.frame}${this.getVarValue(go.rdata.suffix)}`);
+        return go.setFrame(`${go.rdata.frame}${this.varsGetValue(go.rdata.suffix)}`);
     }
 
     scrollSpriteFrame(go, maxLimit = 1, backwards = false)
     {
         const vcoord = go.rdata.suffix;
-        const value = this.getVarValue(vcoord);
-        this.setVariable(vcoord, this.nextIntInRange(value, 0, maxLimit, backwards));
+        const value = this.varsGetValue(vcoord);
+        this.varsSetValue(vcoord, this.nextIntInRange(value, 0, maxLimit, backwards));
         this.refreshSpriteFrame(go);
     }
 

@@ -1,14 +1,14 @@
 import { Viewport } from "../scenes/Viewport";
 
-export default class rs4
-{
+// export default class rs4
+const rs4 = {
     // platform
     /**
      * 
      * @param {Phaser.GameObjects.Sprite} thing 
      * @this {Viewport}
      */
-    static 0(thing)
+    0(thing)
     {
         // console.log(thing.rdata, thing.y, thing.scene);
         const {scene} = thing;
@@ -21,17 +21,20 @@ export default class rs4
             console.log(`After Thing y: ${thing.y}, Actor.y: ${thing.scene.player.y}`);
         }
 
-    }
+    },
 
     // panelb
-    static 1(thing){console.log(thing.frame.name);}
+    1(thing){console.log(thing.frame.name);},
 
     // panela
-    static 2(thing){console.log(thing.frame.name);}
+    2(thing){console.log(thing.frame.name);},
 
     // AREA
-    static 3(ta)
+    3(ta)
     {
+        console.log("Not a CLass ;) But a Method!");
         this.toAnotherRoom(ta, 3, 22, 67, "E", 0);
     }
 }
+
+export default rs4

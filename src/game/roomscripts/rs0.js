@@ -20,9 +20,9 @@ export default class rs0
         const roomJson = this.getJson(0);
         const tjson = roomJson.things[thing.thingIdx]
         // console.dir(tjson);
-        // console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.getVarValue(tjson.suffix)}`)
-        this.toggleBit(tjson.suffix);
-        thing.setFrame(`${tjson.frame}${this.getVarValue(tjson.suffix)}`);
+        // console.log(`Suffix vcoords: ${tjson.suffix}\nSuffix value: ${this.varsGetValue(tjson.suffix)}`)
+        this.varsToggleBit(tjson.suffix);
+        thing.setFrame(`${tjson.frame}${this.varsGetValue(tjson.suffix)}`);
     }
 
     // crate
@@ -96,18 +96,18 @@ export default class rs0
         //const {suffix: vcoords_for_suffix} = tjson;
         const {suffix: vcoords_for_suffix} = thing.rdata;
         console.log(vcoords_for_suffix);
-        const current_value = this.getVarValue(vcoords_for_suffix);
+        const current_value = this.varsGetValue(vcoords_for_suffix);
         if (current_value === 0)
         {
-            this.setVariable(vcoords_for_suffix, 1);
+            this.varsSetValue(vcoords_for_suffix, 1);
         }
         else
         {
-            this.setVariable(vcoords_for_suffix, 0);
+            this.varsSetValue(vcoords_for_suffix, 0);
         }
-        console.log("Changed to:", this.getVarValue(vcoords_for_suffix));
+        console.log("Changed to:", this.varsGetValue(vcoords_for_suffix));
         //refresh frame
-        thing.setFrame(`${thing.rdata.frame}${this.getVarValue(vcoords_for_suffix)}`);
+        thing.setFrame(`${thing.rdata.frame}${this.varsGetValue(vcoords_for_suffix)}`);
     }
 
     /**
@@ -147,7 +147,7 @@ export default class rs0
                 {
                     at: 1100,
                     run: () => {
-                        this.toggleBit(buttonSprite.rdata.suffix);
+                        this.varsToggleBit(buttonSprite.rdata.suffix);
                         this.refreshSpriteFrame(buttonSprite);
                     }
                     

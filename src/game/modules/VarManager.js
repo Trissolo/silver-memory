@@ -72,9 +72,9 @@ class VarManager
         
     }  // end Initialize
 
-    static newHandleAny(kind, varIdx, newValue, toggleBit)
+    static newHandleAny(kind, varIdx, newValue, varsToggleBit)
     {
-        // console.log(`INSIDE HANDEL ARRAY, kind: ${kind}, varIDX: ${varIdx}, newValue: ${newValue}, toggleBit: ${toggleBit}`);
+        // console.log(`INSIDE HANDEL ARRAY, kind: ${kind}, varIDX: ${varIdx}, newValue: ${newValue}, varsToggleBit: ${varsToggleBit}`);
         const container = this.varContainers.get(kind);
 
         // Quick check
@@ -139,7 +139,7 @@ class VarManager
         }
 
         // toggle bit?
-        if (toggleBit && container.isBool)  // if (argLength === 4 && container.isBool)
+        if (varsToggleBit && container.isBool)  // if (argLength === 4 && container.isBool)
         {
             typedArray[y] ^= (1 << x);
         }
@@ -158,7 +158,7 @@ class VarManager
     //     return this.vars.newHandleAny(kind, varIdx, newValue);
     // }
 
-    // toggleBit(varIdx, kind = 0)
+    // varsToggleBit(varIdx, kind = 0)
     // {
     //   return this.vars.newHandleAny(kind, varIdx, null, true);
     // }
@@ -211,3 +211,124 @@ class VarManager
 VarManager.initialize([bool_json, crumble_json, nibble_json, byte_json]);
 
 export default VarManager;
+
+
+
+
+// ///////////Ottimizzato
+// class VarManager {
+//     // Contenitori per le variabili
+//     static varContainers = [];
+//     static BITS_PER_ELEMENT = 32;
+
+//     /**
+//      * Crea un contenitore ottimizzato per un tipo di variabile (Kind).
+//      */
+//     static createByKind(kind, arrayLength = 2)
+//     {
+//         const varSize = 1 << kind; // 1, 2, 4, 8 bits
+//         const varsPerElement = this.BITS_PER_ELEMENT / varSize;
+        
+//         // Calcolo shift e mask per evitare Math.floor e %
+//         // Se varsPerElement è 32, shift è 5 (2^5). Se è 8, shift è 3 (2^3).
+//         const vpeShift = Math.log2(varsPerElement);
+//         const vpeMask = varsPerElement - 1;
+//         const bitmask = (1 << varSize) - 1;
+
+//         let lastIdxAllowed;
+//         let actualArraySize = arrayLength;
+
+//         // Gestione input array (da JSON) o numero diretto
+//         if (Array.isArray(arrayLength)) {
+//             lastIdxAllowed = arrayLength[kind].length;
+//             actualArraySize = Math.ceil((lastIdxAllowed * varSize) / this.BITS_PER_ELEMENT);
+//         } else {
+//             lastIdxAllowed = arrayLength * varsPerElement;
+//         }
+
+//         return {
+//             varSize,
+//             vpeShift,
+//             vpeMask,
+//             bitmask,
+//             typedArray: new Uint32Array(actualArraySize),
+//             lastIdxAllowed: lastIdxAllowed - 1,
+//             kind // memorizziamo il kind per comodità
+//         };
+//     }
+
+//     /**
+//      * Inizializza i 4 contenitori (Bool, Crumble, Nibble, Byte)
+//      */
+//     static initialize(dataArrays) {
+//         console.log("Variable Manager: INITIALIZING...");
+//         for (let kind = 0; kind < 4; kind++) {
+//             this.varContainers[kind] = this.createByKind(kind, dataArrays);
+//         }
+//     }
+
+//     /**
+//      * Funzione Core: Gestisce lettura, scrittura e toggle con logica bitwise pura.
+//      */
+//     static handle(kind, varIdx, newValue, toggle) {
+//         const container = this.varContainers[kind];
+
+//         if (varIdx > container.lastIdxAllowed) {
+//             console.error(`Variable OUT OF RANGE! Kind: ${kind}, Idx: ${varIdx}`);
+//             return 0;
+//         }
+
+//         // Calcolo coordinate bitwise (Niente Math.floor, niente %)
+//         const y = varIdx >>> container.vpeShift;       // Indice nell'Uint32Array
+//         const x = varIdx & container.vpeMask;        // Posizione "slot" nell'elemento
+//         const bitOffset = x << kind;                 // Offset reale del bit (x * varSize)
+
+//         const { typedArray, bitmask } = container;
+
+//         // AZIONE: Scrittura (3 argomenti)
+//         if (newValue !== undefined && toggle === undefined) {
+//             if (newValue < 0 || newValue > bitmask) {
+//                 console.warn(`Value ${newValue} out of range for bitmask ${bitmask}`);
+//             }
+//             // Clear e Set
+//             typedArray[y] &= ~(bitmask << bitOffset);
+//             typedArray[y] |= (newValue & bitmask) << bitOffset;
+//             return newValue;
+//         }
+
+//         // AZIONE: Toggle (4 argomenti, solo per BOOL)
+//         if (toggle && kind === 0) {
+//             typedArray[y] ^= (1 << bitOffset);
+//         }
+
+//         // AZIONE: Lettura (Sempre eseguita se non è una scrittura pura)
+//         return (typedArray[y] >>> bitOffset) & bitmask;
+//     }
+
+//     /**
+//      * Recupera il valore usando le coordinate "fuse" (vcoords)
+//      */
+//     static varsGetValue(vcoords) {
+//         return this.handle(vcoords & 3, vcoords >>> 2);
+//     }
+
+//     /**
+//      * Imposta il valore usando le coordinate "fuse" (vcoords)
+//      */
+//     static varsSetValue(vcoords, newValue) {
+//         return this.handle(vcoords & 3, vcoords >>> 2, newValue);
+//     }
+
+//     /**
+//      * Verifica se una condizione [vcoords, expectedValue] è soddisfatta
+//      */
+//     static varsMatch([vcoords, expectedValue]) {
+//         return this.varsGetValue(vcoords) === expectedValue;
+//     }
+// }
+
+// //
+// static getState() {
+//     // Restituisce una copia dei 4 array per il salvataggio su file/localStorage
+//     return this.varContainers.map(c => Array.from(c.typedArray));
+// }

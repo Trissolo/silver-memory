@@ -15,10 +15,10 @@ export default class rs2
         const ponte = this.getExistentThing(2);
         console.log(thing.frame.name, ponte.frame.name);
         const vcoords = ponte.rdata.skipCond[0];
-        console.log(`Ponte suffix: ${this.getVarValue(vcoords)}`, vcoords);
-        this.toggleBit(ponte.rdata.skipCond);
-        console.log(`Ponte suffix: ${this.getVarValue(vcoords)}`);
-        ponte.setVisible(!!this.getVarValue(ponte.rdata.skipCond[0]));
+        console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`, vcoords);
+        this.varsToggleBit(ponte.rdata.skipCond);
+        console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`);
+        ponte.setVisible(!!this.varsGetValue(ponte.rdata.skipCond[0]));
     }
 
     // portafake
@@ -72,7 +72,7 @@ export default class rs2
         {
             console.log(ta.getOwnData())
             // spec. value
-            const bridgeStatus = this.getVarValue(this.getExistentThing(2).getOwnData().skipCond[0]);
+            const bridgeStatus = this.varsGetValue(this.getExistentThing(2).getOwnData().skipCond[0]);
             if (bridgeStatus === 0)
             {
                 const hitArea = ta.hasPolygon? Phaser.Geom.Polygon.GetAABB(ta.getHitArea()): ta.getHitArea();

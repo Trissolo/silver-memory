@@ -17,21 +17,21 @@ export default class rs1
         //         {
         //             at: 500,
         //             run: () => {
-        //                 this.toggleBit(thing.rdata.suffix);
+        //                 this.varsToggleBit(thing.rdata.suffix);
         //                 this.refreshSpriteFrame(thing);
         //             }
         //         },
         //         {
         //             at: 800,
         //             run: () => {
-        //                 this.toggleBit(thing.rdata.suffix);
+        //                 this.varsToggleBit(thing.rdata.suffix);
         //                 this.refreshSpriteFrame(thing);
         //             }
         //         },
         //         {
         //             at: 1200,
         //             run: () => {
-        //                 this.toggleBit(thing.rdata.suffix);
+        //                 this.varsToggleBit(thing.rdata.suffix);
         //                 this.refreshSpriteFrame(thing);
         //             }
         //         },
@@ -70,7 +70,7 @@ export default class rs1
     static 4(thing)
     {
         const {suffix} = thing.rdata;
-        this.toggleBit(suffix);
+        this.varsToggleBit(suffix);
         this.refreshSpriteFrame(thing);
     }
     
@@ -130,21 +130,21 @@ export default class rs1
                 {
                     at: 500,
                     run: () => {
-                        this.toggleBit(thing.rdata.suffix);
+                        this.varsToggleBit(thing.rdata.suffix);
                         this.refreshSpriteFrame(thing);
                     }
                 },
                 {
                     at: 800,
                     run: () => {
-                        this.toggleBit(thing.rdata.suffix);
+                        this.varsToggleBit(thing.rdata.suffix);
                         this.refreshSpriteFrame(thing);
                     }
                 },
                 {
                     at: 1200,
                     run: () => {
-                        this.toggleBit(thing.rdata.suffix);
+                        this.varsToggleBit(thing.rdata.suffix);
                         this.refreshSpriteFrame(thing);
                     }
                 },
@@ -178,7 +178,7 @@ export default class rs1
     static 5(thing)
     {
         const {suffix} = thing.rdata;
-        this.toggleBit(suffix);
+        this.varsToggleBit(suffix);
         this.refreshSpriteFrame(thing);
 
     }
