@@ -43,6 +43,7 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
 
         this.myGag();
         console.log(this.myGag.toString(), this.qwer);
+        
 
         // this.wordWrapCharCode = 160;
     }
