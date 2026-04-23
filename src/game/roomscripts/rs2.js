@@ -12,12 +12,14 @@ export default class rs2
     {
         //this.cameras.main.startFollow(new Phaser.Math.Vector2(250, 85));
         const ponte = this.getExistentThing(2);
-        console.log(thing.frame.name, ponte.frame.name);
+        //console.log(thing.frame.name, ponte.frame.name);
         const vcoords = ponte.rdata.skipCond[0];
-        console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`, vcoords);
-        this.varsToggleBit(vcoords);
-        console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`);
-        ponte.setVisible(!!this.varsGetValue(ponte.rdata.skipCond[0]));
+        //console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`, vcoords);
+        const tempSataus = this.varsToggleBit(vcoords);
+        console.log(`Ponte tempSataus: ${tempSataus}`);
+        ponte.setVisible(!!tempSataus);
+        console.log(thing.rdata, thing.frame.name, tempSataus);
+        thing.setFrame(`${thing.rdata.frame}${tempSataus}`);
     }
 
     // portafake

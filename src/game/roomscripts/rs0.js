@@ -9,7 +9,9 @@ export default class rs0
         // const tjson = roomJson.things[thing.thingIdx]
         // console.dir(tjson);
         // console.log("SKIPCOND", tjson.skipCond)
-        this.setAsCondition(thing.rdata.skipCond);
+        //this.setAsCondition(thing.rdata.skipCond);
+        const wrenchCond = thing.rdata.skipCond
+        this.varsSetValue(wrenchCond[0], wrenchCond[1]);
         // ADD ITEM IN INV HERE;
         thing.setVisible(false);
     }

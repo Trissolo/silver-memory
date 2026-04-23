@@ -144,20 +144,32 @@ class VarManager
         return this.varContainers.map(c => Array.from(c.typedArray));
     }
 
+    // static _summary()
+    // {
+    //     const kindMap = ['Bools', 'Crumble', 'Nibble', 'Bytes'];
+    //     for (const [cidx, container] of this.varContainers.entries())
+    //     {
+    //         const currRes = [kindMap[cidx]];
+    //         for (const elem of container.typedArray)
+    //         {
+    //             currRes.push(elem.toString(2).padStart(this.BITS_PER_ELEMENT, '0'));
+    //         }
+    //         console.log(currRes.join(' | '));
+    //     }    
+    // }
+
     static _summary()
     {
-        const kindMap = ['Bools', 'Crumble', 'Nibble', 'Bytes'];
-        for (const [cidx, container] of this.varContainers.entries())
-        {
-            const currRes = [kindMap[cidx]];
-            for (const elem of container.typedArray)
-            {
-                currRes.push(elem.toString(2).padStart(this.BITS_PER_ELEMENT, '0'));
-            }
-            console.log(currRes.join(' | '));
-        }
-
-        // console.log(this.varContainers[0].typedArray[0].toString(2).padStart(this.BITS_PER_ELEMENT, '0'));
+        const names = ["BOOL", "CRUMBLE", "NIBBLE", "BYTE"];
+        console.log("--- VAR MANAGER DEBUG SUMMARY ---");
+        this.varContainers.forEach(c => {
+            console.log(`Kind ${c.kind} (${names[c.kind]}):`);
+            c.typedArray.forEach((val, i) => {
+                // Converte in binario, aggiunge gli zeri iniziali fino a 32 e separa ogni 8 bit per leggibilità
+                const binary = val.toString(2).padStart(32, '0').match(/.{1,8}/g).join(' ');
+                console.log(`  [${i}] ${binary}`);
+            });
+        });
     }
 }
 
@@ -169,22 +181,22 @@ const varsMixin = {
 
     varsGetValue(vcoords)
     {
-        return VarManager.getValue(vcoords);
+        return VarManager.handle(vcoords & 3, vcoords >>> 2);  //getValue(vcoords);
     },
 
     varsSetValue(vcoords, newValue)
     {
-        return VarManager.setValue(vcoords, newValue);
+        return VarManager.handle(vcoords & 3, vcoords >>> 2, newValue); //setValue(vcoords, newValue);
     },
 
     varsToggleBit(vcoords)
     {
-        return VarManager.toggleBit(vcoords);
+        return VarManager.handle(vcoords & 3, vcoords >>> 2, undefined, true); //toggleBit(vcoords);
     },
 
     varsMatch(conditionArray)
     {
-        return VarManager.match(conditionArray);
+        return this.varsGetValue(conditionArray[0]) === conditionArray[1]; // VarManager.getValue(conditionArray[0]) === conditionArray[1];  //.match(conditionArray);
     },
 
     varsSummary()
@@ -192,6 +204,7 @@ const varsMixin = {
         console.clear();
         return VarManager._summary();
     }
+    
 }
 
 export default varsMixin;
