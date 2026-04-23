@@ -1,4 +1,5 @@
-import VarManager from '../modules/VarManager.js';
+// import VarManager from '../modules/VarManager.js';
+import varsMixin from '../modules/VarManager.js';
 import RoomScripts from '../roomscripts/roomscripts.js';
 import { NONE, Scene } from 'phaser';
 import PMStroll from '../modules/actorStuff/pmStroll/PMStroll.mjs';
@@ -30,6 +31,13 @@ export class Viewport extends Scene
     varyingDepthSprites = new Set();
     Rnd = Phaser.Math.RND
     labelManager;
+
+    // trick VScode
+    varsGetValue;
+    varsSetValue;
+    varsToggleBit;
+    varsMatch;
+    varsSummary;
 
     constructor ()
     {
@@ -69,6 +77,10 @@ export class Viewport extends Scene
                 }
             ]
         });
+
+        Object.defineProperties(this, Object.getOwnPropertyDescriptors(varsMixin));
+        // console.log(this.varsGetValue);
+        
     } //end constructor
 
     init(data)
@@ -178,9 +190,11 @@ export class Viewport extends Scene
     pressedX(eve)
     {
         console.log("Pressed 'X'");
-        console.log(`scene Timers: ${this.time._active.length}`, this.time._active);
+        // console.log(`scene Timers: ${this.time._active.length}`, this.time._active);
 
-        // VarManager._debug();
+        //console.log(this.varsSetValue(28, 0));
+        this.varsSummary();
+
     }
 
     onDestroy()
@@ -324,7 +338,7 @@ export class Viewport extends Scene
                 roomThing.setInteractive();
             }
             
-            if (thingData.skipCond && this.varsConditionIsSatisfied(thingData.skipCond))
+            if (thingData.skipCond && this.varsMatch(thingData.skipCond))
             {
                 console.log("Skipping",thingData);
                 continue;
@@ -390,31 +404,31 @@ export class Viewport extends Scene
         return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2);
     }
 
-    varsConditionIsSatisfied(ary)
-    {
-        return VarManager.newHandleAny(ary[0] & 3, ary[0] >>> 2) === ary[1];
-    }
+    // //varsConditionIsSatisfied(ary)
+    // {
+    //     return VarManager.newHandleAny(ary[0] & 3, ary[0] >>> 2) === ary[1];
+    // }
 
-    varsSetValue(vcoords, newValue)
-    {
-        // console.log(`Writing the value: ${newValue} to var identified with kind: ${ary&3}, idx: ${ary>>>2}`);
-        VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, newValue);
-    }
+    // varsSetValue(vcoords, newValue)
+    // {
+    //     // console.log(`Writing the value: ${newValue} to var identified with kind: ${ary&3}, idx: ${ary>>>2}`);
+    //     VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, newValue);
+    // }
 
-    setAsCondition(condition_ary)
-    {
-        this.varsSetValue(condition_ary[0], condition_ary[1]);
-    }
+    // setAsCondition(condition_ary)
+    // {
+    //     this.varsSetValue(condition_ary[0], condition_ary[1]);
+    // }
 
-    varsToggleBit(vcoords)
-    {
-        //console.log("Toggle param is array? (An INTEGER is required)", Array.isArray(vcoords));
-        if (Array.isArray(vcoords))
-        {
-            vcoords = vcoords[0];
-        }
-        return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, null, true);
-    }
+    // varsToggleBit(vcoords)
+    // {
+    //     //console.log("Toggle param is array? (An INTEGER is required)", Array.isArray(vcoords));
+    //     if (Array.isArray(vcoords))
+    //     {
+    //         vcoords = vcoords[0];
+    //     }
+    //     return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2, null, true);
+    // }
 
     // end varsvars
 

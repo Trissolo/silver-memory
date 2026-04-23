@@ -11,12 +11,11 @@ export default class rs2
     static 0(thing)
     {
         //this.cameras.main.startFollow(new Phaser.Math.Vector2(250, 85));
-        
         const ponte = this.getExistentThing(2);
         console.log(thing.frame.name, ponte.frame.name);
         const vcoords = ponte.rdata.skipCond[0];
         console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`, vcoords);
-        this.varsToggleBit(ponte.rdata.skipCond);
+        this.varsToggleBit(vcoords);
         console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`);
         ponte.setVisible(!!this.varsGetValue(ponte.rdata.skipCond[0]));
     }
