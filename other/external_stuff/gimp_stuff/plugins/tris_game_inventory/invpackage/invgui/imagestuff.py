@@ -127,9 +127,10 @@ class ImageStuff(GenericUtils):
     
     # @staticmethod
     def extract_id_for_json(self):
-        name = self.image.get_name()
-        pruned = name[4:-4]
-        return int(pruned) if pruned.isdigit() else name
+        #name = self.image.get_name()
+        #pruned = name[4:-4]
+        #return int(pruned) if pruned.isdigit() else name
+        return self.crossroads
     
     #@staticmethod
     def add_peculiar_properties(self, layer, obj, kind_value, remaining_props):
