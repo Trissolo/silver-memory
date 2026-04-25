@@ -1,18 +1,4 @@
-const componentGag = {
-    //constructor()
-    qwer: 234,
-    myGag: function ()
-    {
-        return console.log("MyGag called", this.qwer);
-    }
-}
-
-// Object.assign(DataBaseList.prototype, componentGag);
-
-/**
- * @extends componentGag
- */
-class DataBaseList extends Phaser.GameObjects.BitmapText
+export default class DataBaseList extends Phaser.GameObjects.BitmapText
 {
     listData;
 
@@ -21,9 +7,6 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
     marker = 'X123456789';
 
     _inThrottle = true;
-
-    // trick
-    myGag;
 
     constructor(scene)
     {
@@ -37,13 +20,6 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.onListDown);
         
         this.addToDisplayList();
-
-        ///Object.assign(this.constructor.prototype, componentGag);
-        Object.defineProperties(this, Object.getOwnPropertyDescriptors(componentGag));
-
-        this.myGag();
-        console.log(this.myGag.toString(), this.qwer);
-        
 
         // this.wordWrapCharCode = 160;
     }
@@ -166,6 +142,7 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
     onListDown()
     {
         console.log(this.row);
+        this.scene.varsSetValue(3, this.row);
 
         if(this.row === 0)
         {
@@ -204,5 +181,3 @@ class DataBaseList extends Phaser.GameObjects.BitmapText
         super.destroy();
     }
 }
-
-export default DataBaseList;

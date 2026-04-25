@@ -61,7 +61,7 @@ class VarManager
     }
 
     /**
-     * Funzione Core: Gestisce lettura, scrittura e toggle con logica bitwise pura.
+     * Core Function: Handles reading, writing and toggle with pure bitwise logic.
      */
     static handle(kind, varIdx, newValue, toggle)
     {
@@ -80,7 +80,7 @@ class VarManager
 
         const { typedArray, bitmask } = container;
 
-        // AZIONE: Scrittura (3 argomenti)
+        // ACTION: Writing (3 arguments)
         if (newValue !== undefined && toggle === undefined)
         {
             if (newValue < 0 || newValue > bitmask)
@@ -93,56 +93,15 @@ class VarManager
             return newValue;
         }
 
-        // AZIONE: Toggle (4 argomenti, solo per BOOL)
+        // ACTION: Toggle (4 arguments, only for BOOLs)
         if (toggle && kind === 0)
         {
             typedArray[y] ^= (1 << bitOffset);
         }
 
-        // AZIONE: Lettura (Sempre eseguita se non è una scrittura pura)
+        // ACTION: Reading (Always done if it is not a pure writing)
         return (typedArray[y] >>> bitOffset) & bitmask;
     }
-
-    /**
-     * Recupera il valore usando le coordinate "fuse" (vcoords)
-     */
-    // static getValue(vcoords)
-    // {
-    //     return this.handle(vcoords & 3, vcoords >>> 2);
-    // }
-
-    /**
-     * Imposta il valore usando le coordinate "fuse" (vcoords)
-     */
-    // static setValue(vcoords, newValue)
-    // {
-    //     return this.handle(vcoords & 3, vcoords >>> 2, newValue);
-    // }
-
-    /**
-     * Verifica se una condizione [vcoords, expectedValue] è soddisfatta
-     */
-    // static match(conditionArray)
-    // {
-    //     // const {vcoords, expectedValue} = conditionArray;
-    //     return this.getValue(conditionArray[0]) === conditionArray[1];
-    // }
-
-    /**
-     * Toggle a BOOL bit
-     */
-    // static toggleBit(vcoords)
-    // {
-    //     return this.handle(vcoords & 3, vcoords >>> 2, undefined, true);
-    // }
-
-    /**
-     * Restituisce una copia dei 4 array per il salvataggio su file/localStorage
-     */
-    // static getState()
-    // {
-    //     return this.varContainers.map(c => Array.from(c.typedArray));
-    // }
 
     // static _summary()
     // {
@@ -163,7 +122,7 @@ class VarManager
         const names = ["BOOL", "CRUMBLE", "NIBBLE", "BYTE"];
         console.log("--- VAR MANAGER DEBUG SUMMARY ---");
         this.varContainers.forEach(c => {
-            console.log(`Kind ${c.kind} (${names[c.kind]}):`);
+            console.log(`%c Kind ${c.kind} (${names[c.kind]}):`, "background-color: gray;");
             c.typedArray.forEach((val, i) => {
                 // Converte in binario, aggiunge gli zeri iniziali fino a 32 e separa ogni 8 bit per leggibilità
                 const binary = val.toString(2).padStart(32, '0').match(/.{1,8}/g).join(' ');
@@ -204,6 +163,11 @@ const varsMixin = {
         return VarManager._summary();
     }
     
+}
+
+for (const key of Object.keys(varsMixin))
+{
+    console.log(`%c varsMixin: ${key}; `, "background-color: gray;");
 }
 
 export default varsMixin;

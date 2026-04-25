@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import RoomEvents from './RoomEvents/genericRoomEvents.js'
 import DataBaseList from '../modules/DataBaseList.mjs';
+import varsMixin from '../modules/VarManager.js';
 
 export class Controller extends Scene
 {
@@ -9,9 +10,19 @@ export class Controller extends Scene
 
     dbsList;
 
+    // The following class fields exist only to trick VSCode's IntelliSense:
+    varsGetValue;
+    varsSetValue;
+    varsToggleBit;
+    varsMatch;
+    varsSummary;
+
     constructor ()
     {
         super('Controller');
+
+        // apply the Variables Mix-in
+        Object.assign(this, varsMixin);
     }
 
     init(data)
