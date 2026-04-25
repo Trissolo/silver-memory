@@ -1,22 +1,26 @@
-export default class rs3
-{
+const rs3 = {
+
+    // static onRoomReady(){},
+    
     // uo
-    static 0(ta, actor, boolInside)
+    0(ta, actor, boolInside)
     {
         console.log(ta);
         this.toAnotherRoom(ta, 4, 220, 120, "W", 0);
-    }
+    },
     
     // ue
-    static 1(ta, actor, boolInside)
+    1(ta, actor, boolInside)
     {
         console.log(ta);
         this.toAnotherRoom(ta, 2, 30, 40, "E", 0);
-    }
+    },
     
     // us
-    static 2(ta, actor, boolInside)
+    2(ta, actor, boolInside)
     {
-        console.log(ta);
+        console.log(ta, actor, boolInside);
     }
 }
+
+export default rs3;

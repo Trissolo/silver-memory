@@ -151,17 +151,24 @@ class GuiBarGenerator(ImageStuff):
     def top_bar_generate_json(self, widget):
         self.generate_json()
         self.middle_bar_write("You can now paste the JSON")
+    @staticmethod
+    def _js_func_draft(thing_name, func_name, params):
+        rows = []   
+        for row in (f'\n    // {thing_name}', f'{func_name}({params})', '{', f'    console.log({params});', '}'):
+            rows.append(row)
+        return '\n    '.join(rows)
     def top_bar_generate_script(self, widget):
         res = []
+        obj_name = f'rs{self.crossroads}'
 
         # optional common function:
         res.append('\n    // static onRoomReady(){}')
 
-        triggerArea_params = '(ta, actor, boolInside)'
+        triggerArea_params = 'ta, actor, boolInside'
 
-        thing_params = '(thing)'
+        thing_params = 'thing'
         
-        for i, layer in enumerate(self._layer_iterator()): #(l for l in self.image.get_layers() if 'kind' in l.get_parasite_list() and self.extract_array_from_parasite('kind', l)[0] > 0)):
+        for i, layer in enumerate(self._layer_iterator()):
             current_kind = self.extract_array_from_parasite('kind', layer)[0]
 
             if current_kind == -5:
@@ -169,22 +176,16 @@ class GuiBarGenerator(ImageStuff):
 
             isTriggerZone = current_kind == 1
 
-            for scripttext in (
-            '',
-            f"// {layer.get_name()}",
-            f'static {i}{triggerArea_params if isTriggerZone else thing_params}',
-            '{',
-            f'    console.log({"ta" if isTriggerZone else "thing"});',
-            '}'
-            ):
-                res.append(scripttext)
+            # generic
+            res.append(self._js_func_draft(layer.get_name(), i, triggerArea_params if isTriggerZone else thing_params))
 
-        res = '\n    '.join(res)
+            #triggerArea specific
+            if isTriggerZone:
+                res.append(self._js_func_draft(f'ENTER ON {layer.get_name()}', f'{i}enter', triggerArea_params))
 
-        header = f'export default class rs{self.extract_id_for_json()}'
+        res = ',\n    '.join(res)
 
-
-        self.output_string_to_clipboard(f'{header}\n{{{res}\n}}\n')
+        self.output_string_to_clipboard(f'const {obj_name} = {{\n{res}\n}}\n\nexport default {obj_name};\n')
 
         return self.middle_bar_write("Script ready")
     def top_bar_generate_inventory_script(self, button):
