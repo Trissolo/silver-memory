@@ -33,7 +33,8 @@ const rs2 = {
     // siglight0
     3(thing, pointer)
     {
-        console.log(thing, pointer);
+        console.log("Change frame");
+        this.scrollSpriteFrame(thing, 2);
     },
     
     // r2exitbottom
