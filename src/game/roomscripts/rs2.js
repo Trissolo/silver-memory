@@ -1,73 +1,79 @@
-import TriggerZone from "../modules/TriggerZone.mjs";
+const rs2 = {
 
-export default class rs2
-{
-    static onRoomReady()
+    onRoomReady()
     {
-        // this.cameras.main.setBackgroundColor(0xff0000);
         this.triggerZones.supervise(this.thingsContainer.get(7), this.player, true);
-    }
-    // button
-    static 0(thing)
+    },
+    
+    // button0
+    0(thing, pointer)
     {
-        //this.cameras.main.startFollow(new Phaser.Math.Vector2(250, 85));
+        console.log(thing, pointer);
         const ponte = this.getExistentThing(2);
-        //console.log(thing.frame.name, ponte.frame.name);
         const vcoords = ponte.rdata.skipCond[0];
-        //console.log(`Ponte suffix: ${this.varsGetValue(vcoords)}`, vcoords);
         const tempSataus = this.varsToggleBit(vcoords);
         console.log(`Ponte tempSataus: ${tempSataus}`);
         ponte.setVisible(!!tempSataus);
         console.log(thing.rdata, thing.frame.name, tempSataus);
         thing.setFrame(`${thing.rdata.frame}${tempSataus}`);
-    }
-
+    },
+    
     // portafake
-    static 1(thing){console.log(thing.frame.name);}
-
+    1(thing, pointer)
+    {
+        console.log(thing, pointer);
+    },
+    
     // ponte
-    static 2(thing)
+    2(thing, pointer)
     {
-        console.log(thing.frame.name);
-        this.emulateBgClick();
-    }
-
-    // siglight
-    static 3(thing)
+        this.emulateBgClick(pointer);
+    },
+    
+    // siglight0
+    3(thing, pointer)
     {
-        this.scrollSpriteFrame(thing, 2);
-    }
-
-    // AREA
-    static 4(ta, pointer)
+        console.log(thing, pointer);
+    },
+    
+    // r2exitbottom
+    4(ta, pointer)
     {
-        console.log("AREA4, uscita sud");
         this.toAnotherRoom(ta, 0, 227, 44, "S", 0);
-    }
-
-    // AREA
-    static 5(ta, pointer)
+    },
+    
+    // ENTER ON r2exitbottom
+    in4(ta, actor, boolInside)
     {
-        console.log(arguments.length === 3? "Triggered callback":"Click on zone");
-        console.log("TRigger 5");
+        console.log(ta, actor, boolInside);
+    },
+    
+    // r2exitleft
+    5(ta, pointer)
+    {
         this.toAnotherRoom(ta, 4, 221, 124, "W", 0);
-        //console.log(thing, pointer);
-    }
-
-    // muro
-    static 6()
+    },
+    
+    // ENTER ON r2exitleft
+    in5(ta, actor, boolInside)
     {
-        console.log("Muro", arguments.length);
-    }
-
-    // AREA
-    /**
-     * @this {Viewport}
-     * @param {TriggerZone} ta
-     * @param {*} actor 
-     * @param {*} boolInside 
-     */
-    static 7(ta, actor, boolInside)
+        console.log(ta, actor, boolInside);
+    },
+    
+    // muro
+    6(thing, pointer)
+    {
+        this.emulateBgClick(pointer);
+    },
+    
+    // arear2bridge
+    7(ta, pointer)
+    {
+        console.log(ta, actor, boolInside);
+    },
+    
+    // ENTER ON arear2bridge
+    in7(ta, actor, boolInside)
     {
         if (typeof boolInside === 'boolean')
         {
@@ -88,8 +94,7 @@ export default class rs2
         console.log(`${boolInside? "Crossing": "Leaving" } the bridge in: AREA 7`, arguments.length);
 
         console.log(ta, actor, boolInside);
-
-        // this.triggerZone.clearAll();
     }
-
 }
+
+export default rs2;

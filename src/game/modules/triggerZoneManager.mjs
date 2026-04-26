@@ -101,7 +101,7 @@ export default class TriggerZoneManager
 
                     triggerArea.isOccupied = true;
 
-                    return this.scene.roomscript[triggerArea.thingIdx].call(this.scene, triggerArea, actor, true);
+                    return this.scene.roomscript[`in${triggerArea.thingIdx}`].call(this.scene, triggerArea, actor, true);
                 }
                 else if (triggerArea.isOccupied && !inside)
                 {
@@ -109,7 +109,7 @@ export default class TriggerZoneManager
 
                     triggerArea.isOccupied = false;
 
-                    this.scene.roomscript[triggerArea.thingIdx].call(this.scene, triggerArea, actor, false);
+                    this.scene.roomscript[`in${triggerArea.thingIdx}`].call(this.scene, triggerArea, actor, false);
                 }
             }
         }

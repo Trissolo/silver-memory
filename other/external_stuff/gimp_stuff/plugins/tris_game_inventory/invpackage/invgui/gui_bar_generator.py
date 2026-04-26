@@ -162,11 +162,11 @@ class GuiBarGenerator(ImageStuff):
         obj_name = f'rs{self.crossroads}'
 
         # optional common function:
-        res.append('\n    // static onRoomReady(){}')
+        res.append('\n    // onRoomReady(){}')
 
         triggerArea_params = 'ta, actor, boolInside'
-
-        thing_params = 'thing'
+        triggerArea_clicked_params = 'ta, pointer'
+        thing_params = 'thing, pointer'
         
         for i, layer in enumerate(self._layer_iterator()):
             current_kind = self.extract_array_from_parasite('kind', layer)[0]
@@ -177,11 +177,11 @@ class GuiBarGenerator(ImageStuff):
             isTriggerZone = current_kind == 1
 
             # generic
-            res.append(self._js_func_draft(layer.get_name(), i, triggerArea_params if isTriggerZone else thing_params))
+            res.append(self._js_func_draft(layer.get_name(), i, triggerArea_clicked_params if isTriggerZone else thing_params))
 
             #triggerArea specific
             if isTriggerZone:
-                res.append(self._js_func_draft(f'ENTER ON {layer.get_name()}', f'{i}enter', triggerArea_params))
+                res.append(self._js_func_draft(f'ENTER ON {layer.get_name()}', f'in{i}', triggerArea_params))
 
         res = ',\n    '.join(res)
 

@@ -393,16 +393,16 @@ export class Viewport extends Scene
     }
 
     // varsvars
-    varsGetValue(vcoords)
-    {
-        if (Array.isArray(vcoords))
-        {
-            console.warn(`'varsGetValue' received an array, then attempted to consider the value at position [0]`, ary);
+    // varsGetValue(vcoords)
+    // {
+    //     if (Array.isArray(vcoords))
+    //     {
+    //         console.warn(`'varsGetValue' received an array, then attempted to consider the value at position [0]`, ary);
 
-            vcoords = vcoords[0];
-        }
-        return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2);
-    }
+    //         vcoords = vcoords[0];
+    //     }
+    //     return VarManager.newHandleAny(vcoords & 3, vcoords >>> 2);
+    // }
 
     // //varsConditionIsSatisfied(ary)
     // {
@@ -649,9 +649,9 @@ export class Viewport extends Scene
         }
     }
 
-    emulateBgClick()
+    emulateBgClick(pointer = this.input.activePointer)
     {
-        this.input.forceDownState(this.input.activePointer, this.bg);
+        this.input.forceDownState(pointer, this.bg);
     }
 
     // update(time, delta)
