@@ -1,4 +1,10 @@
-export default class Thing extends Phaser.GameObjects.Sprite
+import ThingDataHelper from "./mixins/thingDataHelper.mjs";
+
+/**
+ * @mixes ThingDataHelper
+ */
+
+class Thing extends Phaser.GameObjects.Sprite
 {
     isThing = true;
     isTriggerArea = false;
@@ -24,17 +30,17 @@ export default class Thing extends Phaser.GameObjects.Sprite
         console.log(`Thing: ${this} typeof Thing: ${typeof this}`);
     }
 
-    setOwnData(thingData)
-    {
-        this.rdata = thingData;
+    // setOwnData(thingData)
+    // {
+    //     this.rdata = thingData;
 
-        return this;
-    }
+    //     return this;
+    // }
 
-    getOwnData()
-    {
-        return this.rdata;
-    }
+    // getOwnData()
+    // {
+    //     return this.rdata;
+    // }
 
     setThingIdx(idx)
     {
@@ -48,6 +54,21 @@ export default class Thing extends Phaser.GameObjects.Sprite
         return this.thingIdx;
     }
 }
+
+{
+    const descriptors = Object.getOwnPropertyDescriptors(ThingDataHelper);
+    for (const elem in descriptors)
+    {
+        descriptors[elem].enumerable = false;
+    }
+            
+    // // Remove the constructor from the mixin so we don't overwrite the base class one
+    delete descriptors.constructor;
+    Object.defineProperties(Thing.prototype, descriptors);
+    // Object.assign(Thing.prototype, ThingDataHelper);
+}
+
+export default Thing;
 
 /*
 thing.setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})

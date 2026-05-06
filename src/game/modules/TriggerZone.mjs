@@ -1,4 +1,6 @@
-export default class TriggerZone extends Phaser.GameObjects.Zone
+import ThingDataHelper from "./mixins/thingDataHelper.mjs";
+
+class TriggerZone extends Phaser.GameObjects.Zone
 {
     isThing = true;
     isTriggerArea = true;
@@ -7,7 +9,6 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
     thingIdx = null
     isOccupied = false;
 
-
     constructor(scene, polyParams)
     {
         super(scene, 0, 0);
@@ -15,6 +16,7 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
         if (polyParams)
         {
             this.hasPolygon = true;
+            
             this.setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer', hitArea: new Phaser.Geom.Polygon(polyParams), hitAreaCallback: Phaser.Geom.Polygon.Contains})
         }
         else
@@ -71,3 +73,20 @@ export default class TriggerZone extends Phaser.GameObjects.Zone
         return this.getHitArea().contains(vector.x, vector.y);
     }
 }
+
+{
+    const descriptors = Object.getOwnPropertyDescriptors(ThingDataHelper);
+    for (const elem in descriptors)
+    {
+        descriptors[elem].enumerable = false;
+    }
+            
+    // Remove the constructor from the mixin so we don't overwrite the base class one
+    delete descriptors.constructor;
+
+    Object.defineProperties(TriggerZone.prototype, descriptors);
+
+    // Object.assign(TriggerZone.prototype, ThingDataHelper);
+}
+
+export default TriggerZone;

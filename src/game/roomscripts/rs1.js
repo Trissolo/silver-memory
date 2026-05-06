@@ -1,4 +1,6 @@
 import { Viewport } from "../scenes/Viewport";
+import Thing from "../modules/ThingClass.mjs";
+import ThingDataHelper from "../modules/mixins/thingDataHelper.mjs";
 
 export default class rs1
 {
@@ -60,15 +62,20 @@ export default class rs1
         this.toAnotherRoom(ta, 0, 23, this.input.activePointer.worldY, "E", 0);
     }
     
+    /**
+     * @param {Thing | ThingDataHelper} thing 
+     */
     // ITcardA
     static 3(thing)
     {
-        console.log(thing);
+        console.log(thing, thing.getOwnData());
     }
     
     // r1cabinetDoors1
     static 4(thing)
     {
+        console.log(thing.dataSuffix());
+        console.log(thing.getOwnData());
         const {suffix} = thing.rdata;
         this.varsToggleBit(suffix);
         this.refreshSpriteFrame(thing);
