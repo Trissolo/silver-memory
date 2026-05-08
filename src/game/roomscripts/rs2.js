@@ -1,3 +1,5 @@
+import { Geom, Math as PhaserMath } from "phaser";
+
 const rs2 = {
 
     onRoomReady()
@@ -83,14 +85,14 @@ const rs2 = {
             const bridgeStatus = this.varsGetValue(this.getExistentThing(2).getOwnData().skipCond[0]);
             if (bridgeStatus === 0)
             {
-                const hitArea = ta.hasPolygon? Phaser.Geom.Polygon.GetAABB(ta.getHitArea()): ta.getHitArea();
+                const hitArea = ta.hasPolygon? Geom.Polygon.GetAABB(ta.getHitArea()): ta.getHitArea();
                 actor.walkTo(hitArea.centerX > actor.x? 42:145, actor.y);
             }
         }
         console.log("Boolinside:", typeof boolInside, boolInside)
         console.log(arguments.length === 3? "Triggered callback":"Click on zone");
             
-        this.cameras.main.setBackgroundColor(Phaser.Math.Between(255, 0xbababa));
+        this.cameras.main.setBackgroundColor(PhaserMath.Between(255, 0xbababa));
 
         console.log(`${boolInside? "Crossing": "Leaving" } the bridge in: AREA 7`, arguments.length);
 

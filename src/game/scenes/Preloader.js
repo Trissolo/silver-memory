@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import { Scene, Loader, Animations, GameObjects } from 'phaser';
 import PMStroll from '../modules/actorStuff/pmStroll/PMStroll.mjs';
 
 export class Preloader extends Scene
@@ -56,12 +56,12 @@ export class Preloader extends Scene
 
         // Some event
         this.load
-            .once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this)
-            .once(Phaser.Loader.Events.COMPLETE, this.listenerAllLoaded, this)
-            .on(Phaser.Loader.Events.PROGRESS, this.redrawBar, this);
+            .once(`${Loader.Events.FILE_KEY_COMPLETE}image-atlasbase`, this.onatlasbase, this)
+            .once(Loader.Events.COMPLETE, this.listenerAllLoaded, this)
+            .on(Loader.Events.PROGRESS, this.redrawBar, this);
             // .on(Phaser.Loader.Events.FILE_COMPLETE, this.listenerOnFileComplete, this);
         
-        this.anims.on(Phaser.Animations.Events.ADD_ANIMATION, this.testAnim, this); 
+        this.anims.on(Animations.Events.ADD_ANIMATION, this.testAnim, this); 
         
         // 'global RoomData'
         this.roomDataMap = this.registry.get('roomData');
@@ -82,7 +82,7 @@ export class Preloader extends Scene
             const roomJsonKey = `room${i}`
             this.load
                 .json(roomJsonKey, `jsons/room${i}.json`)
-                .once(`${Phaser.Loader.Events.FILE_KEY_COMPLETE}json-${roomJsonKey}`, this.singleJsonLoaded, this)
+                .once(`${Loader.Events.FILE_KEY_COMPLETE}json-${roomJsonKey}`, this.singleJsonLoaded, this)
         }
         
     }
@@ -127,7 +127,7 @@ export class Preloader extends Scene
 
     create()
     {
-        this.load.off(Phaser.Loader.Events.PROGRESS, this.redrawBar, this);
+        this.load.off(Loader.Events.PROGRESS, this.redrawBar, this);
 
         this.bar.destroy();
 
@@ -146,7 +146,7 @@ export class Preloader extends Scene
 
     allTasksDone()
     {
-        this.anims.off(Phaser.Animations.Events.ADD_ANIMATION);
+        this.anims.off(Animations.Events.ADD_ANIMATION);
 
         //console.log("Cache:", this.cache.json.getKeys(), this.cache.json);
         // do not use the Cache:
@@ -238,7 +238,7 @@ export class Preloader extends Scene
             'offset.y': cutY - 1  
         };
 
-        this.cache.bitmapFont.add('font0', Phaser.GameObjects.RetroFont.Parse(this, config));
+        this.cache.bitmapFont.add('font0', GameObjects.RetroFont.Parse(this, config));
         
         // hardcode add the ' character:
         const newfont = this.cache.bitmapFont.get('font0');

@@ -1,11 +1,13 @@
+import { Math as PhaserMath } from "phaser";
+
 export default class RotationHelper
 {
     static cardinalPointStrings;
     static directionAngles
     static ARC = Math.PI / 4;
     static _isDestroyed = false;
-    static snapTo = Phaser.Math.Snap.To;
-    static angleBetween = Phaser.Math.Angle.Between;
+    static snapTo = PhaserMath.Snap.To;
+    static angleBetween = PhaserMath.Angle.Between;
     static {
         const cardinalPointStrings = new Map();
 

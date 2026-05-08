@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 // import VarManager from '../modules/VarManager.js';
 import varsMixin from '../modules/VarManager.js';
 import RoomScripts from '../roomscripts/roomscripts.js';

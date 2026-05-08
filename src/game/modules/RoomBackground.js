@@ -1,10 +1,10 @@
 import PMStroll from "./actorStuff/pmStroll/PMStroll.mjs";
 // import bgVec from "./sharedStuff/BgVector.mjs";
+import {GameObjects, Math as PhaserMath, Geom, Input} from "phaser";
 
-export default class RoomBackground extends Phaser.GameObjects.Image
+export default class RoomBackground extends GameObjects.Image
 {
-    clickVector = new Phaser.Math.Vector2();
-    floorVecUtility = Phaser.Geom.Point.Floor;
+    clickVector = new PhaserMath.Vector2();
 
     constructor(scene)
     {
@@ -16,9 +16,9 @@ export default class RoomBackground extends Phaser.GameObjects.Image
             .setName("Room background")
             .setVisible(false)
             .addToDisplayList()
-            .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Phaser.Geom.Rectangle.Contains, hitArea: new Phaser.Geom.Rectangle(0, 0, 1, 2)}
+            .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Geom.Rectangle.Contains, hitArea: new Geom.Rectangle(0, 0, 1, 2)}
             )
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
+            .on(Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
         
         scene.cameras.cameras[1].ignore(this);
     }
@@ -73,7 +73,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
         // console.dir("Bounds riCorretti", cam.getBounds());
 
         // store this room bounds for labelNames
-        Phaser.Geom.Rectangle.CopyFrom(cam.getBounds(), this.scene.labelManager.camBounds);
+        Geom.Rectangle.CopyFrom(cam.getBounds(), this.scene.labelManager.camBounds);
 
         return this;
 
@@ -82,7 +82,7 @@ export default class RoomBackground extends Phaser.GameObjects.Image
     clickOnBg(pointer, screenX, screenY, {stopPropagation})
     {
         // A) assign World coords to thie Vector
-        this.floorVecUtility(this.clickVector.setTo(pointer.worldX, pointer.worldY));
+        this.clickVector.setTo(pointer.worldX, pointer.worldY).floor()
 
         // A2) Info
         if (pointer.rightButtonDown())
@@ -139,14 +139,13 @@ export default class RoomBackground extends Phaser.GameObjects.Image
 
     destroy()
     {
-        this.floorVecUtility = null;
         super.destroy();
     }
 
     benchmarkRotation()
     {
         const {scene} = this;
-        const aryCoords = new Phaser.Geom.Circle(scene.player.x, scene.player.y - 10, 30).getPoints(68);
+        const aryCoords = new Geom.Circle(scene.player.x, scene.player.y - 10, 30).getPoints(68);
 
         Phaser.Utils.Array.Shuffle(aryCoords);
 

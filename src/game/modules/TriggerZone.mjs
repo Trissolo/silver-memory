@@ -1,6 +1,8 @@
 import ThingDataHelper from "./mixins/thingDataHelper.mjs";
+import {GameObjects, Input, Geom} from "phaser";
+const {GAMEOBJECT_POINTER_DOWN, GAMEOBJECT_POINTER_OVER, GAMEOBJECT_POINTER_OUT, GAMEOBJECT_POINTER_MOVE} = Input.Events;
 
-class TriggerZone extends Phaser.GameObjects.Zone
+class TriggerZone extends GameObjects.Zone
 {
     isThing = true;
     isTriggerArea = true;
@@ -17,7 +19,7 @@ class TriggerZone extends Phaser.GameObjects.Zone
         {
             this.hasPolygon = true;
             
-            this.setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer', hitArea: new Phaser.Geom.Polygon(polyParams), hitAreaCallback: Phaser.Geom.Polygon.Contains})
+            this.setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer', hitArea: new Geom.Polygon(polyParams), hitAreaCallback: Geom.Polygon.Contains})
         }
         else
         {        
@@ -28,10 +30,10 @@ class TriggerZone extends Phaser.GameObjects.Zone
             .setActive(true)
             .setOrigin(0, 0)
             .setDepth(1)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
+            .on(GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
+            .on(GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
+            .on(GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
+            .on(GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
             .setSize(0, 0)
             .addToDisplayList();
 

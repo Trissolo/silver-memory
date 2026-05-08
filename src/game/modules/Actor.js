@@ -2,15 +2,16 @@ import RotationHelper from "./actorStuff/rotationHelper";
 import WalkEvents from "./actorStuff/walkEvents";
 import WalkComponent from "./actorStuff/walkComponent";
 import PMStroll from "./actorStuff/pmStroll/PMStroll.mjs";
+import { GameObjects, Math as PhaserMath, Animations } from "phaser";
 
-export default class Actor extends Phaser.GameObjects.Sprite
+export default class Actor extends GameObjects.Sprite
 {
     costume;
     id;
     inventory;
     polygonalMap;
     polygonalMapIdx;
-    comfyDest = new Phaser.Math.Vector2();
+    comfyDest = new PhaserMath.Vector2();
     rotationAnim;
     pendingFunc = null;
     rotFrames = new Map();
@@ -116,7 +117,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         }
 
         // Event that fires when rotationAnim has reached its end. Used to enable walking
-        this.on(Phaser.Animations.Events.ANIMATION_STOP, this.manageStoppedRot, this);
+        this.on(Animations.Events.ANIMATION_STOP, this.manageStoppedRot, this);
 
         // A 'switch' that indicates whether pre-walk rotation is active
         this.rotateBeforeWalkEnabled = true;
@@ -126,7 +127,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
     {
         this.rotFrames.clear();
         this.rotationAnim = null;
-        this.off(Phaser.Animations.Events.ANIMATION_STOP);
+        this.off(Animations.Events.ANIMATION_STOP);
         this.rotateBeforeWalkEnabled = false;
     }
 
@@ -155,7 +156,7 @@ export default class Actor extends Phaser.GameObjects.Sprite
         const startAngle = RotationHelper.getAngle(startAcronym); //RotationHelper.directionAngles.get(startAcronym);
 
         // Distance
-        const gap = Phaser.Math.Angle.GetShortestDistance(startAngle, finalAngle);
+        const gap = PhaserMath.Angle.GetShortestDistance(startAngle, finalAngle);
 
         // Skip if too close
         if (Math.abs(gap) < 1) //.5707963267948966)

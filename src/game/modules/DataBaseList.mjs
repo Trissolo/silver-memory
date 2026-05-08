@@ -1,3 +1,5 @@
+import Phaser from "phaser";
+
 export default class DataBaseList extends Phaser.GameObjects.BitmapText
 {
     listData;

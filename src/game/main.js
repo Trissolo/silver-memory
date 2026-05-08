@@ -2,7 +2,7 @@ import { Boot } from './scenes/Boot';
 import { Controller} from './scenes/Controller'
 import { Preloader } from './scenes/Preloader';
 import { Viewport } from './scenes/Viewport';
-import { AUTO, Game } from 'phaser';
+import { Scale, Game, WEBGL } from 'phaser';
 
 // Find out more information about the Game Config at:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -18,14 +18,14 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     */
-    type: Phaser.WEBGL,
+    type: WEBGL,
     parent: 'game-container',
     pixelArt: true,
     backgroundColor: '#320822',
     disableContextMenu: true,
     scale:
     {
-        mode: Phaser.Scale.NONE,
+        mode: Scale.NONE,
         //autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 256,
         height: 192, // 128,

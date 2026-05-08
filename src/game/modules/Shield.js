@@ -1,4 +1,6 @@
-export default class Shield extends Phaser.GameObjects.Image
+import {GameObjects} from "phaser";
+
+export default class Shield extends GameObjects.Image
 {
   constructor(scene)
   {

@@ -1,10 +1,11 @@
 import ThingDataHelper from "./mixins/thingDataHelper.mjs";
-
+import {GameObjects, Input} from 'phaser'
+const {GAMEOBJECT_POINTER_DOWN, GAMEOBJECT_POINTER_OVER, GAMEOBJECT_POINTER_OUT, GAMEOBJECT_POINTER_MOVE} = Input.Events;
 /**
  * @mixes ThingDataHelper
  */
 
-class Thing extends Phaser.GameObjects.Sprite
+class Thing extends GameObjects.Sprite
 {
     isThing = true;
     isTriggerArea = false;
@@ -19,10 +20,10 @@ class Thing extends Phaser.GameObjects.Sprite
         .setVisible(false)
         //.setState(null)
         .setInteractive({cursor: 'url("/assets/cursors/cover3.cur"), pointer', pixelPerfect: true})
-        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
-        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
-        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
-        .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
+        .on(GAMEOBJECT_POINTER_DOWN, this.scene.onThingDown)
+        .on(GAMEOBJECT_POINTER_OVER, this.scene.onThingOver)
+        .on(GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
+        .on(GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
         
         .addToDisplayList();
 

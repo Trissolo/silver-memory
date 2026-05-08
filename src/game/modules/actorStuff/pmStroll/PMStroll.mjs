@@ -1,15 +1,16 @@
+import {Math as PhaserMath, Geom} from "phaser";
 // Phaser.Math.Vector2
 // Phaser.Math.Clamp
 // Phaser.Math.Distance.BetweenPoints
 
-const {Vector2, Clamp, Distance: {BetweenPoints: heuristic}} = Phaser.Math;
+const {Vector2, Clamp, Distance: {BetweenPoints: heuristic}} = PhaserMath; //Phaser.Math;
 
 // Phaser.Geom.Polygon;
 // Phaser.Geom.Line;
 // Phaser.Geom.Line.GetMidPoint;
 // Phaser.Geom.Intersects.LineToLine;
 
-const {Polygon, Line, Line: {GetMidPoint}, Intersects: {LineToLine}} = Phaser.Geom;
+const {Polygon, Line, Line: {GetMidPoint}, Intersects: {LineToLine}} = Geom;
 
 // generators:
 import AnyAgainstAllOthers from "./generators/AnyAgainstAllOthers.mjs";
@@ -301,7 +302,7 @@ export default class PMStroll
         }
 
         const {x: currX, y: currY} = actor;
-        const quickVec = new Phaser.Math.Vector2();
+        const quickVec = new PhaserMath.Vector2();
 
         for (const x of SnappedCoord(currX))
         {
@@ -346,7 +347,7 @@ export default class PMStroll
     static getClosestInVismap(point, visibilityMap)
     {
         // console.log("getClosestInVismap", visibilityMap.polygons.length, visibilityMap.polygons);
-        const closestPt = new Phaser.Math.Vector2(0, 0);
+        const closestPt = new Vector2(0, 0);
         let minDistance = Number.MAX_SAFE_INTEGER;
         let wantedA = null;
         let wantedB = null;

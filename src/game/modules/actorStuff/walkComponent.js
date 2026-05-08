@@ -1,4 +1,6 @@
 import WalkEvents from "./walkEvents";
+import {Math as phaserMath} from "phaser";
+const {Vector2, GetSpeed, Angle} = phaserMath;
 
 export default class WalkComponent
 {
@@ -11,11 +13,11 @@ export default class WalkComponent
 
     highestIndex = 0;
 
-    startCoords = new Phaser.Math.Vector2();
+    startCoords = new Vector2();
 
-    endCoords = new Phaser.Math.Vector2();
+    endCoords = new Vector2();
 
-    velocity = new Phaser.Math.Vector2();
+    velocity = new Vector2();
 
     maxDistAllowed = 0;
 
@@ -88,7 +90,7 @@ export default class WalkComponent
             //     .normalize();
             
             // alternative way:
-            this.velocity.setToPolar(Phaser.Math.Angle.BetweenPoints(this.startCoords, this.endCoords), 1);
+            this.velocity.setToPolar(Angle.BetweenPoints(this.startCoords, this.endCoords), 1);
             
             if (this.destinations.length === this.highestIndex)
             {
@@ -188,7 +190,7 @@ export default class WalkComponent
 
     calcSpeed(numSpeed)
     {
-        return Phaser.Math.GetSpeed(numSpeed, 1);
+        return GetSpeed(numSpeed, 1);
     }
 
     // vaiARitroso()

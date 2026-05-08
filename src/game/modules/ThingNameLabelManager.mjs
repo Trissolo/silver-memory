@@ -1,15 +1,15 @@
 import hovernames from '../gamedata/hovernames.json';
-
+import {Geom, Math as PhaserMath} from 'phaser';
 export default class ThingNameLabelManager
 {  
     scene;
-    fakeRect = new Phaser.Geom.Rectangle();
+    fakeRect = new Geom.Rectangle();
     labelTexture;
     bitmapText;
     label;
     lastThing = null;
     hovernames = hovernames;
-    camBounds = new Phaser.Geom.Rectangle();
+    camBounds = new Geom.Rectangle();
     border = 3;
 
     constructor(scene)
@@ -75,7 +75,8 @@ export default class ThingNameLabelManager
         labelTexture
             .clear()
             .fill(0x5656a6, 1, 0, 0, fakeRect.width, fakeRect.height)
-            .draw(bitmapText, border, border, 1);
+            .draw(bitmapText, border, border, 1)
+            .render();
         
 
         this.setLabelPosition(pointer);
@@ -87,8 +88,8 @@ export default class ThingNameLabelManager
     {
         const {worldX: x, worldY: y} = pointer;
 
-        const nx = Phaser.Math.Clamp(x - (this.fakeRect.width >> 1), this.camBounds.x, this.camBounds.right - this.fakeRect.width);
-        const ny = Phaser.Math.Clamp(y + this.border, 0, this.camBounds.bottom - this.fakeRect.height);
+        const nx = PhaserMath.Clamp(x - (this.fakeRect.width >> 1), this.camBounds.x, this.camBounds.right - this.fakeRect.width);
+        const ny = PhaserMath.Clamp(y + this.border, 0, this.camBounds.bottom - this.fakeRect.height);
 
         this.label.setPosition(nx, ny);
     }
