@@ -158,6 +158,7 @@ export class Viewport extends Scene
 
     pressedC()
     {
+        // this.shield.active? this.shield.lower(): this.shield.raise();
         // console.log('Viewport: Pressed C-key', this.scene.wake('Controller'));
         // this.scene.bringToTop('Controller');
 

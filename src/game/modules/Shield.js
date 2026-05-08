@@ -1,6 +1,6 @@
 import {GameObjects} from "phaser";
 
-export default class Shield extends GameObjects.Image
+export default class Shield extends GameObjects.Stamp
 {
   constructor(scene)
   {
@@ -12,7 +12,7 @@ export default class Shield extends GameObjects.Image
         .setAlpha(0.5)
         .setDepth(1e8) //Number.MAX_SAFE_INTEGER)
         .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
-        .setScrollFactor(0)
+        // .setScrollFactor(0)
         .on("pointerdown", this.clicked)
         .setOrigin(0)
         .addToDisplayList()
