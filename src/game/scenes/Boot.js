@@ -17,7 +17,7 @@ export class Boot extends Scene
     {
         this.load.setPath('assets');
         
-        this.load.bitmapFont('bootm', 'bootnc.png', 'bootn.xml');
+        this.load.bitmapFont('bootm', 'bootnc.png', 'bootnc.xml');
     }
 
     create()
