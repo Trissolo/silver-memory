@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import { Scene, TintModes } from 'phaser';
 import RoomEvents from './RoomEvents/genericRoomEvents.js'
 import DataBaseList from '../modules/DataBaseList.mjs';
 import varsMixin from '../modules/VarManager.js';
@@ -59,10 +59,11 @@ export class Controller extends Scene
 
     prepareBase()
     {
-        this.dbsSelectionRect = this.add.image(16, 6, 'atlasbase', 'pixelA')
+        this.dbsSelectionRect = this.add.image(16, 6, 'atlasbase', 'selected_database_item')
             .setOrigin(0)
-            .setVisible(false)
-            .setScale(190, 6);
+            .setVisible(false);
+            // .setTintMode(TintModes.FILL)
+            // .setTint(0xb0b088);
 
         this.dbsList = new DataBaseList(this);
         

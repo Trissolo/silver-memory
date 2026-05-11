@@ -27,6 +27,7 @@ export default class Actor extends GameObjects.Sprite
         .setActive(false)
         .setVisible(false)
         .setOrigin(0.5, 1)
+        .setVertexRoundMode('safeAuto')
         .addToDisplayList();
 
         scene.cameras.cameras[1].ignore(this);

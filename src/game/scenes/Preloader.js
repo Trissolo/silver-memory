@@ -187,8 +187,47 @@ export class Preloader extends Scene
 
         const t =  this.textures.get('atlasbase');
 
+        console.log(`Texture 'atlasbase'`, t.getFrameNames().sort());
+        {
+            // Generate new frames (deriving from thr atlas frame 'gui_palette'), called: pixelA, pixelB..., pixelP:
+
+            // pixelA Void (Black)
+            // pixelB Nightblue
+            // pixelC Darkbrown
+            // pixelD Darkgreen
+            // pixelE Red
+            // pixelF Seablue
+            // pixelG Brown
+            // pixelH Green
+            // pixelI Meat
+            // pixelJ Skyblue
+            // pixelK Gray
+            // pixelL Orange
+            // pixelM Slimegreen
+            // pixelN Cloudblue
+            // pixelO Yellow
+            // pixelP White
+
+            const {width, cutX, cutY} = t.get('gui_palette');
+
+            console.log(width, cutX, cutY);
+            for (let i = 0; i < width; i++)
+            {
+                t.add(`pixel${String.fromCharCode(65 + i)}`, 0, cutX + i, cutY, 1, 1);
+            }
+
+            // remove 
+            t.remove('gui_palette');
+        }
+
+        {
+            // gray rectangle 190x6px
+            const {width, cutX, cutY} = t.get('gui_top_bar_15px');
+            t.add(`selected_database_item`, 0, cutX , cutY, 190, 6);
+        }
+
         //hardcoded coords: x:24, y: 5
-        t.add(`pixel${String.fromCharCode(65)}`, 0, 24, 5, 1, 1);
+        // t.add(`pixel${String.fromCharCode(65)}`, 0, 24, 5, 1, 1);
         // this.add.bitmapText(50, 50, 'font0', "ESFT£");
     }
 

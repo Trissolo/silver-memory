@@ -197,6 +197,7 @@ export class Viewport extends Scene
 
         //console.log(this.varsSetValue(28, 0));
         this.varsSummary();
+        console.dir(this.cameras.main, this.scale.baseSize);
 
     }
 
