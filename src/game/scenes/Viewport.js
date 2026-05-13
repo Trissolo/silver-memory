@@ -16,6 +16,8 @@ import TriggerZoneManager from '../modules/triggerZoneManager.mjs';
 import ThingNameLabelManager from '../modules/ThingNameLabelManager.mjs';
 import SaveGame from '../modules/savegame.mjs';
 
+import InventoryManager from '../modules/inventory/inventoryManager.mjs';
+
 export class Viewport extends Scene
 {
     roomEmitter;
@@ -40,6 +42,9 @@ export class Viewport extends Scene
     varsToggleBit;
     varsMatch;
     varsSummary;
+
+    invLayer;
+    invPlugin;
 
     constructor ()
     {
@@ -102,6 +107,10 @@ export class Viewport extends Scene
         // random preliminary stuff:
         this.input.setDefaultCursor('url("/assets/cursors/cross3.cur"), pointer');
 
+        this.invLayer = this.add.layer();
+
+        this.cameras.main.ignore(this.invLayer);
+
         //this.cameras.main.setBackgroundColor(0x00ff00);
 
         // 1) background image
@@ -136,6 +145,8 @@ export class Viewport extends Scene
         // shield
         this.shield = new Shield(this);
 
+        this.invPlugin = new InventoryManager(this);
+
         //test text
         //this.text = this.add.bitmapText(8, 8, "font0", "+[Test SomEthinG]-! .1 (Ecche)").setDepth(1e9).setOrigin(0);
 
@@ -158,6 +169,7 @@ export class Viewport extends Scene
 
     pressedC()
     {
+        this.invLayer.visible = !this.invLayer.visible;
         // this.shield.active? this.shield.lower(): this.shield.raise();
         // console.log('Viewport: Pressed C-key', this.scene.wake('Controller'));
         // this.scene.bringToTop('Controller');
