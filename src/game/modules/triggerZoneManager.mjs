@@ -17,19 +17,20 @@ export default class TriggerZoneManager
 
     get(polyParams)
     {
-        console.log("TZContainer SIZE:", this.polyChildren.size, this.children.size);
-        const zoneContainer = polyParams? this.polyChildren: this.children
+        const zoneContainer = polyParams? this.polyChildren: this.children;
+        
         for (const zone of zoneContainer)
         {
             if (!zone.active)
             {
-                // console.log("Returning existing TZone");
                 return zone;
             }
         }
 
         const zone = new TriggerZone(this.scene, polyParams);
+
         zoneContainer.add(zone);
+
         return zone;
     }
 

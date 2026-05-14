@@ -7,6 +7,7 @@ export default class Shield extends GameObjects.Stamp
     super(scene, 0, 0, 'atlasbase', 'pixelJ');
 
     const {width, height} =  scene.cameras.main; // this.scene.scale.baseSize;
+    scene.renderedRoomLayer.add(this);
 
     this
       .setScale(width, height)
@@ -15,8 +16,9 @@ export default class Shield extends GameObjects.Stamp
       .setInteractive({cursor: 'url("/assets/cursors/bubbly3.cur"), pointer'})
       .on("pointerdown", this.clicked)
       .setOrigin(0)
-      .addToDisplayList()
+      //.addToDisplayList()
       .lower();
+
 
       //console.log('Scene Scale', this.scene.scale.baseSize);
       //console.log('Main camera size', this.scene.cameras.main.width, this.scene.cameras.main.height);

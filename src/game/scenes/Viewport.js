@@ -12,6 +12,7 @@ import RoomBackground from '../modules/RoomBackground.js';
 import Shield from '../modules/Shield.js';
 import Actor from '../modules/Actor.js';
 // import RoomEvents from './RoomEvents/genericRoomEvents.js'
+import ThingSimpleGroup from '../modules/thingsSimpleGroup.mjs';
 import TriggerZoneManager from '../modules/triggerZoneManager.mjs';
 import ThingNameLabelManager from '../modules/ThingNameLabelManager.mjs';
 import SaveGame from '../modules/savegame.mjs';
@@ -35,6 +36,7 @@ export class Viewport extends Scene
     varyingDepthSprites = new Set();
     Rnd = Phaser.Math.RND
     labelManager;
+    renderedRoomLayer;
 
     // trick VScode
     varsGetValue;
@@ -109,7 +111,11 @@ export class Viewport extends Scene
 
         this.invLayer = this.add.layer();
 
+        this.renderedRoomLayer = this.add.layer();
+
         this.cameras.main.ignore(this.invLayer);
+
+        this.cameras.cameras[1].ignore(this.renderedRoomLayer);
 
         //this.cameras.main.setBackgroundColor(0x00ff00);
 
@@ -120,11 +126,11 @@ export class Viewport extends Scene
         this.roomEmitter = this.add.timeline();
         this.roomEmitter.on(Phaser.Time.Events.COMPLETE, this.userInteractionOn, this);
 
-        // 2) Room 'things'
-        this.thingsGroup = this.add.group({classType: Thing})
-
-        // 2b) Room's triggerzones
+        // 2) Room's triggerzones
         this.triggerZones = new TriggerZoneManager(this);
+        
+        // 2b) Room 'things'
+        this.thingsGroup = new ThingSimpleGroup(this); //this.add.group({classType: Thing})
 
         // 2c) container for 'things'
         this.thingsContainer = new Map();
@@ -169,7 +175,7 @@ export class Viewport extends Scene
 
     pressedC()
     {
-        this.invLayer.visible = !this.invLayer.visible;
+        this.renderedRoomLayer.visible = !this.renderedRoomLayer.visible;  //invLayer.visible = !this.invLayer.visible;
         // this.shield.active? this.shield.lower(): this.shield.raise();
         // console.log('Viewport: Pressed C-key', this.scene.wake('Controller'));
         // this.scene.bringToTop('Controller');
@@ -307,6 +313,8 @@ export class Viewport extends Scene
                     
                     roomThing.input.hitArea.setTo(...thingData.rect);
                 }
+
+                // this.renderedRoomLayer.sendToBack(roomThing);
             }
             else
             {
@@ -338,6 +346,7 @@ export class Viewport extends Scene
             else if (thingData.kind === 5)
             {
                 roomThing.setOrigin(0.5, 0.5);
+
                 this.varyingDepthSprites.add(roomThing);
             }
             else
@@ -391,14 +400,14 @@ export class Viewport extends Scene
     {
         const scene = this.scene;
 
-        console.log(`Clicked thing (${this.type})`);
+        // console.log(`Clicked thing (${this.type})`);
 
         scene.roomscript[this.thingIdx].call(scene, this, pointer);
     }
 
     onThingOver(pointer, relX, relY)
     {
-        // console.log(`Over`);
+        // console.log(`Over: ${this.depth}`);
 
         // this.scene._infoThing(this);
 

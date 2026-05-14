@@ -24,7 +24,8 @@ export default class ThingNameLabelManager
 
         this.label = scene.add.image(0, 0, 'dynat').setOrigin(0).setVisible(false).setDepth(1e9);
 
-        scene.cameras.cameras[1].ignore(this.label);
+        // scene.cameras.cameras[1].ignore(this.label);
+        scene.renderedRoomLayer.add(this.label);
     }
 
     clear()

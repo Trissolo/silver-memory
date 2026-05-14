@@ -14,7 +14,8 @@ class Thing extends GameObjects.Sprite
 
     constructor(scene, x, y)
     {
-        super(scene, x, y)
+        super(scene, x, y);
+
         this
         .setActive(false)
         .setVisible(false)
@@ -25,9 +26,11 @@ class Thing extends GameObjects.Sprite
         .on(GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
         .on(GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
         
-        .addToDisplayList();
+        //.addToDisplayList();
 
-        this.scene.cameras.cameras[1].ignore(this);
+        // this.scene.cameras.cameras[1].ignore(this);
+        scene.renderedRoomLayer.add(this);
+        
         console.log(`Thing: ${this} typeof Thing: ${typeof this}`);
     }
 

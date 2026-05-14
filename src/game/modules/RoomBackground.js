@@ -15,12 +15,14 @@ export default class RoomBackground extends GameObjects.Image
             .setOrigin(0)
             .setName("Room background")
             .setVisible(false)
-            .addToDisplayList()
+            //.addToDisplayList()
             .setInteractive({cursor: 'url("/assets/cursors/cross3.cur"), pointer', hitAreaCallback: Geom.Rectangle.Contains, hitArea: new Geom.Rectangle(0, 0, 1, 2)}
             )
             .on(Input.Events.GAMEOBJECT_POINTER_DOWN, this.clickOnBg);
         
-        scene.cameras.cameras[1].ignore(this);
+        // scene.cameras.cameras[1].ignore(this);
+        
+        scene.renderedRoomLayer.add(this);
     }
 
     hide()

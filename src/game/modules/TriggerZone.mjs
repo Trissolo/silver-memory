@@ -35,9 +35,10 @@ class TriggerZone extends GameObjects.Zone
             .on(GAMEOBJECT_POINTER_OUT, this.scene.labelManager.hideLabel, this.scene.labelManager)
             .on(GAMEOBJECT_POINTER_MOVE, this.scene.labelManager.setLabelPosition, this.scene.labelManager)
             .setSize(0, 0)
-            .addToDisplayList();
+            // .addToDisplayList();
 
-        this.scene.cameras.cameras[1].ignore(this);
+        // this.scene.cameras.cameras[1].ignore(this);
+        scene.renderedRoomLayer.add(this);
     }
 
 

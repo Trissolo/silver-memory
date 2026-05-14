@@ -7,7 +7,8 @@ export default class PMDebug
     {
         this.graphics = scene.add.graphics(0, 0);
         
-        scene.cameras.cameras[1].ignore(this.graphics);
+        // scene.cameras.cameras[1].ignore(this.graphics);
+        scene.renderedRoomLayer.add(this.graphics);
     }
 
     fillStyle(color = 0xffffff, alpha = 1)
