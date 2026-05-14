@@ -1,8 +1,18 @@
 import { Viewport } from "../../scenes/Viewport.js";
-import {Geom} from 'phaser';
+import { Geom, Math as PhaserMath, Input } from 'phaser';
+
 class InventoryManager
 {
     topGap = 4;
+    iconEdge = 26;
+    itemsPerRow = 3;
+    itemsPerCol = 4;
+    // clickGUI = new PhaserMath.Vector2();
+    currItem = null;
+    marker;
+    arrow0;
+    arrow1;
+    itemGrid;
     
 
     /**
@@ -11,85 +21,106 @@ class InventoryManager
     constructor(scene)
     {
         const [main, invCamera] = scene.cameras.cameras;
-        //const orcus = scene.add.graphics().fillStyle(0xefefef, 1);
+
         {
             const arrowSize = 13;
             const arrowX = invCamera.width - arrowSize;
             const {height} = main;
+            const {GAMEOBJECT_POINTER_DOWN, GAMEOBJECT_POINTER_OVER, GAMEOBJECT_POINTER_OUT} = Input.Events
 
             for (let i = 0; i < 2; i++)
             {
                 const arrow = scene.add.stamp(arrowX, this.topGap + invCamera.y + arrowSize * i, 'atlasbase', 'gui_inv_arrow_d')
                 .setOrigin(0)
                 .setScrollFactor(0)
-                //.setDepth(400000)
-                //.setVisible(false)
-                .setInteractive(new Geom.Rectangle(0, -height, arrowSize, arrowSize), Geom.Rectangle.Contains, false)
-                .on('pointerover', this.arrowOver)
-                .on('pointerout', this.arrowOut)
-                .on('pointerdown', this.arrowDown);
+                //.setInteractive(, , false)
+                .setInteractive({
+                        hitArea: new Geom.Rectangle(0, -height, arrowSize, arrowSize),
+                        hitAreaCallback: Geom.Rectangle.Contains,
+                        cursor: 'url("/assets/cursors/cover3.cur"), pointer'
+                    })
+                .on(GAMEOBJECT_POINTER_OVER, this.arrowOnOver)
+                .on(GAMEOBJECT_POINTER_OUT, this.arrowOnOut)
+                .on(GAMEOBJECT_POINTER_DOWN, this.arrowOnClick);
     
                 if (i)
                 {
                     arrow
-                    .setFlipY(true)
-                    .setState(i);
+                        .setFlipY(true)
+                        .setState(i);
                 }
     
-                //main.ignore(arrow);
-
                 scene.invLayer.add(arrow);
-                //orcus.fillRectShape(arrow.input.hitArea);
-                console.log(`ARROW${i}`, arrow.input.hitArea);
+
+                this[`arrow${i}`] = arrow;
             }
 
-            const edge = 26
-            const tempGrid = scene.add.grid(0, 0, edge * 5, edge * 3, edge, edge, 0x00b9f2)
+            const {iconEdge, itemsPerRow, itemsPerCol} = this;
+
+            this.itemGrid = scene.add.grid(13, 4, iconEdge * itemsPerRow, iconEdge * itemsPerCol, iconEdge, iconEdge, 0x00b9f2)
                 .setAltFillStyle(0x016fce)
                 .setStrokeStyle()
                 .setCellPadding(0)
-                .setOrigin(0);
+                .setOrigin(0)
+                .setInteractive()
+                .on(GAMEOBJECT_POINTER_DOWN, this.clickOnItem, this);
 
-                scene.invLayer.add(tempGrid);
+            this.marker = scene
+                .add.image(0, 0, 'atlasbase', 'gui_selected_item')
+                .setOrigin(0)
+                .setVisible(false);
+            
+            scene.invLayer.add([this.itemGrid, this.marker]);
         }
 
-        //main.ignore(orcus);
-        //const {x, y, scrollX, scrollY, width, height} = invCamera;
-        //const absY = invCamera.y;
-        // console.log(`INV!! ${main.name}, ${invCamera.name}`);
-        // console.log(x, y, scrollX, scrollY, width, height);
-
-        // this.arrow_up = scene.add.stamp(0, absY, 'atlasbase', 'gui_inv_arrow_d').setOrigin(0);
-        // this.arrow_down = scene.add.stamp(0, absY+this.arrow_up.height, 'atlasbase', 'gui_inv_arrow_d').setOrigin(0).setFlipY(true);
-        //const w = scene.add.stamp(0, 0, 'atlasbase', 'item_wrench').setOrigin(0);
-        // main.ignore([this.arrow_down, this.arrow_up, w]);
-        // invCamera.setBackgroundColor(0x121212);
-        // console.dir(`INV!!`, invCamera);
     }
 
-    arrowOver()
+    arrowOnOver()
     {
         this.setFrame('gui_inv_arrow_l');
     }
 
-    arrowOut()
+    arrowOnOut()
     {
         this.setFrame('gui_inv_arrow_d');
     }
-    arrowDown()
+
+    arrowOnClick()
     {
         console.log(`Arrow${this.state}`);
 
         const cam = this.scene.cameras.cameras[1];
+
+        const {iconEdge} = this.scene.invPlugin;
         
         if (this.state === 0)
         {
-            cam.scrollY = Math.max(0, cam.scrollY - 26);
+            cam.scrollY = Math.max(0, cam.scrollY - iconEdge);
         }
         else
         {
-            cam.scrollY += 26;
+            cam.scrollY += iconEdge;
         }
+    }
+
+    clickOnItem(pointer, relX, relY, event)
+    {
+        const {itemsPerCol, itemsPerRow, iconEdge} = this;
+        const {Floor: snapFloor} = PhaserMath.Snap;
+        //console.log(snapFloor(relX, iconEdge, 0, true) + snapFloor(relY, iconEdge, 0, true) * itemsPerRow);
+
+        const snappedX = snapFloor(relX, iconEdge, 0, true);
+
+        const snappedY = snapFloor(relY, iconEdge, 0, true);
+
+        console.log(`CELL: ${snappedX + snappedY * itemsPerRow}, x: ${snappedX}, y: ${snappedY}`);
+
+        this.manageItemSelection(snappedX, snappedY);
+    }
+
+    manageItemSelection(x, y)
+    {
+        this.marker.setPosition(x * this.iconEdge + this.itemGrid.x, y * this.iconEdge + this.itemGrid.y).setVisible(true);
     }
 }
 
